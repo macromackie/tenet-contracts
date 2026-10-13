@@ -1,5 +1,5 @@
 ---
-name: ownership-and-boundaries
+name: code-ownership-and-boundaries
 message: Give decisions and state one owner, with explicit dependency direction.
 ---
 
@@ -8,7 +8,10 @@ message: Give decisions and state one owner, with explicit dependency direction.
 Give each operation and durable fact one owner.
 Keep domain decisions separate from provider transport, storage, and terminal rendering.
 Pass explicit inputs and results across those boundaries.
-Use the nearest package contract to identify allowed dependencies and public entry points; callers must not reach through them into private modules.
+Use the nearest package contract to identify allowed dependencies and public entry points.
+Import another package only through a declared dependency and its public entry points, never its private modules; keep relative imports inside the owning package.
+Consume another repository only through versioned artifacts or explicitly configured endpoints, never through a sibling checkout or an untracked filesystem path.
+Keep test fixtures out of production code and builds.
 
 Prefer modules or folders for internal organization.
 Add a package for a current ownership, runtime, dependency, or reuse boundary.
@@ -26,5 +29,6 @@ Give a necessary temporary path an owner and removal condition.
 Trace an affected operation from entry point to result.
 Identify the owner of each decision and state transition.
 Inspect package manifests, public exports, and outside imports together.
+Confirm that no import resolves to another package's private module, a sibling checkout, or an untracked path, and that production builds contain no fixtures.
 Can a caller use the operation without knowing its private sequencing or repairing its result?
 Use the owning workspace's existing checks.

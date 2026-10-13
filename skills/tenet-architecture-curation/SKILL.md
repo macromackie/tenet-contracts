@@ -54,8 +54,8 @@ Reuse established patterns, or replace an inadequate convention across its affec
 runtime differences rather than forcing identical implementations.
 
 When convention changes are authorized, record concrete ownership and dependency requirements in the nearest contracts.
-Inherit shared rules instead of copying them. Keep design rationale in `.context`; neither research nor a skill silently
-establishes new repository requirements.
+Inherit shared rules instead of copying them. Keep design rationale in the repository's context notes; neither research
+nor a skill silently establishes new repository requirements.
 
 Use the optional tenet-code-curation skill for local readability and the optional tenet-test-curation skill for
 verification. Exercise the affected flow, including the relevant failure or restart path. Report what was verified;
