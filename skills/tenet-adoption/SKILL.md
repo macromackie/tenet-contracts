@@ -52,8 +52,12 @@ tenet contracts add tenet/data-and-apis --scope packages/api
 tenet check --contract data-and-apis
 ```
 
+Library names start with an area such as `api`, `code`, `security`, `ui`, or `web`. A technology word such as `react` or
+`fastapi` follows when the rules depend on it; a name without one applies to any stack. Install a technology-specific
+contract only into scopes that use that technology.
+
 `add` writes the next numbered `.contracts` folder and records it in `.tenet.lock`. A name already used in the project
-needs `--name`. Check a new contract without `--base`: no earlier revision complied with it. To record an existing copy
+needs `--name`, such as `--name web-data-and-apis` for a second scope. Check a new contract without `--base`: no earlier revision complied with it. To record an existing copy
 of a library contract, run `tenet contracts add tenet/NAME --path PATH`; its differences then count as local edits.
 
 Put local exceptions and additions under a final `## Local adaptations` heading. Edit an upstream sentence only when a
