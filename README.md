@@ -30,8 +30,10 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 | Area | Covers |
 | --- | --- |
+| `agent` | Systems that give autonomous agents tools, credentials, memory, and attributed activity. |
 | `api` | HTTP and RPC interfaces: routes, wire schemas, and generated clients. |
 | `ci` | Automated checks: reproducible inputs and what a result may be trusted for. |
+| `cli` | Command-line programs: command definitions, published references, output, and exit status. |
 | `code` | Source structure, boundaries, and comments in any language. |
 | `context` | Durable repository notes for people and agents. |
 | `contract` | Writing and maintaining adopted contracts. |
@@ -49,7 +51,15 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 73 contracts.
+The library has 87 contracts.
+
+#### agent
+
+| Contract | Requirement |
+| --- | --- |
+| `agent-activity-attribution` | Attribute activity to individual agents without letting attribution grant access or change outcomes. |
+| `agent-shared-memory` | Let one writer edit agent memory, and give readers verified immutable snapshots identified by digest. |
+| `agent-tool-authorization` | Let agents discover and call only reviewed, explicitly selected tools through one assigned backend. |
 
 #### api
 
@@ -66,6 +76,12 @@ The library has 73 contracts.
 | --- | --- |
 | `ci-check-trust` | Run complete required checks with explicit trust and no inherited cache or credential authority. |
 | `ci-reproducible-checks` | Run the same declared checks locally and in CI with pinned tools and complete inputs. |
+
+#### cli
+
+| Contract | Requirement |
+| --- | --- |
+| `cli-command-reference-generation` | Declare each command once in a model that drives both the CLI parser and its published reference. |
 
 #### code
 
@@ -102,6 +118,7 @@ The library has 73 contracts.
 | --- | --- |
 | `data-alembic-revision-history` | Keep one Alembic head, never delete or re-identify a merged revision, and undo applied work with a new revision. |
 | `data-and-apis` | Keep authoritative facts and explicit outcomes behind small, usable APIs. |
+| `data-metric-definitions` | Define each metric's cohort, window, and denominator, count each stored fact once, and show coverage gaps beside results. |
 | `data-object-upload-lifecycle` | Reserve metadata before bytes, publish only after verified storage, and delete only unreferenced objects. |
 | `data-postgres-schema-migrations` | Bound every DDL lock wait, build indexes concurrently, validate NOT VALID constraints, and read dependents from the catalog. |
 | `data-sql-schema-rollouts` | Ship schema changes that the previous release and existing rows survive, in batches an interrupted deploy resumes. |
@@ -132,6 +149,7 @@ The library has 73 contracts.
 | `llm-assessment-inputs` | Capture bounded inputs once, reject rather than truncate, and keep selected, supporting, and omitted source distinct. |
 | `llm-assessment-outcomes` | Keep pass, fail, uncertain, error, and incomplete outcomes distinct, and never let failed execution pass. |
 | `llm-code-review-evidence` | Ground automated review conclusions in cited requirements, confirmed source, and observed execution receipts. |
+| `llm-code-review-publication` | Publish automated review results against the reviewed head revision, and approve only on complete, current, clean evidence. |
 | `llm-confidence-routing` | Keep raw model answers and confidence separate from routing, and never treat confidence as calibrated correctness. |
 | `llm-request-lifecycle` | Retry transient model request failures within one owned budget, never to obtain a preferred answer. |
 | `llm-response-validation` | Accept only complete, protocol-valid model responses that match exactly what was requested. |
@@ -141,6 +159,7 @@ The library has 73 contracts.
 | Contract | Requirement |
 | --- | --- |
 | `release-artifact-provenance` | Publish only verified bytes from a successful default-branch check, without rebuilding them. |
+| `release-public-source-export` | Export only allowlisted files from a committed private revision, validated in isolation, without private context or history. |
 
 #### security
 
@@ -149,6 +168,8 @@ The library has 73 contracts.
 | `security-api-key-lifecycle` | Store issued keys as hashes bound to owner, scope, and expiry, revoke them permanently, and fail with distinct unauthenticated errors. |
 | `security-approved-external-actions` | Execute external writes only from an approved, exact, immutable request, once, and never replay uncertain outcomes. |
 | `security-cli-credential-lifecycle` | Store CLI credentials owner-only and atomically, bound to their origin, and never print them or accept them as arguments. |
+| `security-delegated-credential-vending` | Mint a capped, expiring, narrowly scoped child credential per request, return it once, and delete it when it ends. |
+| `security-inbound-webhook-verification` | Verify each webhook over its raw body, bind it to the expected source, and store it once before processing. |
 | `security-oauth-authorization-server` | Issue audience-bound tokens through PKCE, and never let a login confer authorization. |
 | `security-oauth-browser-sessions` | Keep OAuth tokens server-side behind host-only HttpOnly cookies with exact-origin checks. |
 | `security-resource-access-control` | Authorize every request on the server from current grants; logins, plain links, and caller-supplied facts grant nothing. |
@@ -182,14 +203,18 @@ The library has 73 contracts.
 | Contract | Requirement |
 | --- | --- |
 | `ui-async-read-states` | Present pending, empty, failed, and refreshing reads truthfully, without false empties, flashing loaders, or displaced content. |
+| `ui-component-usage-guidance` | Document each public component's purpose, use, alternatives, and status beside its source, and generate the catalog from it. |
 | `ui-control-accessibility` | Use semantic, named, keyboard-operable controls and managed overlays that contain, dismiss, and return focus. |
+| `ui-data-tables` | Render application-prepared rows as given, and report sorting and paging through controlled values and callbacks. |
 | `ui-design-tokens` | Name shared visual decisions as semantic tokens and expose named variants, not unrestricted style overrides. |
 | `ui-deterministic-display-values` | Render identical display values from identical inputs everywhere, with explicit locale, time zone, zero, and missing values. |
+| `ui-keyboard-shortcuts` | Register each keyboard command with its action owner, in the narrowest scope, without overriding typing or native keys. |
 | `ui-motion-lifecycle` | Keep animation interruptible, reduced-motion aware, pausable, paused when unseen, and released on removal. |
 | `ui-presentation-boundaries` | Render supplied data and report intent; leave requests, routing, identity, and domain decisions to applications. |
 | `ui-presentation-state` | Hold only ephemeral interaction state and unsaved drafts in presentation; receive application-owned state as inputs. |
 | `ui-react-interaction-ownership` | Keep each interaction's state, transitions, subscriptions, and cleanup under one component or hook. |
 | `ui-react-typescript-component-apis` | Encode supported component use in public prop types so unsupported combinations fail to compile. |
+| `ui-semantic-value-controls` | Give each value domain one control whose name states its value contract, and keep application policy outside it. |
 | `ui-storybook-component-checks` | Give every public component synthetic stories of its meaningful states and assert only consequential owned interactions. |
 | `ui-time-series-charts` | Render application-prepared series faithfully and give pointer, touch, and keyboard users the same inspected values. |
 
@@ -199,6 +224,7 @@ The library has 73 contracts.
 | --- | --- |
 | `web-access-scoping` | Authorize every server entry point; scope private client data to its session and discard it on access change. |
 | `web-development-fixtures` | Run presentation work against labeled synthetic responses without changing the production path or reaching production. |
+| `web-edge-gateway-routing` | Route exact origins and paths to configured private upstreams, keep credentials away from static and shell upstreams, and hold no authority. |
 | `web-public-page-server-rendering` | Render complete public content and real links in server HTML, and let hydration only add interaction. |
 | `web-server-state-cache` | Keep server data in one client cache, keyed by every response-changing input and scoped to the viewer. |
 | `web-url-search-state` | Validate URL search state in the destination route that owns it, and write only non-default choices. |

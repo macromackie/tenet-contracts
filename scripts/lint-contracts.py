@@ -3,7 +3,7 @@ import re
 import sys
 from pathlib import Path
 
-AREAS = {"api", "ci", "code", "context", "contract", "data", "eval", "infra", "llm", "release", "security", "service", "telemetry", "test", "ui", "web"}
+AREAS = {"agent", "api", "ci", "cli", "code", "context", "contract", "data", "eval", "infra", "llm", "release", "security", "service", "telemetry", "test", "ui", "web"}
 SUFFIX_FORMS = {"boundary": "boundaries", "api": "apis", "check": "checks", "lifecycles": "lifecycle", "ownerships": "ownership", "curations": "curation"}
 # A technology word may appear only in a contract whose name carries one of the listed words.
 TECHNOLOGIES = {

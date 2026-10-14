@@ -3,6 +3,23 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v2.1.0
+
+Two areas join the closed list: `agent`, for systems that give autonomous agents tools, credentials, memory, and
+attributed activity, and `cli`, for command-line programs. Installing contracts still needs Tenet 0.7.0 or later.
+
+### Added
+
+- 14 contracts:
+  - agent: `agent-activity-attribution`, `agent-shared-memory`, `agent-tool-authorization`.
+  - cli: `cli-command-reference-generation`.
+  - data: `data-metric-definitions`.
+  - llm: `llm-code-review-publication`.
+  - release: `release-public-source-export`.
+  - security: `security-delegated-credential-vending`, `security-inbound-webhook-verification`.
+  - ui: `ui-component-usage-guidance`, `ui-data-tables`, `ui-keyboard-shortcuts`, `ui-semantic-value-controls`.
+  - web: `web-edge-gateway-routing`.
+
 ## v2.0.0
 
 Contract names now start with an area, followed by every technology the rules depend on. A name without a technology
