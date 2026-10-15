@@ -3,6 +3,15 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v4.0.1
+
+The `tenet` skill follows Tenet 0.10.0's review loop and needs Tenet 0.10.0 or later.
+
+### Clarified
+
+- `tenet`: a failed request leaves its contract pending, and a check with a `retryable` failure is rerun; `--context`
+  accepts line ranges of a large file; changed files that no contract governs need the reviewer's own review.
+
 ## v4.0.0
 
 The `tenet` skill follows Tenet 0.9.0's review loop and needs Tenet 0.9.0 or later.

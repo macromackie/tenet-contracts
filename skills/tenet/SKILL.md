@@ -9,7 +9,7 @@ Review against the complete English contracts, including scope and exceptions. Y
 
 ## Review loop
 
-These commands need Tenet 0.9.0 or later.
+These commands need Tenet 0.10.0 or later.
 
 1. Run `tenet check --base BASE` with the actual comparison commit, or `tenet check` for the whole repository. It captures staged, unstaged, and untracked changes, asks the model, and appends a revision to `.tenet/`. The review stays on the commit `BASE` resolved to, so committing the change keeps it. After `tenet contracts add` or `update` changes a contract, check it with `tenet check --contract NAME` and no `--base`.
 2. Run `tenet status`. It lists each contract as settled or pending, suggests the most likely violation to read first, and never calls a model or writes state.
@@ -27,12 +27,12 @@ Follow responsibilities and relationships across the before and after source. Fo
 
 Use ordinary search, ast-grep, and deterministic checks where they answer the question. Before recording a failure, trace the reachable behavior and the violated clause. Read the caller, guard, transaction, or dependency semantics that could disprove it. Syntax and names alone do not establish identity, ordering, or authority. Preserve concrete defects and distinguish unavailable evidence from a demonstrated failure.
 
-Ask the model again only for a question that remains useful after inspection. `tenet check --base BASE --contract NAME --context HELPER` adds supporting source to one contract within the same review; positional paths narrow a check without replacing broader results for the same base. `--context` adds evidence without expanding the selected claim. An unchanged rerun reuses the earlier answer; `--fresh` samples the model again but adds no verification.
+Ask the model again only for a question that remains useful after inspection. `tenet check --base BASE --contract NAME --context HELPER` adds supporting source to one contract within the same review, and `--context HELPER:START-END` supplies only those lines of a large file; positional paths narrow a check without replacing broader results for the same base. `--context` adds evidence without expanding the selected claim. An unchanged rerun reuses the earlier answer; `--fresh` samples the model again but adds no verification.
 
 For external composition, `tenet export PATH --base BASE --context HELPER` exports source and contracts offline. Keep before/after references intact. Optional `ev-grep 'QUESTION' --state state.json --json` assesses one focused JSON value, limited to 64 KiB. Select the facts needed for that question; do not send an entire packet by default. Describe omissions and verify generated claims against source.
 
 ## Results
 
-`check` and `status` exit 0 when every contract is settled without a violation, 1 for a recorded failure, 2 for input or execution errors, 3 for a recorded `unresolved`, and 4 while any contract is pending, including model failures and uncertainty. Exit 0 is favorable only within the reported scope and assumptions. `violation N%` is the model's estimate, not proof; a middling value does not identify its cause. Tenet skips empty, binary, non-UTF-8, and symlinked files, and a file `judged from its patch only` or a reduced combined input had less source to read. Inspect what was left out before relying on a favorable answer. A warning that a selected path is not checked means no contract assessed it.
+`check` and `status` exit 0 when every contract is settled without a violation, 1 for a recorded failure, 2 for input or execution errors, 3 for a recorded `unresolved`, and 4 while any contract is pending, including failed requests and uncertainty. When a request failed, rerun the check if its `failure` is `retryable`; the rerun sends only the failed requests. Exit 0 is favorable only within the reported scope and assumptions. `violation N%` is the model's estimate, not proof; a middling value does not identify its cause. Tenet skips empty, binary, non-UTF-8, and symlinked files, and a file `judged from its patch only` or a reduced combined input had less source to read. Inspect what was left out before relying on a favorable answer. A warning that a selected path is not checked means no contract assessed it, and `No contract governs` lists changed files no contract covers: review those yourself.
 
 Report supported findings, source locations, consequences, and remaining gaps. Distinguish inspected code from executed checks with observed results. Markdown check commands do not execute themselves. Consult `tenet --help` for exact options.
