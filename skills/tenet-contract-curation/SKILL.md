@@ -10,6 +10,10 @@ Give each contract one reviewable concern and an identifiable violation. Inherit
 Tenet asks one question about a whole contract per file, so a clause buried in a long contract can be missed. Enforce a
 mechanical requirement, such as a required metadata field or an import rule, with a project script named under `Checks`.
 A contract can govern code, configuration, tests, or documentation; state its scope in the body.
+When it applies to only some files in its folder, such as one language's source or every `SKILL.md`, add a `paths`
+frontmatter list of globs relative to that folder, such as `paths: ["**/*.py"]`; a glob that starts with `!`, such as
+`"!**/package-lock.json"`, leaves files out. Tenet 0.9.0 or later then assesses only matching files and leaves the rest
+out of the contract's inventory.
 Write for someone reading the file without Tenet. Prefer `Rules` and `Checks`; keep exceptions and small examples inline.
 Avoid mandatory subheadings or support files unless they make this particular contract easier to follow.
 
@@ -22,13 +26,35 @@ Keep shared requirements independent of private development commands. Remove obs
 and references when changing an adopted convention. A model finding is evidence to investigate, not permission to relax a rule.
 Put behavior in prose, not just in a script. Keep production test assertions in project tests.
 
-For model-sensitive requirements, keep short examples inline. Use the project's existing eval workflow when the
-behavior needs live evaluation. Keep private rubrics and expected labels outside the inputs sent to the reviewer.
-Avoid adding a second evaluation path solely for a contract.
+Use the project's existing eval workflow when the behavior needs retained live evaluation. Keep private rubrics and
+expected labels outside the inputs sent to the reviewer. Avoid adding a second evaluation path solely for a contract.
 
 Run `tenet validate` when Tenet is available and the repository's contract checks after edits. This checks document format, not compliance.
 Use the existing eval runner for model behavior and review the code against every applicable contract.
 A model assessment guides the review; it does not replace it.
+
+## Word rules for a model reviewer
+
+A model reads each contract literally, so wording decides what it catches and what it flags by mistake.
+
+- Split a contract that mixes concerns. Separate short contracts catch more than one long contract and are easier to tune.
+- List the violation forms explicitly, such as "returning a default value, logging and continuing, or `pass`", and list what is allowed just as explicitly.
+- Phrase an allowance positively, such as "a check is allowed when the declared type includes `None`", rather than as an exception buried in a prohibition.
+- Replace vague qualifiers such as "unnecessary", "where appropriate", or "cases that never happen" with the observable condition they stand for.
+- Never write an absolute that an allowance contradicts; state the rule with its allowances.
+- Give one short allowed example and one short violation, each with its reason. An example that contradicts a rule teaches the model to ignore the rule, so update examples whenever a rule changes.
+- State every rule in visible text. The checker reads neither images nor linked pages, and hidden characters or comments reach the model but not a human reviewer.
+- Keep the evidence a rule needs in what Tenet reads. A rule that depends on a pull request description or an external system leaves the model uncertain.
+
+## Test new wording
+
+These commands need Tenet 0.8.0 or later.
+Before adopting new or reworded rules, write a few small patches against a copy of the scoped code: violations of each rule in different forms, clean changes, and a clean near miss that an allowance covers.
+Label each patch before running it, keep the labels outside the snapshot, and set a few patches aside as held-out cases that you do not look at while tuning.
+Check each patch in isolation with `tenet check --snapshot BASE --patch CASE.patch --contract NAME --json`, adding `--context PATH` for a definition the rule depends on.
+An unchanged request reuses its earlier answer, so resample borderline results with `--fresh` before drawing conclusions.
+Stop when held-out results stop improving; wording that only fixes the cases you tuned on is overfit.
+Treat these patches as development probes, and keep one in the project's eval suite only when it guards consequential behavior.
 
 ## Improve an existing set
 

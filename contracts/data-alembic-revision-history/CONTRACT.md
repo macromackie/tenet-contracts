@@ -5,16 +5,19 @@ message: Keep one Alembic head, never delete or re-identify a merged revision, a
 
 ## Rules
 
+Apply these rules to Alembic revision files and to the code that runs migrations; changes to other files do not affect them.
+A revision is merged once the default branch contains it; review each change against the branch it merges into, where every revision file that already exists is merged.
+
 Set a new revision's `down_revision` to the current head of the default branch, and keep the docstring's `Revises:` line equal to it.
 Check the head again after every rebase, and re-parent the revision onto any revision the default branch gained.
 When the default branch already has two heads, add a merge revision whose `down_revision` names both.
 Keep exactly one head on the default branch, because every path that runs `alembic upgrade head` fails while two exist.
 
 Keep every merged revision file.
-Never change a merged revision's `revision` or `down_revision`.
+Never change a merged revision's `revision` or `down_revision`, including by renaming it to a new identifier.
 Stop a merged revision from running by tombstoning it: keep the file and both identifiers, make `upgrade()` and `downgrade()` do nothing, and record why in the docstring.
 Do the corrected work in a new revision at the head, written to converge whether or not the tombstoned revision already ran.
-Never rewrite a merged revision's work in place, because databases that recorded it will not run it again.
+Never rewrite a merged revision's work in place, such as a column type, server default, index, or data statement in its `upgrade()`, because databases that recorded it will not run it again.
 
 Write `downgrade()` to reverse the schema change for local development, tests, and deliberate operator rollback.
 When `upgrade()` drops data that `downgrade()` cannot restore, restore the structure empty and name the lost data in a comment.

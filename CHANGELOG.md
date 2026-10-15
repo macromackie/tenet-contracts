@@ -3,6 +3,44 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v4.0.0
+
+The `tenet` skill follows Tenet 0.9.0's review loop and needs Tenet 0.9.0 or later.
+
+### Tightened
+
+- `tenet`: disputing a model `failed` cites a file the model flagged, and a contract the diff adds or edits stays
+  pending until recorded. The skill reads `violation N%` instead of confidence, keeps a review across commits on its
+  base, and inspects skipped files and source left out to fit the input limit before relying on a favorable answer.
+
+### Added
+
+- 5 contracts:
+  - code: `code-python-exception-propagation`, `code-python-none-guards`.
+  - context: `context-agent-instruction-files`.
+  - security: `security-interpreter-injection`.
+  - test: `test-assertion-integrity`.
+- `scripts/lint-contracts.py` rejects invisible, bidirectional, and other hidden characters and HTML comments in
+  Markdown files, and warns when a rule consists of an image or a link.
+
+### Clarified
+
+- `tenet-contract-curation` explains how to word rules for a model reviewer: one concern per contract, explicit
+  violation forms and allowances, consistent examples, and no vague qualifiers. It also shows how to test new wording
+  against labeled clean and violating patches, including held-out ones, with Tenet 0.8.0 or later.
+- `tenet-contract-curation` suggests a `paths` frontmatter list for a contract that applies to only some files in its
+  folder, such as one language's source, with `!` globs to leave files such as a lockfile out. Tenet 0.9.0 or later
+  reads `paths`.
+- `data-alembic-revision-history` states that it governs revision files and the migration runner, counts every revision
+  the target branch already holds as merged, and names renaming to a new identifier and in-place edits, such as a
+  changed column type, server default, index, or data statement, as the forms its rules forbid.
+- `code-comment-attribution` shows that a bare contract name heading a comment is an attribution, and states that a
+  behavioral comment citing an incident, issue, or design specification complies.
+- `test-curation` states that a change touching no test, fixture, test report, or test-only dependency leaves it
+  unaffected, and that removing or skipping a test, case, or assertion deletes coverage.
+- `api-fastapi-wire-schemas-and-errors` applies its purity rule to the conversion function itself; the service that
+  calls it may still call clients before or after, such as after its commit.
+
 ## v3.0.0
 
 The `tenet` skill follows Tenet 0.8.0's review loop and needs Tenet 0.8.0 or later. No contract changed; installing

@@ -10,7 +10,8 @@ Forbid unexpected fields on a request model whose shape is closed.
 Declare a response model for every route, through its return annotation or `response_model`.
 Never return a storage or ORM object, or an untyped dictionary, as an implicit response.
 Build each response from the fields the wire exposes; never dump a storage model wholesale into a response.
-Keep conversions from storage objects to response models pure: they select fields from already loaded objects and never query, commit, call clients, or generate secrets.
+Keep each conversion function, which builds a response model from storage objects, pure: it selects fields from already loaded objects and never queries, commits, calls clients, or generates secrets.
+A service operation may still call clients before or after it calls a conversion, such as calling another service after its commit.
 Reuse a shared response model when its owner already defines the wire shape, instead of copying it.
 Preserve existing field names and wire types when refactoring schemas.
 

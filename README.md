@@ -51,7 +51,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 87 contracts.
+The library has 92 contracts.
 
 #### agent
 
@@ -92,6 +92,8 @@ The library has 87 contracts.
 | `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, with explicit control flow and established patterns. |
 | `code-ownership-and-boundaries` | Give decisions and state one owner, with explicit dependency direction. |
 | `code-python-client-injection` | Construct stateful Python clients at composition roots and inject them into consumers as abstract types. |
+| `code-python-exception-propagation` | Let Python exceptions propagate; catch one only to re-raise it, translate it with its cause, retry it, or record a failed unit of work. |
+| `code-python-none-guards` | Trust non-optional Python annotations, and check for None only where the checked value's type includes None. |
 | `code-rust-source-structure` | Keep Rust entry points thin, alternatives as enums, and errors typed and propagated with context, never unwrapped in production. |
 | `code-rust-workspace-checks` | Enforce rustfmt and deny-warnings Clippy, share dependencies and lints through the workspace, and commit Cargo.lock. |
 | `code-typescript-compiler-strictness` | Type-check every TypeScript package under strict compiler settings that no file relaxes. |
@@ -104,6 +106,7 @@ The library has 87 contracts.
 
 | Contract | Requirement |
 | --- | --- |
+| `context-agent-instruction-files` | Keep agent instruction files visible, accurate, and consistent, and change them with the code they describe. |
 | `context-note-curation` | Keep context notes useful beyond a task, with dated, sourced evidence and execution tracking in the task tracker. |
 
 #### contract
@@ -170,6 +173,7 @@ The library has 87 contracts.
 | `security-cli-credential-lifecycle` | Store CLI credentials owner-only and atomically, bound to their origin, and never print them or accept them as arguments. |
 | `security-delegated-credential-vending` | Mint a capped, expiring, narrowly scoped child credential per request, return it once, and delete it when it ends. |
 | `security-inbound-webhook-verification` | Verify each webhook over its raw body, bind it to the expected source, and store it once before processing. |
+| `security-interpreter-injection` | Pass untrusted input to interpreters only as bound data, never as code, commands, query text, templates, or type-constructing serialized objects. |
 | `security-oauth-authorization-server` | Issue audience-bound tokens through PKCE, and never let a login confer authorization. |
 | `security-oauth-browser-sessions` | Keep OAuth tokens server-side behind host-only HttpOnly cookies with exact-origin checks. |
 | `security-resource-access-control` | Authorize every request on the server from current grants; logins, plain links, and caller-supplied facts grant nothing. |
@@ -196,6 +200,7 @@ The library has 87 contracts.
 
 | Contract | Requirement |
 | --- | --- |
+| `test-assertion-integrity` | Change code to satisfy its tests; never weaken a test to match new behavior or special-case test inputs in production code. |
 | `test-curation` | Treat development tests as disposable and commit only checks that guard consequential regressions. |
 
 #### ui
