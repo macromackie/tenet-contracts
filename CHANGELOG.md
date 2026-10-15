@@ -3,6 +3,17 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v3.0.0
+
+The `tenet` skill follows Tenet 0.8.0's review loop and needs Tenet 0.8.0 or later. No contract changed; installing
+contracts still needs Tenet 0.7.0 or later.
+
+### Tightened
+
+- `tenet`: a review now ends only when `tenet status` stops exiting 4. Each pending contract is settled with
+  `tenet record`, citing current lines; a review that only investigated findings no longer completes it. The skill
+  reads contracts with `tenet show` and exports with `tenet export`, which replaces `tenet evidence`.
+
 ## v2.1.0
 
 Two areas join the closed list: `agent`, for systems that give autonomous agents tools, credentials, memory, and
