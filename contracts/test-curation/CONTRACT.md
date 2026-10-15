@@ -6,6 +6,7 @@ message: Treat development tests as disposable and commit only checks that guard
 ## Rules
 
 Apply this contract to added, changed, and removed tests, fixtures, and test-only dependencies; adopting it does not require deleting an existing suite wholesale.
+A change that touches no test, fixture, test report, or test-only dependency leaves this contract unaffected.
 Test freely during development with temporary tests, probes, broad cases, and manual checks, and treat their results as development evidence.
 Remove exploratory tests, probes, fixtures, and test-only dependencies from a change before merging unless a retained check uses them.
 Passing locally or catching the original bug does not by itself justify keeping a test.
@@ -23,6 +24,7 @@ Keep distinct concerns in separate cases; do not merge unrelated scenarios to re
 Treat sampled or model-graded scores as measurements, not exact expected values.
 Do not set coverage-percentage targets, test-count targets, or test-count gates.
 
+Removing or skipping a test, case, or assertion deletes the coverage it provided.
 Delete existing coverage only for a stated duplicate, a superseded requirement, or behavior explicitly accepted as development-only verification, and name the protection that remains.
 Never loosen or delete a check to hide a regression; difficulty, slowness, or an unfavorable result is not a reason to remove it.
 

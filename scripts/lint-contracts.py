@@ -1,6 +1,7 @@
-"""Check library contract names, layout, and technology words: python3 scripts/lint-contracts.py [ROOT]."""
+"""Check library contract names, layout, technology words, and hidden text: python3 scripts/lint-contracts.py [ROOT]."""
 import re
 import sys
+import unicodedata
 from pathlib import Path
 
 AREAS = {"agent", "api", "ci", "cli", "code", "context", "contract", "data", "eval", "infra", "llm", "release", "security", "service", "telemetry", "test", "ui", "web"}
@@ -24,9 +25,19 @@ TOOLS = r"ev-grep|Next\.js|Node\.js|TanStack|StyleX|Tailwind|Kubernetes|Docker|G
 KEBAB = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
 FRONTMATTER = re.compile(r"^---\nname: (?P<name>.+)\nmessage: (?P<message>.+)\n---\n\n## Rules\n\n(?P<rules>.+?)\n\n## Checks\n\n(?P<checks>.+?)\n\Z", re.S)
 TWO_SENTENCES = re.compile(r"(?<!\be\.g)(?<!\bi\.e)(?<!\bvs)[.!?] +[A-Z`]")
+LINK = re.compile(r"!?\[[^\]]*\]\([^)]*\)|<img\b[^>]*>|https?://\S+")
 
 root = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
 errors = []
+warnings = []
+# A model reads the raw text, while a reviewer of rendered Markdown sees neither hidden characters nor comments.
+for path in sorted(root.rglob("*.md")):
+    for number, line in enumerate(path.read_text().split("\n"), 1):
+        hidden = [ch for ch in line if unicodedata.category(ch) in {"Cc", "Cf", "Co", "Zl", "Zp"} or "VARIATION SELECTOR" in unicodedata.name(ch, "")]
+        if hidden:
+            errors.append(f"{path.relative_to(root)}:{number}: remove hidden character U+{ord(hidden[0]):04X} {unicodedata.name(hidden[0], 'UNNAMED')}")
+        if "<!--" in line:
+            errors.append(f"{path.relative_to(root)}:{number}: remove the HTML comment; rendered views hide it")
 names = [path.parent.name for path in sorted((root / "contracts").glob("*/CONTRACT.md"))]
 for name in names:
     path = root / "contracts" / name / "CONTRACT.md"
@@ -56,6 +67,11 @@ for name in names:
             continue
         if TWO_SENTENCES.search(line.rstrip()):
             errors.append(f"{name}:{number}: write one sentence per line")
+    for line in document["rules"].splitlines():
+        if re.search(r"!\[|<img", line) or (LINK.search(line) and len(re.findall(r"[A-Za-z]+", LINK.sub("", line))) < 4):
+            warnings.append(f"warning: {name}: state this rule in text; the checker reads neither images nor linked pages: {line}")
+for warning in warnings:
+    print(warning, file=sys.stderr)
 if errors:
     sys.exit("\n".join(errors))
 print(f"{len(names)} contract names and layouts valid")
