@@ -51,7 +51,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 92 contracts.
+The library has 93 contracts.
 
 #### agent
 
@@ -88,6 +88,7 @@ The library has 92 contracts.
 | Contract | Requirement |
 | --- | --- |
 | `code-comment-attribution` | Explain source behavior without attributing it to repository contracts or review tools. |
+| `code-domain-vocabulary` | Name each domain concept with its one glossary word in code, output, documentation, and interface text, and never with a word it replaced. |
 | `code-execution-lifecycle` | Bound work and preserve authoritative results through failure and interruption. |
 | `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, with explicit control flow and established patterns. |
 | `code-ownership-and-boundaries` | Give decisions and state one owner, with explicit dependency direction. |

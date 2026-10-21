@@ -3,6 +3,14 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v4.1.0
+
+### Added
+
+- Contract `code-domain-vocabulary`: a declared glossary gives each domain concept one word, which identifiers,
+  comments, output, documentation, and interface text use instead of the words it replaced, and the lint denies each
+  replaced word that has no ordinary sense as an identifier.
+
 ## v4.0.1
 
 The `tenet` skill follows Tenet 0.10.0's review loop and needs Tenet 0.10.0 or later.
