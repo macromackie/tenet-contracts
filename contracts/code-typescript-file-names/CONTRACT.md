@@ -12,6 +12,7 @@ Use a role suffix only when the file's contents match that role.
 Do not use a catch-all role suffix such as `.utils`, `.helpers`, `.common`, or `.misc`; name the behavior in the file stem instead.
 
 Match a file's stem to its primary export, changing only the case, so `invoice-card.ts` exports `InvoiceCard` or `invoiceCard`.
+A file that an entry point re-exports under a namespace matches its stem to that namespace instead, such as `uuid.ts` for `Uuid`.
 A role file that the repository declares, such as `types.ts`, `constants.ts`, or `schemas.ts` inside a module's folder, takes the role as its whole stem instead of a dotted suffix and may hold many exports of that role.
 Give a test or example file the full stem of its subject, including the subject's role suffix.
 Keep a subject's implementation, test, and example files side by side with matching stems.

@@ -17,6 +17,7 @@ Keep a type that several modules share in the types file of the module that owns
 
 When a module holds declarations of several roles, make it a folder named for the module with one file per role, such as `invoice-import/schemas`, `invoice-import/types`, and `invoice-import/parse-lines`.
 Put independent operations of a behavior module, such as building a command and parsing its output, in separate files of that folder.
+A file that an entry point re-exports under one namespace named for the file may hold several operations on the concept that the namespace names, such as generating and validating one identifier format.
 Declare a maximum source file length in lines, and enforce it with the repository's lint.
 Exempt generated files from these rules by a declared path pattern.
 

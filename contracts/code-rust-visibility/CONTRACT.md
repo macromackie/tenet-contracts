@@ -11,6 +11,7 @@ Make checks fail on the `unreachable_pub` lint in every crate, through `[workspa
 An item that the crate root does not export is `pub(crate)`, `pub(in ...)`, `pub(super)`, or private, except a child module, which `code-rust-module-boundaries` keeps private, and a field, whose visibility `code-rust-type-ownership` sets.
 Give such an item the narrowest of these visibilities that reaches every module using it, such as `pub(super)` for an item of `orders/pricing.rs` that only code inside `orders` uses, and never `pub`, even inside a private module, so leave the Clippy `redundant_pub_crate` lint off.
 A type that an exported item's signature uses counts as used by that item's consumers, so the crate root may export it although no other crate names it.
+A link in a doc comment is not a use of the item it names, so never widen an item's visibility only so that a doc comment can link to it.
 
 Violation: a library's crate root re-exports `DEFAULT_SOURCE` with `pub use`, and only its own `lock` module reads it.
 Allowed: a library's crate root exports a `Routing` type that no other crate names, because an exported function returns it.
