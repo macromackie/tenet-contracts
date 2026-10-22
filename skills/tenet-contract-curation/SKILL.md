@@ -38,10 +38,12 @@ A model assessment guides the review; it does not replace it.
 A model reads each contract literally, so wording decides what it catches and what it flags by mistake.
 
 - Split a contract that mixes concerns. Separate short contracts catch more than one long contract and are easier to tune.
+- Never write a catch-all rule, such as "follow the established conventions", that every other contract's violation also breaks. Give each convention its own rule.
 - List the violation forms explicitly, such as "returning a default value, logging and continuing, or `pass`", and list what is allowed just as explicitly.
 - Phrase an allowance positively, such as "a check is allowed when the declared type includes `None`", rather than as an exception buried in a prohibition.
 - Replace vague qualifiers such as "unnecessary", "where appropriate", or "cases that never happen" with the observable condition they stand for.
 - Never write an absolute that an allowance contradicts; state the rule with its allowances.
+- When an allowed form resembles a forbidden one, say plainly that the allowed form is not the forbidden one. A change that uses both is harder for the model to judge.
 - Give one short allowed example and one short violation, each with its reason. An example that contradicts a rule teaches the model to ignore the rule, so update examples whenever a rule changes.
 - State every rule in visible text. The checker reads neither images nor linked pages, and hidden characters or comments reach the model but not a human reviewer.
 - Keep the evidence a rule needs in what Tenet reads. A rule that depends on a pull request description or an external system leaves the model uncertain.
@@ -51,6 +53,9 @@ A model reads each contract literally, so wording decides what it catches and wh
 These commands need Tenet 0.8.0 or later.
 Before adopting new or reworded rules, write a few small patches against a copy of the scoped code: violations of each rule in different forms, clean changes, and a clean near miss that an allowance covers.
 Label each patch before running it, keep the labels outside the snapshot, and set a few patches aside as held-out cases that you do not look at while tuning.
+Before the first model check, give a small model only the contract text and the unlabeled patches in shuffled order, and compare its labels with yours.
+A disagreement points to an ambiguous rule or to a requirement that two contracts both state.
+Ask another model for a change that obeys each rule's letter but breaks its intent, and for one that breaks the letter but a reviewer would accept, and close each gap in the wording.
 Check each patch in isolation with `tenet check --snapshot BASE --patch CASE.patch --contract NAME --json`, adding `--context PATH` for a definition the rule depends on.
 An unchanged request reuses its earlier answer, so resample borderline results with `--fresh` before drawing conclusions.
 Stop when held-out results stop improving; wording that only fixes the cases you tuned on is overfit.
@@ -68,6 +73,6 @@ Work on one concrete concern, such as who owns retries or whether incomplete gra
 4. Fix the code, or clarify an authorized convention change and its affected implementation. Preserve inherited obligations. Merge duplicate rules and remove obsolete requirements deliberately; never weaken a rule solely to obtain a favorable score.
 5. Rerun the affected checks on stable inputs. Keep a representative failure and valid case in the existing eval suite when model behavior warrants it. Stop when the concrete concern is resolved and remaining uncertainty is explained, rather than retrying until every model answer is green.
 
-Use a contract-maintenance meta-contract when ongoing curation needs durable rules: scope, inheritance, identifiable violations, and a useful verification path. Keep commands in the owning project and check references beside the rules. Avoid quotas for file size, package count, or number of contracts.
+Use a contract-maintenance meta-contract when ongoing curation needs durable rules: scope, inheritance, identifiable violations, and a useful verification path. Keep commands in the owning project and check references beside the rules. Avoid quotas for package count or number of contracts.
 
 Record material findings and coverage limits in the project's normal review notes. Selected-file checks and ev-grep searches do not establish whole-repository compliance. Contract documents themselves may be excluded from assessment inputs: inspect their content directly as well as validating their format.

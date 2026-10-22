@@ -3,6 +3,55 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v5.0.0
+
+This release adds the `docs` area: documentation that people read, such as READMEs, guides, and reference pages.
+
+### Tightened
+
+- `code-typescript-function-arguments`: every owned function, method, constructor, and owned callback that takes input
+  takes one destructured object argument, including a single input or a domain object, such as `parse({ line })` and
+  `total({ invoice })`. Signatures that a language, runtime, framework, or dependency defines stay exempt, and so
+  does a function that forwards a wrapped function's arguments unchanged.
+- `code-module-structure-and-control-flow` names every function, type, and file, exported or not, and every stored
+  or wire value for what it stands for, never with a generic word alone such as `data`, `item`, `handler`, or
+  `script`. It also gives each concern to the contract that owns it:
+  - A shared utilities module that `code-shared-utilities` defines is not a catch-all module, so `utils` leaves the
+    banned names, and only helpers that depend on their module's domain stay private to it.
+  - A file named for a declared role, such as `types`, may take the role as its name.
+  - State that one module owns and changes only through its own functions, such as a cache, is not ambient state.
+  - Type placement moves to `code-module-file-roles`, and blank lines between phases move to `code-blank-lines`.
+  - The rule to follow the area's established conventions is removed: it matched every other convention contract's
+    violations, and one file does not show which convention an area follows. The rule on established libraries
+    forbids only hand-written parsing, validation, and provider integration that a maintained library provides.
+
+- `code-rust-source-structure`: a library crate carries each expected failure as a variant of a typed error `enum`
+  until code handles it, and only a binary crate uses an opaque error type, such as `anyhow::Error`.
+
+### Loosened
+
+- `code-typescript-file-names`: a declared role file, such as `types.ts`, `constants.ts`, or `schemas.ts` inside a
+  module's folder, takes the role as its whole stem and may hold many exports of that role.
+
+### Added
+
+- 12 contracts:
+  - code: `code-blank-lines`, `code-closed-value-sets`, `code-conditional-expressions`, `code-function-size`,
+    `code-module-file-roles`, `code-shared-utilities`, `code-typescript-effect-errors`,
+    `code-typescript-effect-schemas`, `code-typescript-named-types`.
+  - data: `data-record-identifiers`.
+  - docs: `docs-prose-style`, `docs-readme-structure`.
+
+### Clarified
+
+- `tenet-contract-curation` no longer advises against a file size limit, since `code-module-file-roles` asks for a
+  declared maximum file length enforced by lint. It warns against catch-all rules and allowed forms that resemble
+  forbidden ones, and adds two checks before the first model run: a small model labels the patches from the contract
+  text alone, and another writes changes that obey a rule's letter but break its intent.
+- `tenet-code-curation` defers to installed contracts for file and function length, file roles, argument shapes,
+  conditionals, and closed value sets. Its TypeScript example uses ordinary branches over declared members and passes
+  dependencies as named fields, and a package exports only what another package imports.
+
 ## v4.1.0
 
 ### Added

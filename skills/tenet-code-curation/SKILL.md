@@ -35,8 +35,8 @@ several forwarding helpers? Remove dead paths, stale comments, redundant wrapper
 Keep one execution path and consistent names, layout, error handling, and package commands across the affected area.
 Inspect nearby implementations before introducing a new pattern; reuse the convention or update its affected callers.
 
-Review large files for mixed responsibilities. Size is a signal to inspect ownership, not a reason to scatter a
-cohesive lifecycle. Keep trivial glue inline. Choose visibility deliberately; a new helper need not become public.
+Review large files for mixed responsibilities. Split a file along its responsibilities, never through the middle of
+one lifecycle, and follow the file and function length limits and the file roles that installed contracts declare. Keep trivial glue inline. Choose visibility deliberately; a new helper need not become public.
 
 Update contracts when this task authorizes changing conventions. Put concrete ownership and dependency rules at the
 narrowest useful scope, inherit shared rules, and update affected callers, READMEs, exports, and indexes together.
