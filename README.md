@@ -38,6 +38,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 | `context` | Durable repository notes for people and agents. |
 | `contract` | Writing and maintaining adopted contracts. |
 | `data` | Stored data, schemas, migrations, and object storage. |
+| `docs` | Documentation that people read: READMEs, guides, and reference pages. |
 | `eval` | Evaluating a system against curated cases. |
 | `infra` | Provisioned infrastructure and its state. |
 | `llm` | Systems that send requests to language models and act on the answers. |
@@ -51,7 +52,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 93 contracts.
+The library has 105 contracts.
 
 #### agent
 
@@ -87,20 +88,29 @@ The library has 93 contracts.
 
 | Contract | Requirement |
 | --- | --- |
+| `code-blank-lines` | Separate a block's logical phases, and each control-flow statement inside it, from neighboring code with one blank line. |
+| `code-closed-value-sets` | Declare each closed set of values once and refer to its members by name, never by repeating their literal values. |
 | `code-comment-attribution` | Explain source behavior without attributing it to repository contracts or review tools. |
+| `code-conditional-expressions` | Choose between values with statements, lookups, or pattern matching, never with a conditional operator. |
 | `code-domain-vocabulary` | Name each domain concept with its one glossary word in code, output, documentation, and interface text, and never with a word it replaced. |
 | `code-execution-lifecycle` | Bound work and preserve authoritative results through failure and interruption. |
-| `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, with explicit control flow and established patterns. |
+| `code-function-size` | Keep every function within lint-enforced length, nesting, and callback limits, and give each case of a branch on a closed set its own function. |
+| `code-module-file-roles` | Give each source file one declared role, keep types in a sibling types file, and turn a module with several roles into a folder. |
+| `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, with explicit inputs, results, and control flow. |
 | `code-ownership-and-boundaries` | Give decisions and state one owner, with explicit dependency direction. |
 | `code-python-client-injection` | Construct stateful Python clients at composition roots and inject them into consumers as abstract types. |
 | `code-python-exception-propagation` | Let Python exceptions propagate; catch one only to re-raise it, translate it with its cause, retry it, or record a failed unit of work. |
 | `code-python-none-guards` | Trust non-optional Python annotations, and check for None only where the checked value's type includes None. |
 | `code-rust-source-structure` | Keep Rust entry points thin, alternatives as enums, and errors typed and propagated with context, never unwrapped in production. |
 | `code-rust-workspace-checks` | Enforce rustfmt and deny-warnings Clippy, share dependencies and lints through the workspace, and commit Cargo.lock. |
+| `code-shared-utilities` | Keep domain-free helpers in the application's one shared utilities module, one per file, and use the declared utility library first. |
 | `code-typescript-compiler-strictness` | Type-check every TypeScript package under strict compiler settings that no file relaxes. |
+| `code-typescript-effect-errors` | Carry each expected TypeScript failure as a tagged error in an Effect's error type until code handles it by tag, and throw or die only for broken invariants. |
+| `code-typescript-effect-schemas` | Decode every value that crosses a TypeScript boundary with an Effect Schema, and derive its type from that schema. |
 | `code-typescript-file-names` | Use kebab-case source paths with dotted role suffixes; preserve tool-required names. |
-| `code-typescript-function-arguments` | Use one named object argument for multiple, boolean, or optional inputs; keep externally defined signatures. |
+| `code-typescript-function-arguments` | Give every owned TypeScript function that takes input one destructured object argument; keep externally defined signatures. |
 | `code-typescript-module-boundaries` | Share code across source folders only through each folder's explicit named-export entry point. |
+| `code-typescript-named-types` | Give every TypeScript object type a name instead of writing an object type literal inline. |
 | `code-typescript-package-boundaries` | Consume TypeScript packages only through declared dependencies and explicitly exported entry points. |
 
 #### context
@@ -125,8 +135,16 @@ The library has 93 contracts.
 | `data-metric-definitions` | Define each metric's cohort, window, and denominator, count each stored fact once, and show coverage gaps beside results. |
 | `data-object-upload-lifecycle` | Reserve metadata before bytes, publish only after verified storage, and delete only unreferenced objects. |
 | `data-postgres-schema-migrations` | Bound every DDL lock wait, build indexes concurrently, validate NOT VALID constraints, and read dependents from the catalog. |
+| `data-record-identifiers` | Give each new record a random UUID, derive an id only where a retry or rebuild must reproduce it, build each derived kind in one named function, and never parse an id. |
 | `data-sql-schema-rollouts` | Ship schema changes that the previous release and existing rows survive, in batches an interrupted deploy resumes. |
 | `data-stored-and-shipped-formats` | Migrate every stored instance and keep what released clients read before narrowing a stored or shipped format. |
+
+#### docs
+
+| Contract | Requirement |
+| --- | --- |
+| `docs-prose-style` | Write documentation in short, direct sentences that lead with what the reader does or needs. |
+| `docs-readme-structure` | Open each README with what the project is and how to start, link out for depth, and keep status and history out. |
 
 #### eval
 

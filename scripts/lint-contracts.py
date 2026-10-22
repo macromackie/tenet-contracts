@@ -4,12 +4,13 @@ import sys
 import unicodedata
 from pathlib import Path
 
-AREAS = {"agent", "api", "ci", "cli", "code", "context", "contract", "data", "eval", "infra", "llm", "release", "security", "service", "telemetry", "test", "ui", "web"}
+AREAS = {"agent", "api", "ci", "cli", "code", "context", "contract", "data", "docs", "eval", "infra", "llm", "release", "security", "service", "telemetry", "test", "ui", "web"}
 SUFFIX_FORMS = {"boundary": "boundaries", "api": "apis", "check": "checks", "lifecycles": "lifecycle", "ownerships": "ownership", "curations": "curation"}
 # A technology word may appear only in a contract whose name carries one of the listed words.
 TECHNOLOGIES = {
     r"React|JSX|use(?:Effect|State|Memo|Callback|Ref)\b": {"react"},
     r"TypeScript|tsconfig": {"typescript"},
+    r"Effect Schema": {"effect"},
     r"Python|Pydantic|SQLAlchemy": {"python", "fastapi", "alembic"},
     r"FastAPI": {"fastapi"},
     r"Alembic": {"alembic"},
