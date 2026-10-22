@@ -20,6 +20,7 @@ A snapshot that a public source export writes into its destination follows `rele
 A value that a declared dependency already exports, such as a validation pattern or a bound, follows `code-shared-definitions`.
 
 Violation: a second repository copies the first repository's export tool and edits the private-name list inside the copy.
+Violation: a consumer appends rules about itself to its copy of shared agent guidance and replaces the lock entry's hash while its revision stays the same.
 Allowed: both repositories run the export tool from the first repository's release, and each keeps its private-name list in its own settings file.
 
 ## Checks

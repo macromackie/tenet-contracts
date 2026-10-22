@@ -17,6 +17,7 @@ Keep functions that other modules import out of an executable file, so that no f
 Enforce these rules with the repository's lint over every executable file, declared by path pattern, and suppress a finding only as `code-lint-suppressions` allows.
 
 Violation: `check-orders` creates its temporary directory, starts the server, and runs forty checks inside one top-level `try` block.
+Violation: a command parses its arguments into a top-level constant so that several functions can read the options.
 Allowed: `check-orders` ends with `await main()`, and `main` starts the environment, runs each scenario function, and stops the environment.
 
 ## Checks

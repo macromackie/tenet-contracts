@@ -3,6 +3,33 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v7.0.0
+
+### Tightened
+
+- `code-export-consumers`: in a language that marks which names another file may import, a name never starts with an
+  underscore to mark it private, except a binding, parameter, or field that the code never reads.
+- `code-typescript-entry-points`: an entry point may re-export a file under the PascalCase form of its stem, such as
+  `export * as Uuid from './uuid.ts'`, whose names leave out the namespace's word; an exported object that code uses
+  only to call its functions by fixed names is banned, while one that code indexes with a computed key, passes as an
+  implementation of an interface type, or receives from a factory whose functions close over dependencies stays
+  allowed.
+
+### Loosened
+
+- `code-module-file-roles`: a file that an entry point re-exports under one namespace may hold several operations on
+  the concept that the namespace names.
+- `code-typescript-file-names`: a file that an entry point re-exports under a namespace matches its stem to that
+  namespace instead of to a primary export.
+- `code-typescript-module-boundaries`: a namespace re-export is allowed in an entry point, as
+  `code-typescript-entry-points` allows.
+
+### Clarified
+
+- `code-cross-repository-copies`: re-locking an edited copy under the same revision is a violation example.
+- `code-rust-visibility`: a doc-comment link is not a use, so it never justifies a wider visibility.
+- `code-script-entry-points`: parsing arguments into a top-level constant is a violation example.
+
 ## v6.0.0
 
 ### Tightened

@@ -7,7 +7,7 @@ message: Share code across source folders only through each folder's explicit na
 
 Give each source folder that other folders import an entry point, `index.ts` unless a tool requires another file name.
 Export every value and type the folder shares by name from that entry point.
-Do not use default exports, wildcard re-exports, or namespace re-exports in source folders, except where a tool defines the export format.
+Do not use default exports or wildcard re-exports in source folders, except where a tool defines the export format, and write a namespace re-export only in an entry point, as `code-typescript-entry-points` allows.
 Export a symbol from a folder's entry point only when production code outside the folder uses it.
 
 Import another folder only through its entry point, including type-only imports, re-exports, and dynamic imports.
