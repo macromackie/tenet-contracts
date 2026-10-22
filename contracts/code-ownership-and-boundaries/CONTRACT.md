@@ -8,7 +8,7 @@ message: Give decisions and state one owner, with explicit dependency direction.
 Give each operation and durable fact one owner.
 Keep domain decisions separate from provider transport, storage, and terminal rendering.
 Pass explicit inputs and results across those boundaries.
-Use the nearest package contract to identify allowed dependencies and public entry points.
+Identify allowed dependencies from the declaration that `code-dependency-boundaries` requires, and public entry points from the nearest package contract.
 Import another package only through a declared dependency and its public entry points, never its private modules; keep relative imports inside the owning package.
 Consume another repository only through versioned artifacts or explicitly configured endpoints, never through a sibling checkout or an untracked filesystem path.
 Keep test fixtures out of production code and builds.

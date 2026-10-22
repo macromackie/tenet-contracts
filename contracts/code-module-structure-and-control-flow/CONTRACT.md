@@ -10,7 +10,7 @@ Name modules for the behavior or resource they own.
 Name each function, type, and file, whether exported or not, and each stored or wire value, for the behavior or concept it stands for, never with a generic word alone such as `data`, `info`, `item`, `manager`, `handler`, or `script`.
 A declared file role, such as `types` or `constants`, is not a generic name for a file that holds that role.
 Do not create catch-all modules, such as `helpers`, `common`, or `misc`, that mix code of unrelated concerns.
-A shared utilities module that holds only domain-free functions, one per file, as `code-shared-utilities` defines, is not a catch-all module.
+A shared utilities module that holds only domain-free functions, one per file, as `code-shared-utilities` defines, and a test support folder that holds one helper or fixture per file, as `test-support-modules` defines, are not catch-all modules.
 Create a module only when it has an actual responsibility; do not add placeholder files.
 Split a module when the split reduces the context needed to understand a change, and keep cohesive code together when splitting would obscure its invariants.
 Keep a helper that depends on its module's domain private to that module until another caller needs it.
@@ -18,9 +18,9 @@ Keep a helper that depends on its module's domain private to that module until a
 Extract a helper only when it names a real concept, collapses real duplication, or isolates an independent operation, never just to shorten a block.
 
 Pass inputs and return results explicitly instead of relying on hidden side effects or ambient mutable state.
-State that one module owns and changes only through its own functions, such as a cache, is not ambient state.
+State that one object or closure owns and changes only through its own functions, such as a cache field, is not ambient state.
 Name intermediate values when nested calls hide the sequence.
-Name values for what they hold, and include the unit in the name of a limit or duration whose type does not carry it.
+Name values for what they hold.
 
 Never write by hand the parsing, validation, or provider integration that a maintained library provides; call the library and use its types.
 

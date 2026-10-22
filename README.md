@@ -52,7 +52,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 105 contracts.
+The library has 139 contracts.
 
 #### agent
 
@@ -83,35 +83,65 @@ The library has 105 contracts.
 | Contract | Requirement |
 | --- | --- |
 | `cli-command-reference-generation` | Declare each command once in a model that drives both the CLI parser and its published reference. |
+| `cli-output-channels` | Write a command-line program's result to standard output and every other line to standard error through one output module, and end the process only from its entry point with a declared exit status. |
 
 #### code
 
 | Contract | Requirement |
 | --- | --- |
 | `code-blank-lines` | Separate a block's logical phases, and each control-flow statement inside it, from neighboring code with one blank line. |
+| `code-boolean-names` | Start every owned boolean's name with a declared predicate or option prefix that lint enforces, and keep an external boolean name only in the mapping that decodes it. |
 | `code-closed-value-sets` | Declare each closed set of values once and refer to its members by name, never by repeating their literal values. |
 | `code-comment-attribution` | Explain source behavior without attributing it to repository contracts or review tools. |
+| `code-comment-content` | Write comments that state what the code cannot show, never what it already says, what it used to do, or a shape that a declaration could carry. |
+| `code-comment-form` | Commit no task markers, commented-out code, or empty doc comments, and give doc comments and file summaries one lint-enforced layout. |
 | `code-conditional-expressions` | Choose between values with statements, lookups, or pattern matching, never with a conditional operator. |
+| `code-cross-repository-copies` | Keep each file that several repositories use in one source repository, and consume it from a release or as a locked copy whose hash checks verify. |
+| `code-dependency-boundaries` | Declare which packages each package may depend on once, in configuration that checks enforce, and keep that declaration acyclic and exact. |
+| `code-diagnostic-messages` | Write each diagnostic as one clause that names the failed operation and its input, without a trailing period. |
 | `code-domain-vocabulary` | Name each domain concept with its one glossary word in code, output, documentation, and interface text, and never with a word it replaced. |
+| `code-duplicated-blocks` | Fail checks on every copied block that the repository's copy detector reports, and remove the copy by calling one declaration. |
+| `code-environment-settings` | Read a program's environment only in its settings module, decode it once there, and pass decoded settings to the code that needs them. |
 | `code-execution-lifecycle` | Bound work and preserve authoritative results through failure and interruption. |
+| `code-exhaustive-branches` | Branch on a closed set that the repository declares by naming every member, never through a default or wildcard case, so that a new member fails the lint. |
+| `code-export-consumers` | Give every export, source file, and dependency a production consumer, and let the repository's dead-code check prove it. |
+| `code-folder-size` | Keep every source folder within lint-enforced limits on its file count and depth, and name and justify each exempt folder in the lint configuration. |
 | `code-function-size` | Keep every function within lint-enforced length, nesting, and callback limits, and give each case of a branch on a closed set its own function. |
+| `code-guard-clauses` | Leave a block early with a guard instead of nesting its remaining work, and never write an `else` after a branch that leaves. |
+| `code-lint-suppressions` | Suppress a lint or check finding only at the one site it reports, with the rule's name and a reason, and fail checks on every suppression that suppresses nothing. |
+| `code-measured-value-names` | End the name of every numeric limit, duration, and bound with a declared unit, counted noun, or unitless measure that the repository's lint enforces. |
 | `code-module-file-roles` | Give each source file one declared role, keep types in a sibling types file, and turn a module with several roles into a folder. |
 | `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, with explicit inputs, results, and control flow. |
 | `code-ownership-and-boundaries` | Give decisions and state one owner, with explicit dependency direction. |
 | `code-python-client-injection` | Construct stateful Python clients at composition roots and inject them into consumers as abstract types. |
 | `code-python-exception-propagation` | Let Python exceptions propagate; catch one only to re-raise it, translate it with its cause, retry it, or record a failed unit of work. |
 | `code-python-none-guards` | Trust non-optional Python annotations, and check for None only where the checked value's type includes None. |
+| `code-rust-doc-comment-coverage` | Give every public item of a Rust library crate a doc comment, and fail checks when one is missing. |
+| `code-rust-module-boundaries` | Keep a Rust crate's top-level modules acyclic and its child modules private. |
+| `code-rust-module-files` | Declare each Rust module that has child modules in a file named for it beside its folder, never in a mod.rs file under src. |
+| `code-rust-numeric-conversions` | Convert Rust numbers with From and TryFrom instead of as, and declare each limit, count, or size in the type its consumers take. |
 | `code-rust-source-structure` | Keep Rust entry points thin, alternatives as enums, and errors typed and propagated with context, never unwrapped in production. |
+| `code-rust-type-ownership` | Give each Rust type at most one impl block per file, make its fields all private or all public, give each shared counter its own type, and declare no global mutable state. |
+| `code-rust-visibility` | Give every Rust item the narrowest visibility its users need, and fail checks on a public item that the crate root does not export. |
 | `code-rust-workspace-checks` | Enforce rustfmt and deny-warnings Clippy, share dependencies and lints through the workspace, and commit Cargo.lock. |
+| `code-script-entry-points` | Keep the top level of every file the repository executes directly to declarations and one statement that runs its main program. |
+| `code-shared-definitions` | Declare each pattern, bound, and derivation that several modules must agree on once, and import it everywhere else. |
 | `code-shared-utilities` | Keep domain-free helpers in the application's one shared utilities module, one per file, and use the declared utility library first. |
+| `code-spelled-out-names` | Spell out every word of every declared name, with a repository word list and a one-character ban that lint enforces in every language. |
+| `code-typescript-class-declarations` | Declare a TypeScript class only where a runtime or library requires one, write every other unit that holds dependencies or state as a factory function, and give each class field a readonly private name. |
 | `code-typescript-compiler-strictness` | Type-check every TypeScript package under strict compiler settings that no file relaxes. |
+| `code-typescript-const-bindings` | Declare TypeScript variables with `const`, give every `let` its first value where it is declared, and choose a value with a function rather than by assigning in each branch. |
 | `code-typescript-effect-errors` | Carry each expected TypeScript failure as a tagged error in an Effect's error type until code handles it by tag, and throw or die only for broken invariants. |
 | `code-typescript-effect-schemas` | Decode every value that crosses a TypeScript boundary with an Effect Schema, and derive its type from that schema. |
+| `code-typescript-entry-points` | Keep each TypeScript entry point a list of named re-exports from the files that declare them, re-export from no other file, and never add a file named after a sibling folder. |
 | `code-typescript-file-names` | Use kebab-case source paths with dotted role suffixes; preserve tool-required names. |
 | `code-typescript-function-arguments` | Give every owned TypeScript function that takes input one destructured object argument; keep externally defined signatures. |
-| `code-typescript-module-boundaries` | Share code across source folders only through each folder's explicit named-export entry point. |
+| `code-typescript-input-immutability` | Never change a value that a TypeScript function received as a parameter or sort an array in place, and return a new value instead. |
+| `code-typescript-module-boundaries` | Share code across source folders only through each folder's explicit named-export entry point, and keep imports between files acyclic, type-only and dynamic imports included. |
+| `code-typescript-module-state` | Keep no TypeScript state at module level or in a static class field that changes after the module loads, hold each cache in the object or closure that owns it, and give module constants read-only types. |
 | `code-typescript-named-types` | Give every TypeScript object type a name instead of writing an object type literal inline. |
 | `code-typescript-package-boundaries` | Consume TypeScript packages only through declared dependencies and explicitly exported entry points. |
+| `code-typescript-type-assertions` | Narrow TypeScript values with checks the compiler follows, never with type assertions, non-null assertions, return-only type parameters, or the any type. |
 
 #### context
 
@@ -137,6 +167,8 @@ The library has 105 contracts.
 | `data-postgres-schema-migrations` | Bound every DDL lock wait, build indexes concurrently, validate NOT VALID constraints, and read dependents from the catalog. |
 | `data-record-identifiers` | Give each new record a random UUID, derive an id only where a retry or rebuild must reproduce it, build each derived kind in one named function, and never parse an id. |
 | `data-sql-schema-rollouts` | Ship schema changes that the previous release and existing rows survive, in batches an interrupted deploy resumes. |
+| `data-sql-store-boundaries` | Write SQL text and database client calls only in the database owner's store module, each statement once and whole, and never expose the client. |
+| `data-store-ownership` | Give each owner of persisted data one store module that alone names, parses, reads, and writes it, behind functions named for records and changes. |
 | `data-stored-and-shipped-formats` | Migrate every stored instance and keep what released clients read before narrowing a stored or shipped format. |
 
 #### docs
@@ -221,6 +253,8 @@ The library has 105 contracts.
 | --- | --- |
 | `test-assertion-integrity` | Change code to satisfy its tests; never weaken a test to match new behavior or special-case test inputs in production code. |
 | `test-curation` | Treat development tests as disposable and commit only checks that guard consequential regressions. |
+| `test-scenario-functions` | Give each scenario of an end-to-end check its own function named for the one guarantee it protects, and name every reported check without a sequence marker. |
+| `test-support-modules` | Declare each test helper and fixture once, in its family's file of the package's test support folder, and never copy it into another test file. |
 
 #### ui
 

@@ -7,7 +7,8 @@ message: Enforce rustfmt and deny-warnings Clippy, share dependencies and lints 
 
 Format all Rust code with rustfmt, and fail checks on unformatted code.
 Run Clippy on every workspace member and target with warnings denied.
-Scope each lint suppression to the smallest item that needs it, and state why in a `reason = "..."` argument or an adjacent comment.
+Suppress a Clippy or compiler lint only as `code-lint-suppressions` allows, with an outer `#[expect(lint, reason = "...")]` attribute on the smallest item or statement that silences it, never with `#[allow]` or an inner attribute that covers a whole module.
+Deny `clippy::allow_attributes`, `clippy::allow_attributes_without_reason`, and the compiler's `unfulfilled_lint_expectations` lint in `[workspace.lints]`.
 Pin the Rust toolchain in `rust-toolchain.toml`, including the rustfmt and Clippy components.
 
 Declare shared lint levels once in `[workspace.lints]`, and set `lints.workspace = true` in every member crate.
