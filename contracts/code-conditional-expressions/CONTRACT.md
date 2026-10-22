@@ -6,7 +6,7 @@ message: Choose between values with statements, lookups, or pattern matching, ne
 ## Rules
 
 Never write a conditional operator expression, such as `ready ? total : 0` or `total if ready else 0`, whether it is nested or not and whether it spans one line or several.
-Choose a value with an `if` statement that assigns or returns it, a lookup table keyed by a closed set of values, a `switch` or `match` statement, or a function that names the choice, such as `Math.min`.
+Choose a value with an `if` statement, a lookup table keyed by a closed set of values, a `switch` or `match` statement, or a function that names the choice, such as `Math.min`.
 Fill a lookup table only with values or functions, never with calls that run when the table is built.
 A null-coalescing default, such as `name ?? 'anonymous'`, is not a conditional operator and is allowed.
 Do not imitate a conditional operator with logical operators, such as `ready && total || 0`.

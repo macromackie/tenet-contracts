@@ -11,7 +11,6 @@ Never give an owned function a positional parameter, whether it is exported or p
 Destructure the object argument in the signature.
 
 Export an options type beyond its module's folder only when another module needs to name it.
-Name each boolean field for the behavior it enables, such as `includeArchived`, never a generic `flag` or `mode`.
 Use a discriminated union when combinations of options would otherwise allow invalid states.
 Keep required fields required; do not add defaults that hide missing caller input.
 Give a callback that owned code defines and calls a single object argument as well.

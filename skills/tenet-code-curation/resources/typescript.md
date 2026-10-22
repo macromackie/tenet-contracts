@@ -1,21 +1,24 @@
 # TypeScript
 
-Installed contracts decide argument shapes, conditional expressions, and closed value sets. These examples follow the
-library's `code-typescript-function-arguments`, `code-conditional-expressions`, and `code-closed-value-sets`.
+Installed contracts decide argument shapes, conditional expressions, bindings, and closed value sets. These examples
+follow the library's `code-typescript-function-arguments`, `code-conditional-expressions`,
+`code-typescript-const-bindings`, and `code-closed-value-sets`.
 
-Make lifecycle decisions visible. Write a decision that accompanies state changes as ordinary branches, and compare
-against the declared members of a closed set:
+Make lifecycle decisions visible. Write a decision as ordinary branches in a function that returns a declared member of
+a closed set, and build the new state from its result rather than changing the input:
 
 ```ts
-if (job.reviewed) {
-  job.progress.stage = JobStage.Judging;
-} else if (job.submission) {
-  job.progress.stage = JobStage.Reviewing;
-} else {
-  job.progress.stage = JobStage.Preparing;
+function nextStage({ job }: NextStageInput): JobStage {
+  if (job.isReviewed) {
+    return JobStage.Judging;
+  }
+  if (job.hasSubmission) {
+    return JobStage.Reviewing;
+  }
+  return JobStage.Preparing;
 }
 
-job.progress.lastEvent = Date.now();
+const progress = { stage: nextStage({ job }), lastEventAtMs: Date.now() };
 ```
 
 Keep transport and environment lookup at composition boundaries. Pass the dependencies a function actually needs as

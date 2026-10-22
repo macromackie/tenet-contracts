@@ -6,7 +6,7 @@ message: Give each source file one declared role, keep types in a sibling types 
 ## Rules
 
 Declare the file roles the repository uses, such as types, constants, schemas, and behavior, and the file name that marks each role, such as `types` or `constants`.
-Give each source file one role: a types file declares only types, a constants file only named constants, a schema file only validation schemas, and a behavior file only functions, classes, and the module state they own, such as a cache.
+Give each source file one role: a types file declares only types, a constants file only named constants, a schema file only validation schemas, and a behavior file only functions and classes.
 Put a module's type declarations in a types file in the same folder as the code that uses them.
 Put a module's named constants, such as limits, default values, and fixed lists, in a constants file in the same folder.
 Keep functions out of a constants file, including functions stored as values in a named object or list.

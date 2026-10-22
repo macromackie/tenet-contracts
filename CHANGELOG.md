@@ -3,6 +3,55 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v6.0.0
+
+### Tightened
+
+- `code-module-file-roles`: a behavior file holds only functions and classes; a cache lives in the object or closure
+  that owns it, as `code-typescript-module-state` requires.
+- `code-module-structure-and-control-flow`: only state that one object or closure owns is exempt from the ambient-state
+  rule. The unit clause moves to `code-measured-value-names`, and a test support folder that `test-support-modules`
+  defines is not a catch-all module.
+- `code-ownership-and-boundaries`: allowed dependencies come from the declaration that `code-dependency-boundaries`
+  requires.
+- `code-rust-workspace-checks`: suppress a lint only with an outer `#[expect(lint, reason = "...")]`, and deny
+  `clippy::allow_attributes`, `clippy::allow_attributes_without_reason`, and `unfulfilled_lint_expectations`.
+- `code-typescript-module-boundaries`: imports between files stay acyclic, type-only and dynamic imports included; a
+  nested folder's outside API goes through its parent's entry point; a dependency check that resolves imports to files
+  enforces both.
+
+### Loosened
+
+- `code-function-size`: its suppression rules move to `code-lint-suppressions`.
+- `code-shared-utilities`: a domain-free helper that only tests call lives in the test support folder.
+- `code-typescript-function-arguments`: boolean naming moves to `code-boolean-names`.
+- `code-typescript-package-boundaries`: which symbols an entry point exports moves to `code-export-consumers`, and a new
+  entry point needs a consumer that `code-export-consumers` accepts, such as the tests of a test support package.
+
+### Added
+
+- 34 contracts:
+  - cli: `cli-output-channels`.
+  - code: `code-boolean-names`, `code-comment-content`, `code-comment-form`, `code-cross-repository-copies`,
+    `code-dependency-boundaries`, `code-diagnostic-messages`, `code-duplicated-blocks`, `code-environment-settings`,
+    `code-exhaustive-branches`, `code-export-consumers`, `code-folder-size`, `code-guard-clauses`,
+    `code-lint-suppressions`, `code-measured-value-names`, `code-rust-doc-comment-coverage`,
+    `code-rust-module-boundaries`, `code-rust-module-files`, `code-rust-numeric-conversions`,
+    `code-rust-type-ownership`, `code-rust-visibility`, `code-script-entry-points`, `code-shared-definitions`,
+    `code-spelled-out-names`, `code-typescript-class-declarations`, `code-typescript-const-bindings`,
+    `code-typescript-entry-points`, `code-typescript-input-immutability`, `code-typescript-module-state`,
+    `code-typescript-type-assertions`.
+  - data: `data-sql-store-boundaries`, `data-store-ownership`.
+  - test: `test-scenario-functions`, `test-support-modules`.
+
+### Clarified
+
+- `code-conditional-expressions`: an `if` statement chooses a value without the rule saying it assigns one.
+- `code-typescript-effect-schemas`: the assertion rule moves to `code-typescript-type-assertions`; decoding every
+  boundary value still forbids reading an asserted one.
+- `tenet-code-curation`: the TypeScript example chooses a stage in a function that returns it and leaves the job
+  unchanged, as `code-typescript-const-bindings` and `code-typescript-input-immutability` require.
+
 ## v5.0.0
 
 This release adds the `docs` area: documentation that people read, such as READMEs, guides, and reference pages.
