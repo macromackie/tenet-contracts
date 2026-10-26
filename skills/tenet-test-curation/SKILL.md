@@ -1,6 +1,7 @@
 ---
 name: tenet-test-curation
 description: Write, review, or slim tests and evals, especially before committing a feature or refactor.
+license: MIT
 ---
 
 # Test curation
@@ -47,7 +48,7 @@ do not assert exact confidence, retry until green, or trim difficult cases to im
 
 ## Examples
 
-- [Rust](resources/rust.md): assert decisions and protocol behavior without locking down presentation.
-- [TypeScript](resources/typescript.md): test completed UI behavior and asynchronous ownership.
+- [Rust](references/rust.md): assert decisions and protocol behavior without locking down presentation.
+- [TypeScript](references/typescript.md): test completed UI behavior and asynchronous ownership.
 
 Run the checks required by the repository instructions. Explain removed coverage and any accepted limitation.

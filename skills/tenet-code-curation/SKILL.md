@@ -1,6 +1,7 @@
 ---
 name: tenet-code-curation
 description: Refactor or review implementation for clear ownership, focused modules, and consistent conventions during development and before committing.
+license: MIT
 ---
 
 # Code curation
@@ -62,4 +63,4 @@ for changes to model behavior or claims that need them. No additional agent or e
 Ask what became easier to understand and what can now be removed. Scope this pass to affected behavior; an unchanged
 document needs no edit. These are review prompts, not required reports, deletion quotas, or complexity scores.
 
-Read [Rust](resources/rust.md) or [TypeScript](resources/typescript.md) for language-specific examples.
+Read [Rust](references/rust.md) or [TypeScript](references/typescript.md) for language-specific examples.

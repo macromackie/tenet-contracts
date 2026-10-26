@@ -3,6 +3,51 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v8.0.0
+
+Tenet 0.11.0 adds `tenet skills`, which installs a skill folder into `.agents/skills/` and locks every file in
+`.tenet.lock`. The `tenet-adoption` skill uses it and needs Tenet 0.11.0 or later. Installing contracts still needs
+Tenet 0.7.0 or later, because no contract ships assets yet. Once `.tenet.lock` records a skill or contract assets,
+every `tenet contracts` command and `tenet validate` in that project need Tenet 0.11.0 or later.
+
+The curation skills' `resources/` folders are now `references/`, the Agent Skills folder name. Before recording an
+installed copy with `tenet skills add tenet/NAME --path PATH`, run `git mv PATH/resources PATH/references` and update
+its links, so its local edits still merge.
+
+### Tightened
+
+- `library-contract-format`: a contract folder holds nothing but `CONTRACT.md` and tool configuration and data files
+  under `assets/<tool>/`, where any other file was allowed before. A contract that ships assets declares
+  `requires-tenet` with the minimum Tenet that installs them, 0.11.0 or later, and the frontmatter now allows that key.
+- `library-skill-portability`: a library skill's frontmatter holds only the Agent Skills fields `name`, `description`,
+  `license`, `compatibility`, `metadata`, and `allowed-tools`. Its `name` uses lowercase letters, digits, and single
+  hyphens, at most 64 characters, its `description` is one line of at most 1024 characters, and any `compatibility`
+  is one line of at most 500 characters. Each skill folder carries the library license as `LICENSE.txt`, which may
+  name its copyright holder, and keeps documents in `references/`, code in `scripts/`, and data files in `assets/`.
+- `tenet-adoption`: install, update, and remove skills with `tenet skills`, and commit a `.claude/skills/NAME` symlink
+  to each one for Claude Code. Edit only an installed skill's Markdown and leave installed contract assets as released.
+  The adoption record keeps only decisions, because `.tenet.lock` holds sources, revisions, and hashes.
+
+### Loosened
+
+- `code-cross-repository-copies`: an installed skill's documents, like an installed contract's, follow the installer's
+  lock and may carry local edits. Any other file that a contract or skill installer locks, such as a lint configuration
+  shipped with a contract, is a permitted locked copy, which the repository's own configuration extends.
+- `library-contract-generality`: a contract whose name carries no tool may ship `assets/<tool>/` files that configure
+  any tool to enforce its stated rules, while its text still names no tool.
+
+### Added
+
+- `scripts/lint-contracts.py` checks skill frontmatter fields, names, descriptions, and compatibility notes. It also
+  refuses any file in a contract folder other than `CONTRACT.md` and `assets/<tool>/` files, and requires
+  `requires-tenet: 0.11.0` or later in a contract that ships assets.
+
+### Clarified
+
+- `tenet`, `tenet-architecture-curation`, `tenet-code-curation`, `tenet-contract-curation`, and `tenet-test-curation`:
+  each skill folder carries the library's MIT license as `LICENSE.txt` and declares `license: MIT`. The three curation
+  skills keep their examples in `references/` instead of `resources/`.
+
 ## v7.0.0
 
 ### Tightened

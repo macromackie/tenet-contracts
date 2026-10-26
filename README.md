@@ -290,9 +290,19 @@ The library has 139 contracts.
 
 ## Skills
 
-Start with `tenet` for CLI usage, `tenet-adoption` for adoption and updates, or one of the curation skills. Ask an agent
-to adopt them with `tenet-adoption`, or use a skill installer such as
-`npx skills add macromackie/tenet-contracts --skill tenet-adoption`.
+Start with `tenet` for CLI usage, `tenet-adoption` for adoption and updates, or one of the curation skills. Install one
+with Tenet 0.11.0 or later:
+
+```sh
+tenet skills add tenet/tenet-adoption
+```
+
+Tenet copies the folder to `.agents/skills/tenet-adoption/` and locks each file in `.tenet.lock`. Edit its Markdown
+freely; `tenet skills update` merges later releases three ways. Leave its other files as released. Claude Code reads
+only `.claude/skills/`, so commit a symlink such as `.claude/skills/tenet-adoption` pointing to
+`../../.agents/skills/tenet-adoption`. Each skill folder carries the MIT license as `LICENSE.txt`. Once
+`.tenet.lock` records a skill, every `tenet contracts` command and `tenet validate` in that project need Tenet 0.11.0
+or later.
 
 ## Contributing
 

@@ -1,6 +1,7 @@
 ---
 name: tenet
 description: Use Tenet to discover repository contracts, assess code and changes, and record a conclusion for each contract. Use when reviewing code governed by .contracts or working with the Tenet CLI.
+license: MIT
 ---
 
 # Tenet
