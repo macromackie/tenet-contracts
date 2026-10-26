@@ -12,6 +12,7 @@ Derive validation schemas, lookup tables, and lists of the set's values from tha
 The declaration itself holds each literal value once, and a stored or wire value keeps its literal there.
 A migration keeps the literal values it wrote, because it must not change when the set changes.
 A comparison against a value that the language or a protocol defines, such as the result of a type-of operator or an HTTP status code, is allowed.
+An error's tag, which its error class declares once, is allowed as a literal in a tag comparison or a tag handler's argument when the type checker rejects a tag outside the error type.
 Give an open set of values, such as configured model or region identifiers that change without a code change, a named type instead of a closed declaration.
 Declare a closed set for the members of an open set that code branches on, such as the models that need special handling.
 

@@ -57,9 +57,9 @@ embed a different command. Retain justified domain-specific adaptations.
 
 ## Adopt contracts
 
-Shared contracts need Tenet 0.7.0 or later. Once `.tenet.lock` records a skill or contract assets, every
-`tenet contracts` command and `tenet validate` need Tenet 0.11.0 or later. Inspect the scoped implementation first,
-then install the contract into the scope it should govern:
+Shared contracts need Tenet 0.7.0 or later, or 0.11.0 or later for a contract that ships files under `assets/`. Once
+`.tenet.lock` records a skill or contract assets, every `tenet contracts` command and `tenet validate` need Tenet 0.11.0
+or later. Inspect the scoped implementation first, then install the contract into the scope it should govern:
 
 ```sh
 tenet contracts add tenet/data-and-apis --scope packages/api

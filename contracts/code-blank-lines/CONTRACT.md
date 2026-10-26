@@ -1,6 +1,7 @@
 ---
 name: code-blank-lines
 message: Separate a block's logical phases, and each control-flow statement inside it, from neighboring code with one blank line.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -13,6 +14,7 @@ A jump statement, such as `return`, `throw`, `break`, or `continue`, is not a co
 Treat `else`, `catch`, and `finally` clauses and the cases of a `switch` or `match` as parts of their statement, which take no blank lines between them.
 Put a comment that describes a statement directly above it, and put the blank line above the comment.
 Configure the repository's formatter or lint to enforce this spacing wherever a tool supports it.
+Where the repository's lint can load the configuration in this contract's `assets/` folder, extend it from the repository's own lint configuration.
 
 Violation: `const order = decode({ raw });` is directly followed by `if (order === undefined) {`.
 Allowed: `const order = decode({ raw });`, then a blank line, the `if` statement, another blank line, and `return order;`.

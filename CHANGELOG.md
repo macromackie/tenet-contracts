@@ -3,6 +3,98 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v9.0.0
+
+`code-blank-lines`, `code-function-size`, and `code-typescript-node-scripts` ship tool configuration under `assets/`,
+so installing or updating them needs Tenet 0.11.0 or later. Every other contract still installs with Tenet 0.7.0 or
+later. The Release workflow now validates every contract with Tenet 0.11.0.
+
+### Tightened
+
+- `code-blank-lines`: the contract ships `assets/oxlint/oxlintrc.json` and declares `requires-tenet: 0.11.0`. Where the
+  repository's lint can load that file, extend it from the repository's own lint configuration. The file loads
+  `@stylistic/eslint-plugin` through oxlint's `jsPlugins` and configures `padding-line-between-statements`. It requires
+  a blank line before each `if`, `for`, `while`, `do`, `switch`, and `try` statement that is not first in its block and
+  after each one that is not last, and forbids a blank line between switch cases. It was checked with oxlint 1.80.0 and
+  1.89.0 and `@stylistic/eslint-plugin` 5.10.0. Pin oxlint and the plugin to exact versions, as `ci-reproducible-checks`
+  requires, because oxlint documents JS plugins as alpha and not subject to semver. Install the plugin in the package
+  that holds the `.contracts` folder or in one above it, because oxlint resolves it from the installed file's folder,
+  then run `oxlint --fix` once. Review still covers logical phases, comment placement, and Python and Rust code.
+- `code-function-size`: declare a maximum complexity per function, in a measure the repository's lint computes, for each
+  language the repository lints, and enforce it on the same functions as the length, nesting, and callback limits. A
+  language may go without a complexity limit only when the repository declares that language and the reason beside its
+  limits. The contract ships `assets/oxlint/oxlintrc.json`, which loads `eslint-plugin-sonarjs` through oxlint's
+  `jsPlugins` and sets cognitive complexity to 15; a repository's lint configuration may extend that file and override
+  its limit. It was checked with oxlint 1.80.0 and 1.89.0 and `eslint-plugin-sonarjs` 4.2.2. Pin oxlint and the plugin
+  to exact versions, as `ci-reproducible-checks` requires, because oxlint documents JS plugins as alpha and not subject
+  to semver. Install the plugin in the package that holds the `.contracts` folder or in one above it, because oxlint
+  resolves it from the installed file's folder. The contract declares `requires-tenet: 0.11.0`.
+- `code-module-structure-and-control-flow`: a generic stored or wire name or value that another system fixes, or that a
+  released format keeps as `data-stored-and-shipped-formats` requires, appears only in the mapping that reads or writes
+  it, such as a serializer rename that decodes an order's `item` field into `lineItem`, or an enumeration member
+  `LineItem` whose value is `'item'`. Owned code that reads such a name directly, such as a provider's `item` field
+  outside its decoder, complied before and now goes through that mapping. A released generic name that the repository
+  chose, which violated the naming rule before, may now stay in its mapping. Owned fields, types, and members still take
+  a name for their concept. A new check asks whether each such name appears only in that mapping.
+- `test-curation`: temporary tests, probes, fixtures, and test-only dependencies stay out of every commit, including
+  intermediate commits and commits pushed only to run CI, unless a retained check uses them; before, they only had to
+  be gone before merging. Its check now inspects each commit, not only the complete diff. Its message and rules now
+  also allow committing the declared example tests of `test-example-suite`, which need no guarded regression to be
+  retained and no reason or remaining protection to be deleted; its rule against hiding a regression still covers them.
+  A declared example limit is exempt from its ban on test-count targets and gates.
+- `ui-storybook-component-checks`: an explicit tag or list selects the stories that run as tests, so adding a story
+  adds no test until it is selected. Storybook's default gives every story the `test` tag, which the test run
+  includes, so that setup no longer complies. Set `tags: ['!test']` in the preview, then add `test` or another
+  selecting tag to each chosen story.
+
+### Loosened
+
+- `code-closed-value-sets`: an error's tag, which its error class declares once, may be written as a literal in a tag
+  comparison or as a tag handler's argument when the type checker rejects a tag outside the error type.
+
+### Added
+
+- Contract `code-mise-script-tasks`: make every repository script, such as a check, a code generator, a smoke run, or a
+  release step, a mise file task in the `mise-tasks/` folder of the root or package that owns it. Helper modules that
+  only tasks use go in `mise-tasks/lib/` without the executable bit. Only the bootstrap that installs mise and one-line
+  shims may live elsewhere. A TOML task may only run one command of one tool, group tasks through `depends`, or define
+  or extend a template. Every CI step that runs repository work calls `mise run`.
+- Contract `code-python-uv-scripts`: run Python repository scripts with `uv run --script`, starting from
+  `#!/usr/bin/env -S uv run --script`. Give each one a PEP 723 block that lists its dependencies, even an empty list,
+  so it never runs in the surrounding project's environment.
+- Contract `code-typescript-node-scripts`: write repository scripts as `.mts` files that a pinned Node with default type
+  stripping runs from `#!/usr/bin/env node`, with no loader, TypeScript runner, or process helper dependency. Imports
+  name the real file. The compiler checks every script folder under `nodenext`, `erasableSyntaxOnly`,
+  `verbatimModuleSyntax`, `allowImportingTsExtensions`, and `noEmit`. The contract ships those options as
+  `assets/typescript/tsconfig.json`, so it needs Tenet 0.11.0 or later.
+- Contract `test-example-suite`: keep, for the whole repository, at most a declared, fixed number of example tests of
+  each kind for each test runner command that CI invokes, counting a command that CI invokes once per package as one, at
+  a declared path marker, and never let that number grow with packages, modules, or features. Each example is a new
+  file, never cut from an existing test, with one case and one assertion of a literal value or stable error code, and no
+  loop, table, parameterized rows, generator, asserting helper, or second instantiation from build configuration. It
+  calls a stable public entry point, imports helpers only from the test support folder, and opens with a header that
+  states its kind, when to copy it, and the command that runs a copy. An isolated example starts no child process, opens
+  no socket, and touches no disk outside a temporary folder; a local-dependency example starts one local dependency
+  through a support fixture; a test that runs the product's own entry point is end-to-end and never an example. An
+  example never guards a regression or counts as the protection that remains, and is replaced only while it passes, in a
+  change that touches no other file. Each temporary test for a runner and kind that has an example starts as a renamed
+  copy of that example in a declared scratch folder that version control ignores and the runner collects. Its Allowed
+  example declares one isolated and one local-dependency example per runner command.
+- `scripts/lint-contracts.py` allows `mise`, `Node`, and `uv` only in a contract whose name carries `mise`, `node`, or
+  `uv`; before, it refused `mise` and `Node.js` in every contract and did not check `Node` or `uv`. It skips a
+  backticked library contract name, such as `code-mise-script-tasks`, so any contract may name another.
+
+### Clarified
+
+- `code-typescript-effect-errors`: a `_tag` comparison or a tag handler's argument, such as
+  `Effect.catchTag('RefundRefused', ...)`, may write the tag as a literal, as `code-closed-value-sets` allows, because
+  the compiler rejects a tag outside the Effect's error type.
+- `data-stored-and-shipped-formats`: renaming an owned field or member while its mapping keeps the stored or shipped
+  name is not a narrowing; `code-module-structure-and-control-flow` requires that mapping for a generic name.
+- `tenet-adoption`: a contract that ships files under `assets/` needs Tenet 0.11.0 or later to install.
+- `tenet-test-curation`: a declared example test needs no named consequential failure before committing, as
+  `test-example-suite` allows.
+
 ## v8.0.0
 
 Tenet 0.11.0 adds `tenet skills`, which installs a skill folder into `.agents/skills/` and locks every file in

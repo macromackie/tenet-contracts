@@ -1,0 +1,6 @@
+{
+  "jsPlugins": ["eslint-plugin-sonarjs"],
+  "rules": {
+    "sonarjs/cognitive-complexity": ["error", 15]
+  }
+}

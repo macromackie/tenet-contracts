@@ -8,6 +8,7 @@ message: Migrate every stored instance and keep what released clients read befor
 Apply these rules to persisted data, including records in every status, stored documents and snapshots, durable workflow histories, and serialized objects, and to released clients, including published command-line tools, packages, and deployed images.
 Treat as a narrowing any change that makes a reader reject a shape still in storage, such as removing or renaming a field, making a field required, narrowing a literal or enumeration, tightening a bound, forbidding extra keys, changing a default, or adding a rejecting validator.
 Treat adding an optional field whose default means what old instances meant, or loosening a constraint, as a widening that needs no migration.
+Renaming an owned field or member while its mapping keeps the stored or shipped name, as `code-module-structure-and-control-flow` requires for a generic name, is not a narrowing.
 
 Before shipping a narrower reader, migrate every stored instance to the new shape, covering records in every status, including completed and failed ones.
 Size each migration for production volume rather than loading every instance into application memory; see `data-sql-schema-rollouts` for resumable batched backfills.

@@ -15,6 +15,7 @@ Render stories from fixed synthetic data, without application providers, live se
 Build Storybook with the same compiler and styling configuration as the application.
 
 Add a `play` function only for a primary owned interaction or a distinct consequential failure that existing coverage would miss.
+Select the stories that run as tests with an explicit tag or list rather than a default every story receives, so adding a story adds no test until it is selected.
 Assert outcomes through accessible roles, visible state, and callback payloads.
 Do not assert style classes, incidental markup, or each intermediate step of an interaction.
 Let composition-only wrappers rely on their children's coverage.
@@ -26,5 +27,6 @@ Do not treat a passing story as proof of application wiring, authorization, or r
 Compare exported components with story files and confirm each has a story.
 Build the Storybook catalog without application services.
 Run the interaction tests for changed `play` functions locally, and confirm the selected stories actually execute.
+Add a story that no tag or list selects, and confirm the test run does not execute it.
 Review each new `play` function against `test-curation`: does it guard a consequential, owned interaction?
 Inspect changed stories in every supported theme, at a narrow viewport, and with the keyboard.

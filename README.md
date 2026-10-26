@@ -5,7 +5,8 @@ Markdown contracts. A contract becomes a requirement only when a project install
 
 ## Contracts
 
-Install a contract into the scope it governs with Tenet 0.7.0 or later:
+Install a contract into the scope it governs with Tenet 0.7.0 or later, or 0.11.0 or later for a contract that ships
+tool files under `assets/`:
 
 ```sh
 tenet contracts add tenet/data-and-apis --scope packages/api
@@ -52,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 139 contracts.
+The library has 143 contracts.
 
 #### agent
 
@@ -106,16 +107,18 @@ The library has 139 contracts.
 | `code-exhaustive-branches` | Branch on a closed set that the repository declares by naming every member, never through a default or wildcard case, so that a new member fails the lint. |
 | `code-export-consumers` | Give every export, source file, and dependency a production consumer, and let the repository's dead-code check prove it. |
 | `code-folder-size` | Keep every source folder within lint-enforced limits on its file count and depth, and name and justify each exempt folder in the lint configuration. |
-| `code-function-size` | Keep every function within lint-enforced length, nesting, and callback limits, and give each case of a branch on a closed set its own function. |
+| `code-function-size` | Keep every function within lint-enforced length, nesting, callback, and complexity limits, and give each case of a branch on a closed set its own function. |
 | `code-guard-clauses` | Leave a block early with a guard instead of nesting its remaining work, and never write an `else` after a branch that leaves. |
 | `code-lint-suppressions` | Suppress a lint or check finding only at the one site it reports, with the rule's name and a reason, and fail checks on every suppression that suppresses nothing. |
 | `code-measured-value-names` | End the name of every numeric limit, duration, and bound with a declared unit, counted noun, or unitless measure that the repository's lint enforces. |
+| `code-mise-script-tasks` | Make every repository script a mise file task in the `mise-tasks/` folder of the root or package that owns it, and run repository work in CI only through `mise run`. |
 | `code-module-file-roles` | Give each source file one declared role, keep types in a sibling types file, and turn a module with several roles into a folder. |
 | `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, with explicit inputs, results, and control flow. |
 | `code-ownership-and-boundaries` | Give decisions and state one owner, with explicit dependency direction. |
 | `code-python-client-injection` | Construct stateful Python clients at composition roots and inject them into consumers as abstract types. |
 | `code-python-exception-propagation` | Let Python exceptions propagate; catch one only to re-raise it, translate it with its cause, retry it, or record a failed unit of work. |
 | `code-python-none-guards` | Trust non-optional Python annotations, and check for None only where the checked value's type includes None. |
+| `code-python-uv-scripts` | Run each Python repository script with `uv run --script`, and declare its dependencies in its own PEP 723 inline metadata block. |
 | `code-rust-doc-comment-coverage` | Give every public item of a Rust library crate a doc comment, and fail checks when one is missing. |
 | `code-rust-module-boundaries` | Keep a Rust crate's top-level modules acyclic and its child modules private. |
 | `code-rust-module-files` | Declare each Rust module that has child modules in a file named for it beside its folder, never in a mod.rs file under src. |
@@ -140,6 +143,7 @@ The library has 139 contracts.
 | `code-typescript-module-boundaries` | Share code across source folders only through each folder's explicit named-export entry point, and keep imports between files acyclic, type-only and dynamic imports included. |
 | `code-typescript-module-state` | Keep no TypeScript state at module level or in a static class field that changes after the module loads, hold each cache in the object or closure that owns it, and give module constants read-only types. |
 | `code-typescript-named-types` | Give every TypeScript object type a name instead of writing an object type literal inline. |
+| `code-typescript-node-scripts` | Write repository scripts as `.mts` files that the pinned Node runs directly without a loader or runner dependency, and type-check them for what Node's type stripping accepts. |
 | `code-typescript-package-boundaries` | Consume TypeScript packages only through declared dependencies and explicitly exported entry points. |
 | `code-typescript-type-assertions` | Narrow TypeScript values with checks the compiler follows, never with type assertions, non-null assertions, return-only type parameters, or the any type. |
 
@@ -252,7 +256,8 @@ The library has 139 contracts.
 | Contract | Requirement |
 | --- | --- |
 | `test-assertion-integrity` | Change code to satisfy its tests; never weaken a test to match new behavior or special-case test inputs in production code. |
-| `test-curation` | Treat development tests as disposable and commit only checks that guard consequential regressions. |
+| `test-curation` | Treat development tests as disposable, and commit only checks that guard consequential regressions and declared example tests. |
+| `test-example-suite` | Keep a declared, fixed number of one-case example tests for each test runner as templates for temporary tests, and never count one as a regression's protection. |
 | `test-scenario-functions` | Give each scenario of an end-to-end check its own function named for the one guarantee it protects, and name every reported check without a sequence marker. |
 | `test-support-modules` | Declare each test helper and fixture once, in its family's file of the package's test support folder, and never copy it into another test file. |
 

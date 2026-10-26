@@ -6,7 +6,8 @@ license: MIT
 
 # Test curation
 
-Investigate broadly during development. Commit the smallest durable suite that protects important behavior.
+Investigate broadly during development. Commit the smallest durable suite that protects important behavior, plus any
+declared example tests.
 
 ## While developing
 
@@ -16,10 +17,11 @@ which checks deserve ongoing maintenance. Manual verification is useful evidence
 
 ## Before committing
 
-For each retained test or eval case, name the consequential failure, the gap in existing coverage, and the smallest
-clear protection. Consider fixtures, setup, dependencies, runtime, and failure diagnosis together. Prefer extending an
-existing representative flow when it covers the gap clearly; keep a separate case when it exposes a distinct failure.
-Explore combinations temporarily rather than retaining every variation encountered during development.
+For each retained test or eval case other than a declared example test, name the consequential failure, the gap in
+existing coverage, and the smallest clear protection. Consider fixtures, setup, dependencies, runtime, and failure
+diagnosis together. Prefer extending an existing representative flow when it covers the gap clearly; keep a separate
+case when it exposes a distinct failure. Explore combinations temporarily rather than retaining every variation
+encountered during development.
 
 Remove duplicated coverage and assertions about incidental wording, formatting, helper calls, or private data shapes.
 Test a guarantee at its owning boundary; repeat it at integration level only when the wiring can fail independently.
