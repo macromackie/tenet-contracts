@@ -14,6 +14,7 @@ Pass an expected failure up in the error type, unchanged or wrapped in a higher-
 Never `throw`, return `null`, `undefined`, `false`, or an `{ ok: false }` object, or log and continue for an expected failure.
 Never discard an expected failure, such as with `Effect.ignore`, `Effect.option`, or `Effect.orElseSucceed`.
 A handler that catches every failure at once, such as `Effect.catch`, is allowed when it branches on each tag, such as by passing the error to a function that switches on its `_tag` with a case for every tag.
+A `_tag` comparison or a tag handler's argument, such as `Effect.catchTag('RefundRefused', ...)`, may write the tag as a literal, as `code-closed-value-sets` allows, because the compiler rejects a tag outside the Effect's error type.
 Wrap a dependency's promise or throwing call with `Effect.tryPromise` or `Effect.try`, and map its failure to a tagged error in the `catch` option.
 Use a defect, such as `Effect.die` or `Effect.orDie`, only for a broken invariant, such as a state the types already exclude.
 Run an Effect, such as with `Effect.runPromise` or `Effect.runSync`, only at an entry point that a framework or runtime calls, such as a request handler or a scheduled alarm, and map each tag to that entry point's response there; everywhere else, compose Effects with `yield*` or `pipe`.

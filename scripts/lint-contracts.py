@@ -21,8 +21,11 @@ TECHNOLOGIES = {
     r"Terraform|OpenTofu": {"terraform"},
     r"OpenAPI": {"openapi", "fastapi"},
     r"OAuth|PKCE|OIDC": {"oauth"},
+    r"Node(?:\.js)?": {"node"},
+    r"mise": {"mise"},
+    r"uv": {"uv"},
 }
-TOOLS = r"ev-grep|Next\.js|Node\.js|TanStack|StyleX|Tailwind|Kubernetes|Docker|GitHub|GitLab|Datadog|Cloudflare|AWS|GCP|Azure|Temporal|Bazel|mise|pnpm|npm|Vite|Vitest|Jest|Playwright|Redis|Kafka"
+TOOLS = r"ev-grep|Next\.js|TanStack|StyleX|Tailwind|Kubernetes|Docker|GitHub|GitLab|Datadog|Cloudflare|AWS|GCP|Azure|Temporal|Bazel|pnpm|npm|Vite|Vitest|Jest|Playwright|Redis|Kafka"
 KEBAB = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
 FRONTMATTER = re.compile(r"^---\nname: (?P<name>[^\n]+)\nmessage: (?P<message>[^\n]+)\n(?:requires-tenet: (?P<requires>[^\n]+)\n)?---\n\n## Rules\n\n(?P<rules>.+?)\n\n## Checks\n\n(?P<checks>.+?)\n\Z", re.S)
 # A contract folder holds CONTRACT.md and tool files under assets/<tool>/, which only Tenet 0.11.0 or later installs.
@@ -53,6 +56,8 @@ for path in sorted(root.rglob("*.md")):
         if "<!--" in line:
             errors.append(f"{path.relative_to(root)}:{number}: remove the HTML comment; rendered views hide it")
 folders = sorted(path for path in (root / "contracts").iterdir() if path.is_dir())
+# A backticked library contract name, such as `code-python-uv-scripts`, names that contract, not its technology.
+references = re.compile("|".join(rf"`{re.escape(folder.name)}`" for folder in folders))
 for folder in folders:
     name = folder.name
     files = sorted(path.relative_to(folder).as_posix() for path in folder.rglob("*") if not path.is_dir())
@@ -70,10 +75,11 @@ for folder in folders:
         errors.append(f"{name}: start with an area: {', '.join(sorted(AREAS))}")
     if words[-1] in SUFFIX_FORMS:
         errors.append(f"{name}: end with -{SUFFIX_FORMS[words[-1]]}, not -{words[-1]}")
+    prose = references.sub("", text)
     for pattern, allowed in TECHNOLOGIES.items():
-        if not allowed & set(words) and (found := re.search(rf"\b(?:{pattern})\b", text)):
+        if not allowed & set(words) and (found := re.search(rf"\b(?:{pattern})\b", prose)):
             errors.append(f"{name}: {found[0]} needs one of {', '.join(sorted(allowed))} in the contract name")
-    if found := re.search(rf"\b(?:{TOOLS})\b", text):
+    if found := re.search(rf"\b(?:{TOOLS})\b", prose):
         errors.append(f"{name}: do not name the tool {found[0]} in a library contract")
     document = FRONTMATTER.match(text)
     if not document:
