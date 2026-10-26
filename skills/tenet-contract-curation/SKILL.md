@@ -1,6 +1,7 @@
 ---
 name: tenet-contract-curation
 description: Author or revise repository contracts and their examples when requested.
+license: MIT
 ---
 
 # Contract curation

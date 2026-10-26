@@ -5,8 +5,9 @@ message: Write each library contract as a message, rules, and checks, one senten
 
 ## Rules
 
-Store each contract at `contracts/<name>/CONTRACT.md`.
-Start it with frontmatter holding only `name` and `message`, followed by `## Rules` and `## Checks` and no other headings.
+Store each contract at `contracts/<name>/CONTRACT.md`, and keep nothing else in its folder except tool configuration and data files under `assets/<tool>/`.
+Start it with frontmatter holding `name`, `message`, and an optional `requires-tenet`, followed by `## Rules` and `## Checks` and no other headings.
+Set `requires-tenet` to the minimum Tenet version that installs the contract's files, at least 0.11.0, whenever its folder holds `assets/`.
 Write the message as one imperative sentence that states the requirement.
 Write one sentence per line and never wrap a sentence, so line-based merges conflict only on a sentence both sides changed.
 Separate groups of related rules with one blank line.

@@ -15,13 +15,16 @@ Keep consumer-specific values, such as a list of private names, in the consumer'
 A comment that says a block matches, mirrors, or works the same way as code in another repository marks a copy.
 
 A file that a tool generates in each repository from that repository's own settings, such as a release workflow, is not a copy.
-An installed contract follows `contract-maintenance` and the lock its installer keeps, not this contract.
+An installed contract or skill document, which its installer merges with local edits on update, follows the lock its installer keeps and, for a contract, `contract-maintenance`, not this contract.
+Any other file that a contract or skill installer copies and locks by hash, such as a lint configuration shipped with a contract, is a locked copy of a released file that this contract permits, even when its format can extend a published file.
 A snapshot that a public source export writes into its destination follows `release-public-source-export`, not this contract.
 A value that a declared dependency already exports, such as a validation pattern or a bound, follows `code-shared-definitions`.
 
 Violation: a second repository copies the first repository's export tool and edits the private-name list inside the copy.
 Violation: a consumer appends rules about itself to its copy of shared agent guidance and replaces the lock entry's hash while its revision stays the same.
+Violation: a repository adds its own rule to a lint configuration that its contract installer locked, instead of to the repository's configuration that extends it.
 Allowed: both repositories run the export tool from the first repository's release, and each keeps its private-name list in its own settings file.
+Allowed: the repository's lint configuration extends a lint configuration installed with a contract and adds the repository's own rules.
 
 ## Checks
 

@@ -1,6 +1,7 @@
 ---
 name: tenet-architecture-curation
 description: Design or review ownership, package boundaries, data flow, recovery, and observability when changing how parts of the system work together.
+license: MIT
 ---
 
 # Architecture curation
@@ -22,7 +23,7 @@ maintained state, and operational cost. More packages or a larger rewrite are no
 
 Prefer focused modules and nested folders. Introduce a package when a current dependency, runtime, ownership, or reuse
 boundary warrants it. Keep cohesive state transitions together. A small file is useful only if its responsibility is
-understandable. See [boundaries and data](resources/boundaries-and-data.md).
+understandable. See [boundaries and data](references/boundaries-and-data.md).
 
 ## Design the flow
 
@@ -33,14 +34,14 @@ conversions and checks for invariants already established by types or their owne
 
 Review the data model from its actual callers. Distinguish authoritative fields from derived values; look for
 contradictory flags, optional fields that hide distinct outcomes, repeated conversions, and unused parameters.
-Simplify the representation where it removes decisions from callers. See [boundaries and data](resources/boundaries-and-data.md).
+Simplify the representation where it removes decisions from callers. See [boundaries and data](references/boundaries-and-data.md).
 
 Design interruption and recovery alongside the happy path. Prefer operations that can safely repeat and state that
 can explain what remains unfinished. Bound retries, concurrency, and deadlines. Durable infrastructure such as celld
-is useful where work must survive disconnection; it is not required for every operation. See [recovery](resources/recovery.md).
+is useful where work must survive disconnection; it is not required for every operation. See [recovery](references/recovery.md).
 
 Make important transitions and failures inspectable without scattering logging through every helper. Keep correlation,
-redaction, and diagnostic conventions consistent. See [observability](resources/observability.md).
+redaction, and diagnostic conventions consistent. See [observability](references/observability.md).
 
 ## Make the change complete
 
