@@ -1,0 +1,57 @@
+# code-typescript-effect-errors: fail and die only with a tagged error class, never with a bare error.
+# Tsx variant (.tsx); untagged-errors-typescript.yml is identical except for `id`, `language`, and this line.
+id: untagged-errors-tsx
+language: Tsx
+severity: error
+message: Fail or die with an instance of a tagged error class that carries its fields, never with a bare error.
+note: |
+  Declare a tagged error class with the fields its handler needs, such as `class InvoiceMissing extends Schema.TaggedError<InvoiceMissing>()('InvoiceMissing', { invoice: Schema.String }) {}`.
+  Fail with it for an expected failure, such as `return yield* new InvoiceNotFound({ invoice })`, and raise it for a defect, such as `throw new InvoiceMissing({ invoice })`.
+  The rule reports a built-in error built with or without `new`, a class that extends one, `Effect.dieMessage`, and a failure or defect written as a literal.
+  A test fake that reproduces a dependency's own error suppresses the finding with a reason that names the dependency.
+utils:
+  # The runtime's built-in error constructors.
+  built-in-error:
+    kind: identifier
+    regex: ^(Error|AggregateError|EvalError|RangeError|ReferenceError|SuppressedError|SyntaxError|TypeError|URIError)$
+  # A value that is not an instance of an error class.
+  literal:
+    any:
+      - kind: string
+      - kind: template_string
+      - kind: number
+      - kind: object
+      - kind: array
+rule:
+  any:
+    # `new Error(message)` and `Error(message)`.
+    - kind: new_expression
+      has:
+        field: constructor
+        matches: built-in-error
+    - kind: call_expression
+      has:
+        field: function
+        matches: built-in-error
+    # `class InvoiceError extends Error`.
+    - kind: extends_clause
+      has:
+        field: value
+        matches: built-in-error
+    # `Effect.dieMessage(message)` builds an untagged runtime error.
+    - kind: call_expression
+      has:
+        field: function
+        pattern: Effect.dieMessage
+    # `Effect.fail('refused')` and `Effect.die({ reason })`.
+    - kind: call_expression
+      all:
+        - has:
+            field: function
+            any:
+              - pattern: Effect.fail
+              - pattern: Effect.die
+        - has:
+            field: arguments
+            has:
+              matches: literal

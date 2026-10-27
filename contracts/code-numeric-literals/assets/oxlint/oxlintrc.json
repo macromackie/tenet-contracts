@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "no-magic-numbers": [
+      "error",
+      {
+        "ignore": [-1, 0, 1, 2],
+        "enforceConst": true,
+        "detectObjects": false,
+        "ignoreArrayIndexes": true,
+        "ignoreEnums": true,
+        "ignoreNumericLiteralTypes": true,
+        "ignoreTypeIndexes": true,
+        "ignoreReadonlyClassProperties": true,
+        "ignoreClassFieldInitialValues": false,
+        "ignoreDefaultValues": false
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/test/**",
+        "**/tests/**",
+        "**/testing/**",
+        "**/__tests__/**"
+      ],
+      "rules": { "no-magic-numbers": "off" }
+    }
+  ]
+}

@@ -12,9 +12,11 @@ function nextStage({ job }: NextStageInput): JobStage {
   if (job.isReviewed) {
     return JobStage.Judging;
   }
+
   if (job.hasSubmission) {
     return JobStage.Reviewing;
   }
+
   return JobStage.Preparing;
 }
 

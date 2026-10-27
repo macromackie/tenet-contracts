@@ -1,0 +1,69 @@
+# code-typescript-call-arguments: bind a function written as a field, method, or element of an argument object or array to a name.
+# TypeScript variant (.ts, .mts, .cts); argument-object-functions-tsx.yml adds the JSX boundaries.
+# Keep the two otherwise identical; they differ only in `id`, `language`, and `utils.boundary`.
+id: argument-object-functions-typescript
+language: TypeScript
+severity: error
+message: Bind this function to a name before writing it in an argument object or array.
+note: |
+  Write `const writeEvent: EventSink = ...` or `function writeEvent(...)`, then pass `{ onEvent: writeEvent }`.
+  A function passed directly as an argument, such as `items.map((item) => ...)`, stays inline.
+  A function, class, or JSX element in between starts afresh: an object it returns or holds is not an argument.
+utils:
+  # A function, class, or JSX element restarts the search.
+  boundary:
+    any:
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: function_declaration
+      - kind: generator_function
+      - kind: generator_function_declaration
+      - kind: method_definition
+      - kind: class
+      - kind: class_declaration
+      - kind: abstract_class_declaration
+  # The functions the rule judges: a function expression, or a method written in an object literal, except a getter or setter.
+  function:
+    any:
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: generator_function
+      - kind: method_definition
+        inside:
+          kind: object
+        not:
+          has:
+            field: name
+            follows:
+              regex: ^(get|set)$
+  # tree-sitter parses a tagged template as a call whose arguments are the template.
+  tagged-template:
+    kind: call_expression
+    has:
+      field: arguments
+      kind: template_string
+  # An argument list ends the search, and so does a call or `new` whose callee side holds the function.
+  # A tagged template is a template, not a call, so its placeholders belong to the arguments that hold it.
+  stop:
+    any:
+      - kind: arguments
+      - kind: call_expression
+        not:
+          matches: tagged-template
+      - kind: new_expression
+      - matches: boundary
+rule:
+  matches: function
+  all:
+    # The nearest enclosing stop is an argument list.
+    - inside:
+        kind: arguments
+        stopBy:
+          matches: stop
+    # An object or array literal lies between the function and that argument list.
+    - inside:
+        any:
+          - kind: object
+          - kind: array
+        stopBy:
+          matches: stop

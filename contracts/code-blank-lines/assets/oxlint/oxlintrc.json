@@ -3,9 +3,75 @@
   "rules": {
     "@stylistic/padding-line-between-statements": [
       "error",
-      { "blankLine": "always", "prev": "*", "next": ["if", "for", "while", "do", "switch", "try"] },
-      { "blankLine": "always", "prev": ["if", "for", "while", "do", "switch", "try"], "next": "*" },
-      { "blankLine": "never", "prev": ["case", "default"], "next": ["case", "default"] }
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": ["if", "for", "while", "do", "switch", "try", "return", "throw"]
+      },
+      {
+        "blankLine": "always",
+        "prev": ["if", "for", "while", "do", "switch", "try", "return", "throw"],
+        "next": "*"
+      },
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": [
+          "multiline-expression",
+          {
+            "selector": "VariableDeclaration, FunctionDeclaration, ClassDeclaration, TSTypeAliasDeclaration, TSInterfaceDeclaration, TSEnumDeclaration, TSModuleDeclaration, TSDeclareFunction, ExportNamedDeclaration[declaration], ExportDefaultDeclaration",
+            "lineMode": "multiline"
+          }
+        ]
+      },
+      {
+        "blankLine": "always",
+        "prev": [
+          "multiline-expression",
+          {
+            "selector": "VariableDeclaration, FunctionDeclaration, ClassDeclaration, TSTypeAliasDeclaration, TSInterfaceDeclaration, TSEnumDeclaration, TSModuleDeclaration, TSDeclareFunction, ExportNamedDeclaration[declaration], ExportDefaultDeclaration",
+            "lineMode": "multiline"
+          }
+        ],
+        "next": "*"
+      },
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": {
+          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression']"
+        }
+      },
+      {
+        "blankLine": "always",
+        "prev": {
+          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression']"
+        },
+        "next": "*"
+      },
+      {
+        "blankLine": "any",
+        "prev": {
+          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression']"
+        },
+        "next": {
+          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression']"
+        }
+      },
+      {
+        "blankLine": "any",
+        "prev": {
+          "selector": "TSDeclareFunction[declare=false], ExportNamedDeclaration[declaration.type='TSDeclareFunction'][declaration.declare=false], ExportDefaultDeclaration[declaration.type='TSDeclareFunction']"
+        },
+        "next": {
+          "selector": "TSDeclareFunction[declare=false], ExportNamedDeclaration[declaration.type='TSDeclareFunction'][declaration.declare=false], ExportDefaultDeclaration[declaration.type='TSDeclareFunction'], FunctionDeclaration, ExportNamedDeclaration[declaration.type='FunctionDeclaration'], ExportDefaultDeclaration[declaration.type='FunctionDeclaration']"
+        }
+      },
+      {
+        "blankLine": "never",
+        "prev": ["case", "default"],
+        "next": ["case", "default"]
+      }
     ]
   }
 }

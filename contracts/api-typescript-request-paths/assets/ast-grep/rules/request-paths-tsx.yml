@@ -1,0 +1,23 @@
+# api-typescript-request-paths: write path text that starts with `/` only in a declared paths file, and call its path functions elsewhere.
+# Tsx variant (.tsx); the TypeScript and Tsx variants differ only in `id`, `language`, and this line.
+id: request-paths-tsx
+language: Tsx
+severity: error
+message: Build this request path with its operation's path function, such as `PackPaths.chunk({ key, index })`, declared once in the module that owns the route.
+note: |
+  A template literal that starts with `/` is reported, and so is a `+` concatenation whose left operand is a string that starts with `/`.
+  A path that starts with a value, such as `${origin}/packs/${key}`, and a path written as one plain string are left to review.
+  The declared paths files are exempt; the shipped pattern marks them by a stem that ends in `-paths`, such as `pack-paths.ts`, and a repository that declares another pattern edits `ignores`.
+  Exempt generated files by their declared path pattern in a scan of these rules alone, such as `ast-grep scan --filter '^request-paths-' --globs '!src/generated/**'`.
+# The declared paths files, which write each path once.
+ignores:
+  - "**/*-paths.{ts,mts,cts,tsx}"
+rule:
+  any:
+    - kind: template_string
+      regex: ^`/
+    - pattern: $LEFT + $RIGHT
+      has:
+        field: left
+        kind: string
+        regex: ^['"]/

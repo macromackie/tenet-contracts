@@ -12,12 +12,12 @@ Configure the repository's lint to reject a numeric constant, variable, field, c
 Add to the lists only a unit, a counted noun, or a unitless measure, never a word that names neither, such as `Value` or `Amount`.
 
 A value whose type carries its unit, such as a duration, a date, or a named unit type, needs no suffix.
-Convert a value to another unit only into a name that carries the new unit, such as `timeoutMs = timeoutSeconds * 1000`.
+Convert a value to another unit only into a name that carries the new unit, such as `timeoutMs = timeoutSeconds * MILLISECONDS_PER_SECOND`.
 Write a name that another system fixes, such as a library's `timeout` option or a wire field, only in the call or mapping that meets that system, map it there to or from a name or type that carries its unit, and suppress any finding that remains as `code-lint-suppressions` requires, with a reason that names that system.
 Keep the external name of a stored or shipped field that the repository owns, as `data-stored-and-shipped-formats` requires, through a serializer rename where one exists and otherwise with a suppressed finding.
 Exempt generated files and copied third-party source from these rules by a declared path pattern, and map each limit or duration they carry to a name or type that carries its unit where owned code first reads it.
 
-Violation: `const UPLOAD_LIMIT = 3 * 1024 * 1024` is compared with a body's byte length, and its name does not say bytes.
+Violation: `const UPLOAD_LIMIT = UPLOAD_LIMIT_MEBIBYTES * BYTES_PER_MEBIBYTE` is compared with a body's byte length, and its name does not say bytes.
 Allowed: `UPLOAD_LIMIT_BYTES`, `timeoutSeconds`, `maxAttempts`, and a `retryDelay` whose type is a duration.
 
 ## Checks

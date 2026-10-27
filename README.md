@@ -53,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 143 contracts.
+The library has 146 contracts.
 
 #### agent
 
@@ -66,6 +66,7 @@ The library has 143 contracts.
 #### api
 
 | Contract | Requirement |
+| `api-typescript-request-paths` | Build each request path and URL with one typed path function per operation, declared once in the module that owns its routes, and encode each part inside it. |
 | --- | --- |
 | `api-fastapi-resource-layout` | Give each resource one folder of router, schema, query and service modules, and keep URLs fixed when code moves. |
 | `api-fastapi-route-authorization` | Declare route admission as named shared dependencies and apply ownership in the statement, never after loading. |
@@ -89,14 +90,16 @@ The library has 143 contracts.
 #### code
 
 | Contract | Requirement |
+| `code-numeric-literals` | Give every number outside a declared few a named constant that holds one literal, and build each derived constant from other constants' names. |
+| `code-typescript-call-arguments` | Bind each nested call, `new`, `await`, and function written in an argument object or array to a name, and bind functions only as declarations or typed constants. |
 | --- | --- |
-| `code-blank-lines` | Separate a block's logical phases, and each control-flow statement inside it, from neighboring code with one blank line. |
+| `code-blank-lines` | Separate a block's logical phases, control flow, returns, throws, calls, and multi-line declarations and expressions from neighboring code with one blank line. |
 | `code-boolean-names` | Start every owned boolean's name with a declared predicate or option prefix that lint enforces, and keep an external boolean name only in the mapping that decodes it. |
-| `code-closed-value-sets` | Declare each closed set of values once and refer to its members by name, never by repeating their literal values. |
+| `code-closed-value-sets` | Declare each closed set of values once, HTTP methods and status codes included, and refer to its members by name, never by repeating their literal values. |
 | `code-comment-attribution` | Explain source behavior without attributing it to repository contracts or review tools. |
 | `code-comment-content` | Write comments that state what the code cannot show, never what it already says, what it used to do, or a shape that a declaration could carry. |
 | `code-comment-form` | Commit no task markers, commented-out code, or empty doc comments, and give doc comments and file summaries one lint-enforced layout. |
-| `code-conditional-expressions` | Choose between values with statements, lookups, or pattern matching, never with a conditional operator. |
+| `code-conditional-expressions` | Choose values with statements, lookups, pattern matching, or named functions, not conditional operators or immediately invoked functions, and cap each expression's logical operators at a declared maximum. |
 | `code-cross-repository-copies` | Keep each file that several repositories use in one source repository, and consume it from a release or as a locked copy whose hash checks verify. |
 | `code-dependency-boundaries` | Declare which packages each package may depend on once, in configuration that checks enforce, and keep that declaration acyclic and exact. |
 | `code-diagnostic-messages` | Write each diagnostic as one clause that names the failed operation and its input, without a trailing period. |
@@ -104,7 +107,7 @@ The library has 143 contracts.
 | `code-duplicated-blocks` | Fail checks on every copied block that the repository's copy detector reports, and remove the copy by calling one declaration. |
 | `code-environment-settings` | Read a program's environment only in its settings module, decode it once there, and pass decoded settings to the code that needs them. |
 | `code-execution-lifecycle` | Bound work and preserve authoritative results through failure and interruption. |
-| `code-exhaustive-branches` | Branch on a closed set that the repository declares by naming every member, never through a default or wildcard case, so that a new member fails the lint. |
+| `code-exhaustive-branches` | Write an `else if` chain of equality tests on one value as a `switch`, and name every member of a declared closed set instead of a default or wildcard. |
 | `code-export-consumers` | Give every export, source file, and dependency a production consumer, and let the repository's dead-code check prove it. |
 | `code-folder-size` | Keep every source folder within lint-enforced limits on its file count and depth, and name and justify each exempt folder in the lint configuration. |
 | `code-function-size` | Keep every function within lint-enforced length, nesting, callback, and complexity limits, and give each case of a branch on a closed set its own function. |
@@ -112,7 +115,7 @@ The library has 143 contracts.
 | `code-lint-suppressions` | Suppress a lint or check finding only at the one site it reports, with the rule's name and a reason, and fail checks on every suppression that suppresses nothing. |
 | `code-measured-value-names` | End the name of every numeric limit, duration, and bound with a declared unit, counted noun, or unitless measure that the repository's lint enforces. |
 | `code-mise-script-tasks` | Make every repository script a mise file task in the `mise-tasks/` folder of the root or package that owns it, and run repository work in CI only through `mise run`. |
-| `code-module-file-roles` | Give each source file one declared role, keep types in a sibling types file, and turn a module with several roles into a folder. |
+| `code-module-file-roles` | Give each source file one declared role and at most one exported function, keep types in a sibling types file, and make a module with several roles a folder. |
 | `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, with explicit inputs, results, and control flow. |
 | `code-ownership-and-boundaries` | Give decisions and state one owner, with explicit dependency direction. |
 | `code-python-client-injection` | Construct stateful Python clients at composition roots and inject them into consumers as abstract types. |
@@ -134,7 +137,7 @@ The library has 143 contracts.
 | `code-typescript-class-declarations` | Declare a TypeScript class only where a runtime or library requires one, write every other unit that holds dependencies or state as a factory function, and give each class field a readonly private name. |
 | `code-typescript-compiler-strictness` | Type-check every TypeScript package under strict compiler settings that no file relaxes. |
 | `code-typescript-const-bindings` | Declare TypeScript variables with `const`, give every `let` its first value where it is declared, and choose a value with a function rather than by assigning in each branch. |
-| `code-typescript-effect-errors` | Carry each expected TypeScript failure as a tagged error in an Effect's error type until code handles it by tag, and throw or die only for broken invariants. |
+| `code-typescript-effect-errors` | Carry each TypeScript failure that a caller can act on as a tagged error in an Effect's error type, and every other failure as a tagged defect. |
 | `code-typescript-effect-schemas` | Decode every value that crosses a TypeScript boundary with an Effect Schema, and derive its type from that schema. |
 | `code-typescript-entry-points` | Keep each TypeScript entry point a list of named re-exports from the files that declare them, re-export from no other file, and never add a file named after a sibling folder. |
 | `code-typescript-file-names` | Use kebab-case source paths with dotted role suffixes; preserve tool-required names. |
@@ -259,7 +262,7 @@ The library has 143 contracts.
 | `test-curation` | Treat development tests as disposable, and commit only checks that guard consequential regressions and declared example tests. |
 | `test-example-suite` | Keep a declared, fixed number of one-case example tests for each test runner as templates for temporary tests, and never count one as a regression's protection. |
 | `test-scenario-functions` | Give each scenario of an end-to-end check its own function named for the one guarantee it protects, and name every reported check without a sequence marker. |
-| `test-support-modules` | Declare each test helper and fixture once, in its family's file of the package's test support folder, and never copy it into another test file. |
+| `test-support-modules` | Declare each test helper and fixture once, in its own file of the package's test support folder, and never copy it into another test file. |
 
 #### ui
 

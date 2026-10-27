@@ -7,7 +7,7 @@ message: Keep the top level of every file the repository executes directly to de
 
 Apply this contract to every file the repository executes directly, such as automation scripts, smoke and qualification checks, fixture servers started as processes, development tools, and command entry points; `code-function-size` then limits all of their work.
 Hold only imports, type declarations, function and class declarations, constant declarations, and one statement that runs the main program at the top level of an executable file.
-Running the main program means one call to the main function, awaited or not, one call that hands the main program to its runtime's entry function, or one call that ends the process and whose only argument is one of those calls.
+Running the main program means one call to the main function, awaited or not, or one call that hands the main program to its runtime's entry function.
 A guard that runs the main program only when the file is executed directly, such as comparing the module's path with the process's first argument, is part of that statement when its body holds only that call.
 Declare the calls that may initialize a top-level constant, such as resolving a directory from the module's location or building a validation schema, and initialize each top-level constant only from literals, functions, other constants, the module's location, and those calls.
 A top-level statement or constant that awaits, starts a process, opens a server, reads or writes a file, reads the process's arguments or environment, branches, loops, or wraps the rest of the file in a `try` block is a violation.
