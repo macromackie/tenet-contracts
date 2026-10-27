@@ -1,0 +1,73 @@
+id: immediately-invoked-function-tsx
+language: Tsx
+severity: error
+message: Compute the value with a named function called by name instead of invoking a function expression where it is written.
+utils:
+  function-expression:
+    any:
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: generator_function
+      - kind: parenthesized_expression
+        has:
+          matches: function-expression
+      - kind: as_expression
+        has:
+          matches: function-expression
+      - kind: satisfies_expression
+        has:
+          matches: function-expression
+      - kind: non_null_expression
+        has:
+          matches: function-expression
+      - kind: sequence_expression
+        has:
+          matches: function-expression
+          nthChild:
+            position: 1
+            reverse: true
+      - kind: call_expression
+        has:
+          field: function
+          kind: member_expression
+          all:
+            - has:
+                field: object
+                matches: function-expression
+            - has:
+                field: property
+                regex: ^bind$
+  discarded:
+    any:
+      - inside:
+          kind: expression_statement
+      - inside:
+          kind: unary_expression
+          regex: ^void\b
+      - inside:
+          any:
+            - kind: unary_expression
+            - kind: await_expression
+          inside:
+            kind: expression_statement
+rule:
+  any:
+    - kind: call_expression
+      has:
+        field: function
+        any:
+          - matches: function-expression
+          - kind: member_expression
+            all:
+              - has:
+                  field: object
+                  matches: function-expression
+              - has:
+                  field: property
+                  regex: ^(call|apply)$
+    - kind: new_expression
+      has:
+        field: constructor
+        matches: function-expression
+  not:
+    matches: discarded

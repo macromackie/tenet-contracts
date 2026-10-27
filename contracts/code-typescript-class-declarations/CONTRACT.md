@@ -11,7 +11,7 @@ Keep a factory's storage handle and other dependencies in its closure, and never
 A plain record that holds values and no storage handle, such as `type InvoiceAccount = { apiUrl: string; token: string }` passed as `requestInvoices({ account, path })`, is data and needs no factory.
 Extend only the base class that the runtime or library requires, and never extend an owned class or declare an `abstract` class.
 Declare each field of a class `readonly` with a private name, such as `readonly #storage: Storage`, and never use the `private`, `protected`, or `public` keywords or constructor parameter properties.
-A field that the runtime base class declares for subclasses to set, such as a container's `defaultPort`, keeps the name the base class gives it and carries the `override` modifier, such as `override readonly defaultPort = 8080`.
+A field that the runtime base class declares for subclasses to set, such as a container's `defaultPort`, keeps the name the base class gives it and carries the `override` modifier, such as `override readonly defaultPort = DEFAULT_PORT`.
 A `readonly` field may hold a collection that the class changes, such as `readonly #tokens = new Map<Purpose, Token>()`.
 Read `this` in every method of a class except an `override` of a method that the runtime or library base class declares; any other method that reads nothing from the instance is a function.
 Enable `erasableSyntaxOnly`, which rejects parameter properties, and `noImplicitOverride`, which requires `override` on each field and method that the base class declares, in every package's compiler configuration.

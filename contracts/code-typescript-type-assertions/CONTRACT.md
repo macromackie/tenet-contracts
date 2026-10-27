@@ -8,7 +8,7 @@ message: Narrow TypeScript values with checks the compiler follows, never with t
 Never write a type assertion, such as `value as Invoice` or `<Invoice>value`, a non-null assertion, such as `rows[0]!` or `findInvoice({ id })!.total`, or the `any` type.
 Treat a value whose type is `any`, such as the result of `JSON.parse(body)` or an element of `value` after `Array.isArray(value)`, as `unknown`: never read its properties or call it, and never annotate, return, or pass it as a type other than `unknown`.
 A const assertion, such as `['draft', 'sent'] as const`, is not a type assertion and is allowed.
-Give a value its declared type with an annotation or `satisfies`, such as `const statusText: Record<number, string> = { 404: 'not_found' }`, instead of an assertion.
+Give a value its declared type with an annotation or `satisfies`, such as `const invoice: Invoice = { id, status: InvoiceStatus.Draft }`, instead of an assertion.
 Narrow a value with a check the compiler follows, such as a comparison with `undefined`, a discriminant test, or an `in` test, and decode each boundary value as `code-typescript-effect-schemas` requires.
 Never write a type predicate as a function's return type, such as `invoice is PaidInvoice`, or, in source, an assertion signature, such as `asserts value is Invoice`, because the compiler does not check that the function's body proves the claim; write the check where the value is read, or let the compiler infer the predicate from that check.
 In tests and scripts, an assertion function that throws when its check fails, such as `assert.ok(row)`, narrows a value and is allowed.

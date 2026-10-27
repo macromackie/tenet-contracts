@@ -1,0 +1,82 @@
+{
+  "plugins": ["import"],
+  "jsPlugins": ["eslint-plugin-boundaries"],
+  "settings": {
+    "boundaries/elements": [{ "type": "folder", "pattern": "{.,}*" }],
+    "boundaries/files": [{ "category": "root", "pattern": "{.,}*" }],
+    "boundaries/additional-dependency-nodes": [
+      { "name": "type-import", "selector": "TSImportType > Literal", "kind": "type" },
+      {
+        "name": "import-equals",
+        "selector": "TSExternalModuleReference > Literal",
+        "kind": "value"
+      }
+    ],
+    "boundaries/ignore": ["**/.*"],
+    "import/resolver": { "typescript": { "symlinks": false, "exportsFields": [] } }
+  },
+  "rules": {
+    "boundaries/dependencies": [
+      "error",
+      {
+        "default": "allow",
+        "policies": [
+          {
+            "disallow": {
+              "to": {
+                "element": {
+                  "type": "folder",
+                  "fileInternalPath": "**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"
+                }
+              },
+              "dependency": {
+                "relationship": {
+                  "to": ["child", "descendant", "sibling", "uncle", "nephew", null]
+                }
+              }
+            }
+          },
+          {
+            "allow": {
+              "to": {
+                "element": {
+                  "type": "folder",
+                  "fileInternalPath": "index.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"
+                }
+              },
+              "dependency": { "relationship": { "to": ["child", "sibling", "uncle"] } }
+            }
+          },
+          {
+            "allow": {
+              "to": {
+                "element": {
+                  "type": "folder",
+                  "parent": null,
+                  "fileInternalPath": "index.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"
+                }
+              }
+            }
+          },
+          {
+            "allow": {
+              "from": {
+                "element": {
+                  "type": "folder",
+                  "fileInternalPath": "index.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"
+                }
+              },
+              "to": { "element": { "type": "folder" } },
+              "dependency": { "relationship": { "to": ["child", "descendant"] } }
+            }
+          }
+        ]
+      }
+    ],
+    "boundaries/no-unknown-dependencies": "error",
+    "boundaries/no-unknown-files": "error",
+    "import/default": "off",
+    "import/namespace": "off",
+    "import/no-cycle": ["error", { "ignoreTypes": false }]
+  }
+}

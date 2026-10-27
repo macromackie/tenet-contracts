@@ -37,7 +37,7 @@ contradictory flags, optional fields that hide distinct outcomes, repeated conve
 Simplify the representation where it removes decisions from callers. See [boundaries and data](references/boundaries-and-data.md).
 
 Design interruption and recovery alongside the happy path. Prefer operations that can safely repeat and state that
-can explain what remains unfinished. Bound retries, concurrency, and deadlines. Durable infrastructure such as celld
+can explain what remains unfinished. Bound retries, concurrency, and deadlines. Durable infrastructure
 is useful where work must survive disconnection; it is not required for every operation. See [recovery](references/recovery.md).
 
 Make important transitions and failures inspectable without scattering logging through every helper. Keep correlation,

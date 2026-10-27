@@ -1,32 +1,54 @@
 ---
 name: code-typescript-effect-errors
-message: Carry each expected TypeScript failure as a tagged error in an Effect's error type until code handles it by tag, and throw or die only for broken invariants.
+message: Carry each TypeScript failure that a caller can act on as a tagged error in an Effect's error type, and every other failure as a tagged defect.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
 
-An expected failure is one a correct program can meet, such as a rejected request, a missing record, invalid input, or a provider error.
+Treat a failure as expected when any caller or user could act differently because of it, such as a requested record that does not exist or a dropped request.
+Treat every other failure as a defect, such as a record that the same object wrote now missing or corrupt, which means the code's own invariant broke.
+An empty result, such as a search that matches nothing, is a value, but a lookup that finds no record for a caller's identifier is an expected failure.
+
 Fail with a tagged error class for each expected failure, such as `class InvoiceNotFound extends Schema.TaggedError<InvoiceNotFound>()('InvoiceNotFound', { invoice: Schema.String }) {}`, and treat its tag as the failure's stable code.
+Use `Effect.die`, `Effect.orDie`, or `throw` only for a defect, and give it a tagged error class with fields that locate it, such as `new InvoiceMissing({ invoice })`.
 Give each tagged error the fields its handler needs, such as the invoice number or the provider's status, never only a message string.
 Give each failure that a handler treats differently its own tag; a field may refine a tag only with a member of a closed set, such as a provider's refusal kind, never with a free-form code string.
-A result that may be empty, such as a search that matches nothing or an optional setting left unset, is a value, not a failure; a lookup by identity that finds no record is an expected failure.
+Never build or extend a bare runtime error, such as `new Error(message)` or `class InvoiceError extends Error`, and never fail, die, or throw with a string or plain object.
+A test fake that stands in for a dependency may throw what that dependency throws, such as the `TypeError` of a failed network request.
+
 Pass an expected failure up in the error type, unchanged or wrapped in a higher-level tagged error, until the code that decides what happens next handles it by tag, such as with `Effect.catchTag`.
-Never `throw`, return `null`, `undefined`, `false`, or an `{ ok: false }` object, or log and continue for an expected failure.
-Never discard an expected failure, such as with `Effect.ignore`, `Effect.option`, or `Effect.orElseSucceed`.
+Never return `null`, `undefined`, `false`, or an `{ ok: false }` object for an expected failure, and never discard one, such as with `Effect.ignore`, `Effect.option`, or `Effect.orElseSucceed`.
 A handler that catches every failure at once, such as `Effect.catch`, is allowed when it branches on each tag, such as by passing the error to a function that switches on its `_tag` with a case for every tag.
-A `_tag` comparison or a tag handler's argument, such as `Effect.catchTag('RefundRefused', ...)`, may write the tag as a literal, as `code-closed-value-sets` allows, because the compiler rejects a tag outside the Effect's error type.
-Wrap a dependency's promise or throwing call with `Effect.tryPromise` or `Effect.try`, and map its failure to a tagged error in the `catch` option.
-Use a defect, such as `Effect.die` or `Effect.orDie`, only for a broken invariant, such as a state the types already exclude.
-Run an Effect, such as with `Effect.runPromise` or `Effect.runSync`, only at an entry point that a framework or runtime calls, such as a request handler or a scheduled alarm, and map each tag to that entry point's response there; everywhere else, compose Effects with `yield*` or `pipe`.
+
+Wrap each foreign call that can throw or reject, such as `fetch`, JSON parsing, or a storage or library call, once where it is called, with `Effect.tryPromise` or `Effect.try`.
+Map its failure in the `catch` option to a tagged error class that keeps the caught value as its `cause`, such as `RequestDropped` for a failed `fetch`.
+Never catch a failure with a `catch` clause or a promise's `catch` method, though a `try` with only a `finally` clause may release a resource.
+
+Run an Effect, such as with `Effect.runPromise`, only at an entry point that a framework or runtime calls, such as a request or click handler.
+Map each tag to that entry point's response there, such as a 404 response for `InvoiceNotFound` or a retry prompt for a dropped request.
+Elsewhere, compose Effects with `pipe` as `code-typescript-call-arguments` allows, and write the bound statements that it requires inside `Effect.gen`, such as `const invoice = yield* loadInvoice({ id })`.
+Give each entry point one defect handler that records the defect and ends its unit of work, such as a server's 500 response or a command's error exit status.
+Wrap each route of a user interface in an error boundary, and pass it the defects of that route's event handlers and asynchronous reads, which it cannot catch itself.
+Catch a defect only in an entry point's defect handler, and never log a failure or defect and then continue, whether in a component or anywhere else.
+
+Configure the repository's lint to reject bare runtime errors, thrown literals, `catch` clauses, and inline promise `catch` handlers, suppressing a finding only as `code-lint-suppressions` allows.
+Keep off any lint rule that reports a tagged error class's declaration, such as one requiring `new` before each call whose name ends in `Error`.
+Where the repository's lint can load the configuration in this contract's `assets/` folder, load it from the repository's own lint configuration.
 
 Violation: `if (!response.ok) throw new Error('the payment provider refused the refund')` turns a provider refusal into an untyped exception.
 Violation: `refund({ invoice }).pipe(Effect.orDie)` turns the provider's refusals and outages into defects.
-Allowed: `Effect.fail(new RefundRefused({ invoice, status }))`, which the request handler handles with `Effect.catchTag('RefundRefused', ...)`.
+Violation: `readInvoice({ invoice })` throws `new Error('invoice row missing')` for a row that the same object wrote, so the defect carries neither a tag nor the invoice number.
+Violation: a component calls `load().catch(() => {})`, so a dropped request shows no retry and a defect never reaches the route's error boundary.
+Allowed: `return yield* new RefundRefused({ invoice, status })`, which the request handler handles with `Effect.catchTag('RefundRefused', ...)`.
+Allowed: `throw new InvoiceMissing({ invoice })` inside `Effect.gen` for a row that the same object wrote, and `return yield* new InvoiceNotFound({ invoice })` for a number a caller supplied.
 
 ## Checks
 
-Run the type check; an Effect's error type lists every tag it can fail with.
-For each `throw`, `Effect.die`, `Effect.orDie`, `Effect.catch`, or `Effect.runPromise` a change adds, is it a broken invariant or an entry point, or an expected failure that needs a tagged error?
+Run the type check from each package root; an Effect's error type lists every tag it can fail with.
+Run the repository's lint from the repository root, and confirm that it rejects a bare runtime error, a thrown literal, a `catch` clause, and an inline promise `catch` handler.
+For each failure a change adds, could any caller or user act differently because of it, and is it a tagged error if so and a tagged defect otherwise?
 For each tagged error a change adds, which code handles it by tag, and does every Effect between them pass it up in its error type?
-For each `Effect.ignore`, `Effect.option`, or `Effect.orElseSucceed` a change adds, does it discard an expected failure?
-For each catch-all handler a change adds, does it branch on every tag?
+For each `Effect.ignore`, `Effect.option`, `Effect.orElseSucceed`, or catch-all handler a change adds, does it discard an expected failure or skip a tag?
+For each foreign call a change adds, is it wrapped once where it is called, with its failure mapped to a tagged class that keeps the cause?
+For each entry point a change adds, where is its one defect handler, and does the change run an Effect or catch a defect anywhere else?

@@ -1,0 +1,7 @@
+{
+  "jsPlugins": ["eslint-plugin-sonarjs"],
+  "rules": {
+    "no-ternary": "error",
+    "sonarjs/expression-complexity": ["error", { "max": 2 }]
+  }
+}

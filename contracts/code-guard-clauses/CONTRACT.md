@@ -11,7 +11,7 @@ Declare a maximum number of statements for an `if` statement that has no `else` 
 Never end a function with an `if` statement that has no `else` and holds more statements than that maximum, counting every statement nested inside the `if` at any depth; invert its condition into a guard.
 
 Never write an `else` after a branch that always ends with `return`, `throw`, `break`, or `continue`, whether the `else` holds a block or another `if`, and wherever that branch sits in an `else if` chain.
-Never write an `if` statement as the only statement of an `else` block; write `else if`.
+Never write an `if` statement as the only statement of an `else` block; write `else if`, or a `switch` or `match` where `code-exhaustive-branches` requires one.
 Never negate the whole condition of an `if` statement whose `else` holds a block, such as with `!` or a not-equal comparison; swap the branches instead.
 Never end a loop body with a `continue` statement, and never write an `else` that holds only `continue`.
 In a language with a statement that binds a pattern or leaves, such as `let Some(order) = found else { return Ok(None); };`, use it instead of a `match` or `if let` whose other branch only leaves, when the set is declared outside the repository; `code-exhaustive-branches` governs the sets the repository declares.

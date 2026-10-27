@@ -1,0 +1,34 @@
+{
+  "options": { "typeAware": true },
+  "jsPlugins": [{ "name": "unicorn-js", "specifier": "eslint-plugin-unicorn" }],
+  "rules": {
+    "unicorn-js/prefer-switch": [
+      "error",
+      { "minimumCases": 2, "emptyDefaultCase": "no-default-case" }
+    ],
+    "typescript/switch-exhaustiveness-check": [
+      "error",
+      {
+        "allowDefaultCaseForExhaustiveSwitch": true,
+        "considerDefaultExhaustiveForUnions": false,
+        "requireDefaultForNonUnion": true
+      }
+    ],
+    "typescript/await-thenable": "off",
+    "typescript/no-array-delete": "off",
+    "typescript/no-base-to-string": "off",
+    "typescript/no-duplicate-type-constituents": "off",
+    "typescript/no-floating-promises": "off",
+    "typescript/no-for-in-array": "off",
+    "typescript/no-implied-eval": "off",
+    "typescript/no-meaningless-void-operator": "off",
+    "typescript/no-misused-spread": "off",
+    "typescript/no-redundant-type-constituents": "off",
+    "typescript/no-unsafe-unary-minus": "off",
+    "typescript/no-useless-default-assignment": "off",
+    "typescript/prefer-string-starts-ends-with": "off",
+    "typescript/require-array-sort-compare": "off",
+    "typescript/restrict-template-expressions": "off",
+    "typescript/unbound-method": "off"
+  }
+}

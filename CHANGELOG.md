@@ -3,6 +3,255 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v10.0.0
+
+`api-typescript-request-paths`, `code-closed-value-sets`, `code-conditional-expressions`, `code-exhaustive-branches`,
+`code-module-file-roles`, `code-numeric-literals`, `code-typescript-call-arguments`, `code-typescript-effect-errors`,
+and `code-typescript-module-boundaries` now ship tool configuration under `assets/`, beside `code-blank-lines`,
+`code-function-size`, and `code-typescript-node-scripts`, so installing or updating them needs Tenet 0.11.0 or later.
+Every other contract still installs with Tenet 0.7.0 or later. The shipped lint files fail on code that complied before;
+run each tool's autofix where it has one, then rewrite or suppress what remains as `code-lint-suppressions` allows.
+
+### Tightened
+
+- `code-blank-lines`: besides control flow, each `return`, `throw`, or `raise` statement, each call or `await`
+  statement, each multi-line declaration, exported or not, and each multi-line assignment or expression statement now
+  takes one blank line before it unless it opens its block and after it unless it closes its block. Call statements
+  include `new`, `void`, and optional-call statements. Consecutive call statements need no blank line between them, even
+  when one spans several lines. `break` and `continue` statements, one-line assignments, imports, re-exports, and lists
+  of exported names need a blank line only where a neighboring statement requires one. A function's overload signatures
+  need none before their implementation. Where the repository's formatter requires more blank lines, such as two around
+  a top-level function, its count stands. The rule that exempted jump statements is removed. The shipped
+  `assets/oxlint/oxlintrc.json` extends `@stylistic/eslint-plugin`'s `padding-line-between-statements` to match. Its
+  `lineMode` selector options need the plugin at 5.10.0 or later. It was checked with oxlint 1.80.0 and
+  `@stylistic/eslint-plugin` 5.10.0. One `oxlint --fix` clears every finding, and oxfmt 0.65.0 keeps the inserted lines.
+  Review still covers logical phases, comment placement, and Python and Rust code.
+- `code-closed-value-sets`: HTTP methods and status codes leave the exemption for protocol values. Code names each one
+  through a declared closed set whose members hold the protocol's values, such as `HttpMethod.Post` and
+  `HttpStatus.MethodNotAllowed`, wherever it writes, passes, or compares one. Code such as `{ method: 'POST' }`, `{
+  status: 404 }`, `request.method === 'GET'`, and a type `'GET' | 'POST'` complied before and now violates. Each set's
+  declaration sits in a module that holds only that declaration, unless the standard library or a dependency already
+  exports the set with named members. A status code is also a numeric literal under `code-numeric-literals`, and its
+  named constant is the status set's member, never a second constant such as `NOT_FOUND = 404`. Test files, matched by a
+  declared path pattern, may still write methods and status codes as literals. The contract now ships `assets/ast-grep/`
+  with TypeScript and Tsx rules and declares `requires-tenet: 0.11.0`. The rules report an uppercase method literal
+  anywhere. They report `HEAD` or a lowercase method only where a method belongs: a `method`, `formMethod`,
+  `httpMethod`, or `requestMethod` property, a comparison or `switch` on one, or a list of methods. They report a status
+  code from 100 to 599 only where the `code-numeric-literals` lint skips it: as a `status` or `statusCode` property's
+  value in an object, a member assignment, a readonly class field, or a markup attribute, and in a type named for
+  statuses, such as `type ErrorStatus = 404 | 410`. So the two lints report no literal twice. The rules exempt files
+  named `http-method` and `http-status` and common test folders and suffixes, and a repository may override those
+  patterns. Load the rules from the repository's own configuration, such as by adding the installed
+  `assets/ast-grep/rules` folder to its `ruleDirs`. They were checked with ast-grep 0.51.0; pin it to an exact version,
+  as `ci-reproducible-checks` requires. The message now names HTTP methods and status codes.
+- `code-conditional-expressions`: never compute a value with an immediately invoked function, such as `const limit = (()
+  => { ... })()` or `pending = (async () => { ... })()`. A value that needs statements comes from a named function
+  called by name, and a function that chooses a value only chooses and returns it. That function is an independent
+  operation under `code-module-structure-and-control-flow`, even when it has one caller. A callback passed to an array
+  method, a memoizing hook, or any other call is still allowed, even when that call runs it at once. Declare a maximum
+  number of logical operators in one expression, counting `&&`, `||`, and `??` together, or the words `and` and `or` in
+  a language that spells them as words. Every logical operator nested inside a chain counts with that chain, including
+  through parentheses, negation, array elements, template placeholders, `new` arguments, arrow function bodies, and
+  markup fragments. A call's callee and arguments, an object literal's values, a `function` expression's body, and a
+  named markup element's attributes and children start their own count. Never shorten a long expression with a call that
+  only restarts the count, such as `Boolean(isOpen && isShipped) && isPaid && isReady`. A null-coalescing default is
+  still allowed and counts toward the maximum. Both new rules hold in every language, and review covers a language
+  without a shipped asset. The contract ships `assets/oxlint/oxlintrc.json`. That file enables oxlint's native
+  `no-ternary` and loads `eslint-plugin-sonarjs` through oxlint's `jsPlugins` to set `expression-complexity` to a
+  maximum of 2. At that maximum, `a && b && c` and `x ?? y ?? z` pass, while `a && b && c && d` and `(a && b) || (c &&
+  d)` fail. A repository's lint configuration may extend that file and override its maximum. sonarjs also counts the `?`
+  of a conditional operator, so a conditional operator that remains counts toward the maximum and also fails
+  `no-ternary`. The contract also ships `assets/ast-grep/sgconfig.yml`, whose `rules/` folder holds JavaScript,
+  TypeScript, and Tsx rules that reject a function expression invoked where it is written. They see through parentheses,
+  a comma sequence, `call`, `apply`, `bind`, and `new`, and in TypeScript through a type assertion, `satisfies`, and a
+  non-null assertion. They skip an invocation whose result is discarded, such as a statement of its own or one started
+  with `void`, because it computes no value; a chained result, as in `void (async () => { ... })().catch(...)`, is still
+  rejected. Load that `rules/` folder from the repository's own `sgconfig.yml` `ruleDirs`, or run `ast-grep scan -c`
+  with the shipped file. It was checked with oxlint 1.80.0, `eslint-plugin-sonarjs` 4.2.2, and ast-grep 0.51.0. Pin
+  oxlint, the plugin, and ast-grep to exact versions, as `ci-reproducible-checks` requires, because oxlint documents JS
+  plugins as alpha and not subject to semver. Install the plugin in the package that holds the `.contracts` folder or in
+  one above it, because oxlint resolves it from the installed file's folder. The contract declares `requires-tenet:
+  0.11.0`.
+- `code-exhaustive-branches`: an `else if` that tests the same value for equality as the test before it now becomes a
+  `switch` statement, for an open set as well as a closed one, so that the exhaustiveness lint can check every member;
+  before, both forms complied. The requirement applies only where a `switch` accepts any expression as a case and
+  compares it by strict equality, so a pattern `match` is never required. Comparisons of the value joined by a logical
+  or form one equality test, and a test joined by a logical and stays outside the rule. Lint rules that require a
+  default case or final `else` on a branch over a closed set, or an `if` instead of a short `switch`, must be off, and
+  the lint must run with type information. A default case beside cases that already name every member stays allowed. The
+  contract ships `assets/oxlint/oxlintrc.json` and declares `requires-tenet: 0.11.0`. The file loads
+  `eslint-plugin-unicorn` through oxlint's `jsPlugins` under the alias `unicorn-js`, because oxlint reserves `unicorn`
+  for its native plugin, and sets `prefer-switch` to its minimum of 2 cases with `emptyDefaultCase: "no-default-case"`.
+  It sets `options.typeAware` and configures `typescript/switch-exhaustiveness-check` to reject a missing member beside
+  a default and a switch on a non-union type without a default, and to allow a default on an exhaustive switch. It was
+  checked with oxlint 1.80.0, `eslint-plugin-unicorn` 79.0.0, and `oxlint-tsgolint` 7.0.2005. Pin oxlint, the plugin,
+  and `oxlint-tsgolint` to exact versions, as `ci-reproducible-checks` requires, because oxlint documents JS plugins as
+  alpha and not subject to semver. Install the plugin in the package that holds the `.contracts` folder or in one above
+  it, because oxlint resolves it from the installed file's folder. Install `oxlint-tsgolint` where the lint runs, such
+  as a dev dependency at the repository root, because oxlint looks for it from its working directory. Type-aware mode
+  would also turn on oxlint's 16 default type-aware rules, such as `unbound-method` and `no-floating-promises`, so the
+  file turns each of them off and enforces only this contract; a repository's own configuration may turn any of them
+  back on. On conductor this removes 6 warnings and keeps the 5 contract errors. A tsconfig error makes the
+  exhaustiveness rule skip that project's files with only a warning. A repository that lints only JavaScript can set
+  `options.typeAware` to false in its own configuration. `oxlint --fix-suggestions` rewrites every chain, with a second
+  run for a chain nested in another; run the formatter afterwards.
+- `code-function-size`: its `assets/oxlint/oxlintrc.json` now also sets the length, nesting, and callback limits beside
+  cognitive complexity 15. `max-lines-per-function` allows 50 lines, counted without blank lines and comments, and also
+  checks immediately invoked functions. An override allows 60 lines for functions in `.tsx` and `.jsx` files, such as
+  React components, as an example of a limit declared for one kind of function. The text now lets a repository declare
+  such a limit, with its reason beside the limits. In the largest measured repository, the override lowers the asset's
+  findings from 573 to 555. `max-depth` allows 3 nested blocks, and `max-nested-callbacks` allows 3 nested callbacks.
+  Code that passed a lint configuration extending the file can now fail, such as a 101-line method or a fourth nested
+  block. None of the three rules has an autofix, so each finding needs a rewrite or a suppression that
+  `code-lint-suppressions` allows. A repository may still override any limit the file sets, and the text now says "any
+  limit". The three rules are native to oxlint and need no plugin beyond `eslint-plugin-sonarjs`. It was checked with
+  oxlint 1.80.0 and 1.89.0 and `eslint-plugin-sonarjs` 4.2.2.
+- `code-module-file-roles`: declare at most one exported function in each source file. A function counts when the file
+  declares it or binds it as a value to a name for another file to import; a re-export does not count. A file may keep
+  the exported function's private helpers, such as the function for one case of its branch, unexported beside it. A
+  namespace file, which an entry point re-exports under one namespace named for the file, may still export several
+  functions on that namespace's concept. The repository exempts namespace files from the limit by a declared path
+  pattern that matches no other file. A language may leave the limit to review only when the repository declares that
+  language and the reason beside its declared file length. Before, every independent operation of a behavior module
+  needed its own file. A private independent operation, or one that an exported class or another exported value that is
+  not a function holds, which violated that rule, now complies. The contract ships `assets/ast-grep/` rules for
+  JavaScript, TypeScript, and Tsx that report each exported function after a file's first, including one inside
+  parentheses or a type assertion, and declares `requires-tenet: 0.11.0`. They were checked with ast-grep 0.51.0; pin
+  ast-grep to an exact version, as `ci-reproducible-checks` requires. Keep the installed rules folder out of the
+  repository's root ast-grep configuration, because `--globs` applies to every rule in a scan. Run the rules alone with
+  the installed `sgconfig.yml` and the declared namespace and generated path patterns, such as `ast-grep scan -c
+  .contracts/001-code-module-file-roles/assets/ast-grep/sgconfig.yml --globs '!src/uuid/uuid.ts'`. Review covers a
+  function that an export list or a default export names or a call returns, and a new check confirms that each path the
+  namespace pattern matches is a namespace file. The message now names the one-function limit.
+- `code-script-entry-points`: the main program can no longer run as one call that ends the process with a main call as
+  its only argument, such as `process.exit(await main())`, because `code-typescript-call-arguments` forbids nesting that
+  call.
+- `code-typescript-effect-errors`: a failure is expected when any caller or user could act differently because of it,
+  such as a requested record that does not exist or a dropped request. Every other failure is a defect, such as a record
+  that the same object wrote now missing or corrupt, which means the code's own invariant broke. A lookup that finds no
+  record for a caller's identifier stays an expected failure. Each defect now carries a tagged error class with fields
+  that locate it, such as `new InvoiceMissing({ invoice })`, and only a defect uses `Effect.die`, `Effect.orDie`, or
+  `throw`. Code never builds or extends a bare runtime error, such as `new Error(message)` or `class InvoiceError
+  extends Error`, and never fails, dies, or throws with a string or plain object. A test fake may throw what the
+  dependency it stands in for throws. Each foreign call that can throw or reject, such as `fetch`, JSON parsing, or a
+  storage or library call, is wrapped once where it is called with `Effect.tryPromise` or `Effect.try`. Its `catch`
+  option maps the failure to a tagged error class that keeps the caught value as its `cause`. A `catch` clause or a
+  promise's `catch` method is now a violation; a `try` with only a `finally` clause stays allowed. Each entry point has
+  one defect handler that records the defect and ends its unit of work, such as a server's 500 response or a command's
+  error exit status. A user interface wraps each route in an error boundary and passes it the defects of that route's
+  event handlers and asynchronous reads. Only that handler catches a defect, and no code logs a failure or defect and
+  then continues. `pipe` stays allowed as `code-typescript-call-arguments` allows, and the bound statements that
+  contract requires go inside `Effect.gen` with `yield*`. The tag-literal allowance is now stated only in
+  `code-closed-value-sets`. The contract ships `assets/oxlint/oxlintrc.json`, which enables oxlint's native
+  `no-throw-literal` and `preserve-caught-error` and keeps `unicorn/throw-new-error` off, because that rule reports and
+  rewrites the base of a tagged error class. It also ships `assets/ast-grep/` with TypeScript and Tsx variants of an
+  `untagged-errors` rule and a `catch-handlers` rule; run them from the repository root with `ast-grep scan -c` and the
+  installed `assets/ast-grep/sgconfig.yml`. They were checked with oxlint 1.80.0 and ast-grep 0.51.0; pin both to exact
+  versions, as `ci-reproducible-checks` requires. The contract declares `requires-tenet: 0.11.0`.
+- `test-support-modules`: each fixture server, fixture builder, and harness helper in the test support folder goes in
+  its own file, named for its behavior, such as `start-process`, as `code-module-file-roles` requires. Before, one file
+  per helper family, such as `processes`, could hold several helpers. Where a contract such as
+  `code-typescript-module-boundaries` gives each folder an entry point, tests import every helper through the test
+  support folder's entry point, not its files.
+
+### Loosened
+
+- `code-module-structure-and-control-flow`: the rule "Name intermediate values when nested calls hide the sequence" no
+  longer applies to code that `code-typescript-call-arguments` governs, which binds every nested call instead. In other
+  code it is unchanged.
+- `code-typescript-module-boundaries`: A file may now import files directly in a folder that contains it, such as
+  `orders/lines/sum.ts` importing `orders/format.ts`, except the package's own entry point. An entry point's re-exports
+  of its nested folders' symbols now follow `code-typescript-entry-points`, which lets an entry point re-export from a
+  nested folder's declaring file. Before this change, the entry-point import rule forbade both. Every other folder is
+  still imported only through its entry point. The entry point of the test support folder that `test-support-modules`
+  declares may export what only test files use, so tests import helpers through it. The contract now ships
+  `assets/oxlint/oxlintrc.json` and declares `requires-tenet: 0.11.0`. The file loads `eslint-plugin-boundaries` through
+  oxlint `jsPlugins`, uses `eslint-import-resolver-typescript`, and treats every folder as a module. It fails on any
+  import of a code file that goes past a folder's index file. That covers type-only imports, re-exports, dynamic
+  imports, `import()` types, import-equals, `require()`, extensionless and `.js` specifiers, and tsconfig and package
+  `imports` aliases. It also fails on a relative import it cannot resolve. It fails on cycles through `import/no-cycle`
+  with `ignoreTypes: false`, but that rule does not see cycles through dynamic imports, `import()` types, import-equals
+  declarations, or `require()`, so those cycles need another check. It skips dot-named files, such as a package's
+  `.prettierrc.cjs`, so an import of a dot-named file in another folder is left to review. It turns off `import/default`
+  and `import/namespace`, which enabling oxlint's `import` plugin would otherwise run. Package-name imports and imports
+  of data files are left to review. The file was checked with oxlint 1.80.0, `eslint-plugin-boundaries` 7.3.0, and
+  `eslint-import-resolver-typescript` 4.4.5. Use `eslint-plugin-boundaries` 7.3.0 or later, because 7.2.1 and earlier
+  misplace a folder whose name appears earlier in its own path, such as `workspaces/api/src/work`. oxlint does not pass
+  `settings` through `extends`, so either run the file as its own configuration from the repository root or extend it
+  and copy its `settings`. Without those settings, `boundaries/no-unknown-files` fails on every file. Pin exact versions
+  as `ci-reproducible-checks` requires. Install the plugin and the resolver in the package that holds `.contracts` or in
+  one above it. The resolver reads the `tsconfig.json` in the folder the lint runs from, plus its references, so list
+  every other tsconfig that declares path aliases under `project`, as the contract now requires.
+
+### Added
+
+- Contract `api-typescript-request-paths`: build each request path and URL with one typed path function per operation,
+  declared once in the module that owns the routes or stored layout it addresses. This covers fixed paths, test code,
+  and other systems' APIs, whose path functions belong to the module that owns that API's client. Each path function
+  takes one named, typed field per variable part, percent-encodes each text part, builds its query with a query encoder,
+  and returns the whole path; callers never append to it, and a full URL resolves it against a configured origin. A path
+  function holds no state, so a chained builder does not count as one. Hand-written path functions sit in the module's
+  one paths file, whose stem names the module and ends in `paths`, such as `packs/pack-paths.ts`, which its entry point
+  re-exports as one namespace such as `PackPaths`, so calls read `PackPaths.chunk({ key, index })`. A served route's
+  pattern and its path function derive from one declaration. A typed call that a client or router derives from one route
+  declaration counts as a path function; a call-site template such as `request('GET /accounts/{account}/invoices', {
+  account })` is a hand-written path. The contract ships `assets/ast-grep/` rules for TypeScript and Tsx. They report
+  each template literal, and each `+` concatenation, that starts with `/` outside files whose stem ends in `-paths`; a
+  repository that declares another pattern may override it. The rules were checked with ast-grep 0.51.0. The contract
+  declares `requires-tenet: 0.11.0`.
+- Contract `code-numeric-literals`: give every number a named constant, meaning a constant binding or read-only field
+  whose whole value is one number, and refer to the number by that name. A reassignable variable and a parameter's
+  default are not named constants. A declared few numbers may stay bare anywhere, such as -1, 0, 1, and 2, and that list
+  never holds a quantity such as a limit, size, duration, conversion factor, or status code. An enumeration member's
+  value, an array or type index, a type alias's whole value or union member, such as `type RetryCount = 3 | 5`, and an
+  object property's whole value, including property assignments and markup attributes, may also stay bare. Elsewhere in
+  a type, such as `{ size: 3 | 5 }`, code refers to such an alias. Each constant holds one literal at most besides the
+  bare numbers. A derived constant composes other constants' names, such as `UPLOAD_CHUNK_BYTES = UPLOAD_CHUNK_MEBIBYTES
+  * BYTES_PER_MEBIBYTE`, never literal arithmetic such as `5 * 1024 ** 2` or its computed value such as `5242880`. A
+  constant is named for what its number means, not its digits, and a status code takes its closed set's member as its
+  name under `code-closed-value-sets`. Test files, generated files, and copied third-party source are exempt by declared
+  path patterns. The contract ships `assets/oxlint/oxlintrc.json`, which configures oxlint's native `no-magic-numbers`
+  rule, so it needs no JS plugin. The file also turns the rule off for `*.test.*`, `*.spec.*`, `test/`, `tests/`,
+  `testing/`, and `__tests__/`, the same test patterns `code-closed-value-sets` ships. A repository's own lint
+  configuration may override the bare numbers and add or re-enable test patterns. Review covers the numbers the lint
+  misses, such as a markup child, a parse call's radix, or an object key. It was checked with oxlint 1.80.0. The
+  contract declares `requires-tenet: 0.11.0`.
+- Contract `code-typescript-call-arguments`: never write a call, `new` expression, or `await` inside the arguments of
+  another call or `new` expression; bind the result to a name and pass the name. The ban reaches through object fields,
+  array elements, templates, operators, spreads, and type assertions. It counts a call chain once and starts afresh
+  inside a function, class, or embedded markup element written in the arguments. A tagged template is a template, not a
+  call. Files with the schema role a repository declares under `code-module-file-roles` may nest calls, `new`
+  expressions, and `await` inside arguments. Each direct argument of `pipe(...)` or `.pipe(...)` may itself be one call,
+  but not a `new` or an `await`, and that call's own arguments follow the rule. When a step needs an earlier step's
+  result other than its input, or chooses between paths, each step's result is bound in a statement, such as `const
+  amount = yield* fetchAmount`. The formatter decides pipeline layout. A function written as a field, method, or element
+  of an object or array in a call's arguments is bound to a name first, while a function passed directly as an argument,
+  such as an array-method callback, stays inline. A function bound to a variable is a function declaration or a constant
+  annotated with a function type; `any`, `unknown`, `satisfies`, and `as` do not count as that annotation. Such a
+  binding is an independent operation even with one use. The contract ships ast-grep rules for TypeScript and Tsx in
+  `assets/ast-grep/rules/`: `call-arguments-*` for nesting, which exempt files named `schemas`, and
+  `argument-object-functions-*` for functions in argument objects and arrays. A repository that declares another schema
+  file name copies the nesting rules with that name. It also ships an `assets/ast-grep/sgconfig.yml` that runs them on
+  their own, and a repository can instead list the installed `assets/ast-grep/rules` folder under `ruleDirs` in its own
+  `sgconfig.yml`. It also ships `assets/oxlint/oxlintrc.json`, which sets the native `func-style` rule to `declaration`
+  with `allowTypeAnnotation` and needs no plugin. They were checked with ast-grep 0.51.0 and oxlint 1.80.0; pin both to
+  exact versions, as `ci-reproducible-checks` requires. None of the three rules has an autofix. The contract declares
+  `requires-tenet: 0.11.0`.
+
+### Clarified
+
+- `code-guard-clauses`: an `if` that is the only statement of an `else` block may become a `switch` or `match` where
+  `code-exhaustive-branches` requires one, instead of an `else if`.
+- `code-measured-value-names`: the unit-conversion example multiplies by the named constant `MILLISECONDS_PER_SECOND`
+  instead of a bare `1000`, and the violation example builds `UPLOAD_LIMIT` from named constants, as
+  `code-numeric-literals` requires.
+- `code-typescript-class-declarations`: the `override` field example sets `defaultPort` from a named constant, as
+  `code-numeric-literals` requires.
+- `code-typescript-type-assertions`: the annotation example declares an invoice, replacing a status-text map keyed by a
+  bare `404`, which `code-closed-value-sets` and `code-numeric-literals` reject.
+- `tenet-architecture-curation`: the recovery guidance no longer names one repository's durable infrastructure.
+- `tenet-code-curation`: the TypeScript decision example puts a blank line after each `if` statement, as
+  `code-blank-lines` requires.
 ## v9.0.0
 
 `code-blank-lines`, `code-function-size`, and `code-typescript-node-scripts` ship tool configuration under `assets/`,

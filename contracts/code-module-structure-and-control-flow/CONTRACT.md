@@ -21,7 +21,7 @@ Extract a helper only when it names a real concept, collapses real duplication, 
 
 Pass inputs and return results explicitly instead of relying on hidden side effects or ambient mutable state.
 State that one object or closure owns and changes only through its own functions, such as a cache field, is not ambient state.
-Name intermediate values when nested calls hide the sequence.
+Name intermediate values when nested calls hide the sequence, in code that `code-typescript-call-arguments` does not govern.
 Name values for what they hold.
 
 Never write by hand the parsing, validation, or provider integration that a maintained library provides; call the library and use its types.

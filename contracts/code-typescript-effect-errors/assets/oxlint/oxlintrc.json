@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "no-throw-literal": "error",
+    "preserve-caught-error": "error",
+    "unicorn/throw-new-error": "off"
+  }
+}

@@ -1,0 +1,73 @@
+# code-closed-value-sets: name each HTTP status code through its declared set, such as `HttpStatus.MethodNotAllowed`, never as a number.
+# TypeScript variant (.ts, .mts, .cts); http-status-literals-tsx.yml adds markup attributes and differs otherwise only in `id`, `language`, and this line.
+id: http-status-literals-typescript
+language: TypeScript
+severity: error
+message: Name this HTTP status code through its declared set, such as `HttpStatus.MethodNotAllowed`, instead of writing its number.
+note: |
+  A number from 100 to 599 is reported as the value of a property named `status` or `statusCode`, in an object, a member assignment, or a readonly class field.
+  It is also reported in a type named for statuses, such as `type ErrorStatus = 404 | 410`.
+  A status code in a comparison, a call argument, a `case` label, or a property's type, such as `status: 404 | 410`, is a bare number, which the lint of `code-numeric-literals` reports.
+  A status code under another name, such as `{ code: 404 }`, is left to review.
+  The module that declares the status set and the test files are exempt by the path patterns under `ignores`; replace them with the repository's declared paths.
+ignores:
+  # The module that declares the status set.
+  - "**/http-status.*"
+  # Test files, which may state the status codes they expect as numbers.
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/testing/**"
+  - "**/__tests__/**"
+utils:
+  # A three-digit number in the range that HTTP status codes occupy.
+  status-code:
+    kind: number
+    regex: ^[1-5][0-9][0-9]$
+  # A property name that holds a status code, quoted or not.
+  status-name:
+    regex: ^["']?(?i:status|status_?code)["']?$
+  # A type name that holds status codes, such as `ErrorStatus`.
+  status-type-name:
+    regex: (?i)status(_?code)?$
+rule:
+  all:
+    - matches: status-code
+    - any:
+        # `{ status: 404 }`.
+        - inside:
+            kind: pair
+            field: value
+            has:
+              field: key
+              matches: status-name
+        # `response.status = 500`.
+        - inside:
+            kind: assignment_expression
+            field: right
+            has:
+              field: left
+              kind: member_expression
+              has:
+                field: property
+                matches: status-name
+        # `readonly status = 410`.
+        - inside:
+            kind: public_field_definition
+            field: value
+            regex: \breadonly\s
+            has:
+              field: name
+              matches: status-name
+        # `type ErrorStatus = 404 | 410`.
+        - inside:
+            kind: literal_type
+            inside:
+              stopBy:
+                not:
+                  kind: union_type
+              kind: type_alias_declaration
+              has:
+                field: name
+                matches: status-type-name
