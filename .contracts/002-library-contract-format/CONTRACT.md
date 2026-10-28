@@ -14,6 +14,13 @@ Separate groups of related rules with one blank line.
 
 Give each contract one reviewable concern; split a contract whose rules a reviewer would check against unrelated code.
 Write each rule as a plain imperative requirement that a reviewer could find violated in code, configuration, or history.
+Give each rule one allowed form for each case it covers, never a choice between equivalent forms.
+Allow two forms only for disjoint cases, and state the observable condition that tells them apart, such as a file extension.
+Write a requirement in a form that a tool can check whenever such a form expresses the same decision.
+Where a tool can check a rule, ship that tool's configuration under `assets/<tool>/`, and give the contract a check that runs the tool.
+Turn a rule off in a shipped file only for a reason `code-lint-strictness` lists, never to scope that file's own test cases.
+Leave a rule to review alone only when two reviewers would decide each case of it the same way.
+Write each violation example so it breaks only the rule it illustrates, and each allowed example so it breaks no library contract that would govern it.
 Do not number rules or use hedges such as "consider" or "where appropriate".
 Keep a contract to at most 25 rules and 7 checks.
 State each requirement once in the library; a contract that depends on another contract's rule names that contract instead of restating it.
@@ -27,3 +34,5 @@ Run `python3 scripts/lint-contracts.py` from the repository root.
 Install each changed contract into a scratch repository with `tenet contracts add`, then run `tenet validate` there.
 For each changed rule, what code or history would violate it?
 Does any changed rule repeat a requirement another library contract owns?
+For each changed rule, does it name one allowed form per case, and does a shipped tool configuration check it wherever a tool can?
+Does each changed violation example break only its own rule, and each changed allowed example no library contract that would govern it?

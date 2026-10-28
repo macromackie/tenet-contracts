@@ -13,7 +13,9 @@ Comparisons of the value joined by a logical or form one equality test, and a te
 
 When code branches on a closed set, as `code-closed-value-sets` defines it, that the repository declares, such as a union of states or an enumeration of event kinds, name every member in a case or arm.
 Never cover a member of such a set with a default case, a wildcard arm, or a final `else`, such as `default: return 0` or `_ => None`, because a member added later would take that path unreviewed.
+Never end a branch that names every member with a default case or wildcard arm, because a member added later would take it unreviewed.
 A test for one member whose other branch serves every remaining member, such as `if let Order::Paid(paid) = order` with an `else` or `let Order::Paid(paid) = order else`, is a wildcard too, although no lint reports it.
+A test with the lookup of a declared subset of two or more members, such as `endedStates.has(state)`, is not a wildcard, so its `else` may serve the remaining members.
 Group members that share one result in one case, such as `Order::Draft(_) | Order::Sent(_) => None`.
 A lookup table that `code-conditional-expressions` allows is exhaustive only when its type requires every member as a key, such as `Record<OrderStatus, Delay>`.
 
@@ -27,14 +29,14 @@ Turn off each lint rule that requires a default case or final `else` on a branch
 Run the lint with the type information that its exhaustiveness rule needs.
 Where the repository's lint can load the configuration in this contract's `assets/` folder, extend it from the repository's own lint configuration.
 
-Violation: `if (order.status === OrderStatus.Draft)` is followed by `else if` tests for `OrderStatus.Paid` and for `OrderStatus.Refunded` or `OrderStatus.Cancelled`, so a new status passes the lint unhandled.
+Violation: `if (order.status === OrderStatus.Draft)` is followed by `else if` tests for `OrderStatus.Paid`, `OrderStatus.Refunded`, and `OrderStatus.Cancelled`, so a new status passes the lint unhandled.
 Allowed: `switch (order.status)` names `OrderStatus.Draft` and `OrderStatus.Paid` in their own cases and `OrderStatus.Refunded` and `OrderStatus.Cancelled` in one shared case, with no default, so a new status fails the lint.
 
 ## Checks
 
 Run the repository's lint with type information from the repository root, and confirm that it reports no type configuration error, which makes its exhaustiveness rule skip files.
-Confirm that the lint rejects an `else if` chain of equality tests on one value, a missing member, and a default or wildcard covering a member.
+Confirm the lint rejects an `else if` chain of equality tests on one value, a missing member, a default or wildcard covering a member, and a default after every member.
 For each `else if` that a change adds and the lint does not report, does it test the same value for equality as the test before it?
-For each chain of `if` and `else` that a change adds over a closed set's members, would a member added later fall into the final `else`?
+For each final `else` a change adds over a closed set's members, does it follow a declared subset's lookup, or would a later member fall into it?
 For each pattern test with an `else` that a change adds over a closed set the repository declares, does the `else` serve every remaining member?
 For each wildcard suppression a change adds, is the set declared outside the repository, and does the reason name it?

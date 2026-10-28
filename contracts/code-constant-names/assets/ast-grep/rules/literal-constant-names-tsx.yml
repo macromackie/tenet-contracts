@@ -1,0 +1,99 @@
+# code-constant-names: name each module-level constant whose value is a number or string written in source in SCREAMING_SNAKE_CASE.
+# Tsx variant (.tsx); the TypeScript and Tsx variants differ only in `id`, `language`, and this line.
+# Exempt generated files by their declared path pattern in a scan of these rules, such as
+# `ast-grep scan -c .contracts/NNN-code-constant-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: literal-constant-names-tsx
+language: Tsx
+severity: error
+message: Name this constant in SCREAMING_SNAKE_CASE, such as `STOP_TICK_MS`, because its value is a number or string written in source.
+note: |
+  A top-level `const`, exported or not, is reported when its value is a number, string, or template literal, or an arithmetic or string expression of such literals and SCREAMING_SNAKE_CASE constants, and its name is not SCREAMING_SNAKE_CASE.
+  A value wrapped in parentheses, `as const`, or `satisfies T` counts as the value it wraps.
+  A constant inside a function, a class field, and a constant whose value a call, a member, an object, or a list computes are not reported.
+  Suppress a name that a framework outside the repository fixes, such as an exported route option, with a reason that names that framework.
+utils:
+  # A name in SCREAMING_SNAKE_CASE, such as `MAX_ATTEMPTS` or `ENDED`.
+  constant-case:
+    regex: ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$
+  # A node that a number or string fixed in source cannot hold.
+  computed-part:
+    any:
+      - kind: identifier
+        not:
+          matches: constant-case
+      - kind: unary_expression
+        has:
+          field: operator
+          regex: ^(typeof|void|delete|!)$
+      - kind: binary_expression
+        has:
+          field: operator
+          regex: ^(&&|\|\||\?\?|==|===|!=|!==|<|<=|>|>=|in|instanceof)$
+      - kind: call_expression
+      - kind: member_expression
+      - kind: subscript_expression
+      - kind: new_expression
+      - kind: object
+      - kind: array
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: generator_function
+      - kind: class
+      - kind: regex
+      - kind: "true"
+      - kind: "false"
+      - kind: "null"
+      - kind: undefined
+      - kind: this
+      - kind: await_expression
+      - kind: ternary_expression
+      - kind: assignment_expression
+      - kind: meta_property
+  # A number or string written in source: a literal, or an arithmetic or string expression of literals and constants named in SCREAMING_SNAKE_CASE.
+  literal-value:
+    any:
+      - kind: number
+      - kind: string
+      - kind: template_string
+      - kind: unary_expression
+      - kind: binary_expression
+      - kind: parenthesized_expression
+    not:
+      any:
+        - matches: computed-part
+        - has:
+            matches: computed-part
+            stopBy: end
+  # That value, bare or wrapped in `as const` or `satisfies T` any number of times.
+  wrapped-literal-value:
+    any:
+      - matches: literal-value
+      - any:
+          - kind: as_expression
+          - kind: satisfies_expression
+        has:
+          matches: wrapped-literal-value
+  # A constant declared at the module's top level, exported or not.
+  module-constant:
+    kind: variable_declarator
+    inside:
+      kind: lexical_declaration
+      regex: ^const\b
+      inside:
+        any:
+          - kind: program
+          - kind: export_statement
+            inside:
+              kind: program
+rule:
+  matches: module-constant
+  has:
+    field: value
+    matches: wrapped-literal-value
+  not:
+    has:
+      field: name
+      any:
+        - not:
+            kind: identifier
+        - matches: constant-case

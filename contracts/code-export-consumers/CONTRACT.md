@@ -21,7 +21,7 @@ Treat a public-API marker and each ignore entry in the check's configuration as 
 An ignore entry may also exclude files that are not the package's source, such as fixture projects or generated output.
 An ignore entry that hides an unused file, export, or dependency is a violation, and so is a public-API marker whose reason names a test, a script in the repository, a planned use, or no consumer; a change in another repository that imports the export from the release that adds it is a consumer, not a planned use.
 
-Violation: a records file declares `export function formatUsd({ micros }: FormatUsdInput)`, and no other file imports `formatUsd`.
+Violation: a records file declares `export function formatUsd({ micros }: FormatUsdInput): string`, and no other file imports `formatUsd`.
 Allowed: a published client entry point marks its `InvoiceClient` type as public API, and the marker's reason names the other repository that imports it.
 
 ## Checks

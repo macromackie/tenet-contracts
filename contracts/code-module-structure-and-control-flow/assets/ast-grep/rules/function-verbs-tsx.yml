@@ -1,0 +1,94 @@
+# code-module-structure-and-control-flow: every owned function name that starts in lowercase starts with a verb from the declared list.
+# Tsx variant (.tsx); it differs from the TypeScript variant only in `id`, `language`, and this line.
+# The alternation below holds every word of verbs.txt beside this folder; keep the two identical when either changes.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-module-structure-and-control-flow/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: function-verbs-tsx
+language: Tsx
+severity: error
+message: Start this function's name with a verb from the declared list, such as `readInvoice` rather than `invoice`.
+note: |
+  A function declaration, a method, a method or abstract method signature, a property signature whose type is a function type, and a constant or class field whose value is a function are checked.
+  The first word is the name's leading lowercase run, after any `#`, `_`, or `$`, so `settleInvoice` starts with `settle`.
+  Names that start in capitals, such as components and classes, accessors such as `get total()`, a method whose body only returns a field of `this`, `constructor`, the runtime's conversion methods, and `main` are not checked.
+  Suppress a name that an interface or framework outside the repository fixes, with a reason that names that system.
+utils:
+  # A function written as a value.
+  bare-function:
+    any:
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: generator_function
+  # A node that wraps a value without changing it, such as `(value)` or `value satisfies Loader`.
+  value-wrapper:
+    any:
+      - kind: parenthesized_expression
+      - kind: as_expression
+      - kind: satisfies_expression
+      - kind: non_null_expression
+  # A function value, bare or inside wrappers.
+  function-value:
+    any:
+      - matches: bare-function
+      - matches: value-wrapper
+        has:
+          matches: bare-function
+          stopBy:
+            not:
+              matches: value-wrapper
+  # The name of a function declaration, method, method signature, function-typed property signature, or function-valued constant or field.
+  function-name:
+    any:
+      - kind: identifier
+        inside:
+          field: name
+          any:
+            - kind: function_declaration
+            - kind: generator_function_declaration
+      - any:
+          - kind: property_identifier
+          - kind: private_property_identifier
+        inside:
+          field: name
+          any:
+            - kind: method_signature
+            - kind: abstract_method_signature
+            - kind: method_definition
+              not:
+                any:
+                  # An accessor, such as `get total()`, is read as a property and named for its value.
+                  - regex: '^((static|public|private|protected|override|abstract|async|readonly|declare)\s+)*(get|set)\s+[\w#$\[]'
+                  # A method that only returns a field, such as `balance() { return this.#balance; }`, is named for its field.
+                  - has:
+                      field: body
+                      regex: '^\{\s*return\s+this\.[#\w$]+;?\s*\}'
+      - kind: identifier
+        inside:
+          field: name
+          kind: variable_declarator
+          has:
+            field: value
+            matches: function-value
+      - kind: property_identifier
+        inside:
+          field: name
+          kind: property_signature
+          has:
+            field: type
+            has:
+              kind: function_type
+      - kind: property_identifier
+        inside:
+          field: name
+          kind: public_field_definition
+          has:
+            field: value
+            matches: function-value
+rule:
+  matches: function-name
+  regex: ^[#_$]*[a-z]
+  not:
+    any:
+      - regex: ^[#_$]*(abort|accept|acquire|add|admit|advance|aggregate|allocate|allow|answer|append|apply|approve|archive|arm|assert|assess|assign|attach|audit|authenticate|authorize|await|backfill|begin|bind|block|build|bump|calculate|call|can|cancel|capture|change|check|choose|claim|classify|clean|clear|clip|close|collect|combine|commit|compare|compile|complete|compose|compress|compute|configure|confirm|connect|consume|continue|convert|copy|count|create|decide|declare|decode|decrypt|deduplicate|define|delete|deliver|deny|deploy|derive|describe|detach|detect|diagnose|diff|disable|discard|discover|dismiss|dispatch|dispose|download|drain|draw|drop|edit|emit|enable|encode|encrypt|end|enforce|enqueue|enroll|ensure|enter|escape|estimate|evaluate|exchange|exclude|execute|exit|expand|expect|expire|explain|export|expose|extend|extract|fail|feed|fill|filter|find|finish|flush|focus|fold|follow|force|format|forward|freeze|generate|grade|grant|group|guard|handle|has|hash|hide|hold|identify|ignore|import|include|increment|index|infer|ingest|initialize|insert|inspect|install|invoke|is|issue|join|judge|keep|kill|label|launch|lease|leave|limit|link|list|listen|lock|log|look|make|map|mark|mask|match|measure|merge|migrate|mint|mock|mount|move|name|navigate|needs|normalize|notify|observe|obtain|on|open|order|pack|page|paginate|parse|patch|pause|pick|pin|place|plan|poll|post|prepare|present|preserve|print|probe|process|produce|promote|prompt|protect|provide|provision|prune|publish|pull|push|put|qualify|query|queue|quote|raise|rank|read|reap|rebuild|receive|recheck|reconcile|record|recover|redact|redeem|redirect|reduce|refresh|refund|refuse|register|reject|release|reload|remember|remove|rename|render|renew|reopen|repair|repeat|replace|replay|reply|report|request|require|reserve|reset|resolve|respond|restart|restore|resume|retain|retry|return|reveal|review|revoke|rotate|route|run|sample|save|scale|scan|schedule|score|seal|search|seed|select|send|serialize|serve|set|settle|share|ship|should|show|sign|signal|simulate|skip|sleep|slice|sort|spawn|split|start|stop|store|stream|strip|submit|subscribe|sum|summarize|supply|suspend|sync|tag|take|terminate|test|throw|toggle|touch|trace|track|transform|translate|trigger|trim|truncate|try|unlabel|unlock|unpack|unregister|unset|unsubscribe|unwrap|update|upgrade|upload|upsert|use|validate|vend|verify|view|visit|wait|wake|walk|warn|was|watch|wrap|write|yield)([^a-z]|$)
+      # Names the language defines or calls, and the main function of an executable file.
+      - regex: ^(constructor|toString|toLocaleString|toJSON|valueOf|main)$

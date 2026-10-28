@@ -1,0 +1,35 @@
+// The strictest markdownlint settings that code-lint-strictness requires.
+// Every rule runs, each style option names the one form the formatter writes, and each rule left off names its reason above it:
+// C contradicts a contract, R contradicts another enabled rule, F conflicts with the formatter,
+// and Q reports code the contracts require.
+//
+// Extend this file from the repository's own .markdownlint.jsonc, as that file's first key:
+//   "extends": ".contracts/<number>-code-lint-strictness/assets/markdownlint/markdownlint.jsonc"
+// Run it from the repository root on every Markdown file:
+//   markdownlint-cli2 "**/*.md" "#node_modules"
+// Turn one more rule off there, beside a comment that starts with its reason letters.
+// A new markdownlint version adds rules, so this file is tested against markdownlint-cli2 0.24.0 with markdownlint 0.42.0;
+// pin that exact version and raise it in a reviewed upgrade.
+{
+  "MD003": { "style": "atx" },
+  "MD004": { "style": "dash" },
+  "MD009": { "list_item_empty_lines": false, "strict": true },
+  // F: the formatter owns line breaks, and a document writes one sentence per line at any length.
+  "MD013": false,
+  "MD026": { "punctuation": ".,;:!?。，；：！？" },
+  "MD029": { "style": "ordered" },
+  "MD035": { "style": "---" },
+  "MD040": { "language_only": true },
+  // Q: an installed contract starts at `## Rules` after front matter that holds its `name`, as the contract format requires.
+  "MD041": { "front_matter_title": "^\\s*(name|title)\\s*[:=]" },
+  "MD046": { "style": "fenced" },
+  "MD048": { "style": "backtick" },
+  "MD049": { "style": "underscore" },
+  "MD050": { "style": "asterisk" },
+  "MD052": { "shortcut_syntax": true },
+  // R: autolinks stay allowed, because no-bare-urls asks for a bare URL to be written as an autolink.
+  "MD054": { "collapsed": false, "full": false, "shortcut": false, "url_inline": false },
+  "MD055": { "style": "leading_and_trailing" },
+  "MD060": { "aligned_delimiter": true, "style": "aligned" },
+  "default": true,
+}

@@ -1,0 +1,40 @@
+# code-typescript-effect-absent-values: write no `null` or `undefined` in a return type, field type, or type alias that owned code declares.
+# Tsx variant (.tsx); absent-literal-types-typescript.yml is identical except for `id`, `language`, and this line.
+id: absent-literal-types-tsx
+language: Tsx
+severity: error
+message: Type a result or field that may hold no value as `Option.Option<T>`, and mark a field a caller may leave out with `?:`, instead of writing `null` or `undefined` in a type.
+note: |
+  This covers a declared return type, a field of an interface, object type, or class, and a type alias, including a type argument inside one, such as `Map<string, Invoice | undefined>`.
+  A parameter or local annotation outside those is not reported.
+  A component that renders nothing declares its framework's node type, which admits `null`, and a function that implements a dependency's signature is annotated with that dependency's type.
+  A type argument that a dependency's type requires takes a suppression with its reason, and a declaration file that types a dependency, such as `vendor.d.ts`, is not reported.
+ignores:
+  - "**/*.d.ts"
+  - "**/*.d.mts"
+  - "**/*.d.cts"
+rule:
+  kind: literal_type
+  any:
+    - has: { kind: "null" }
+    - has: { kind: undefined }
+  inside:
+    stopBy: end
+    any:
+      - kind: property_signature
+      - kind: public_field_definition
+      - kind: type_alias_declaration
+      - all:
+          - kind: type_annotation
+          - inside:
+              stopBy: neighbor
+              field: return_type
+              any:
+                - kind: function_declaration
+                - kind: generator_function_declaration
+                - kind: function_expression
+                - kind: arrow_function
+                - kind: method_definition
+                - kind: method_signature
+                - kind: abstract_method_signature
+                - kind: function_signature

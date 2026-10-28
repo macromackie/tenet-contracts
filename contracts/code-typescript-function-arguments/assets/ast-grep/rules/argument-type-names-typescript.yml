@@ -1,0 +1,111 @@
+# code-typescript-function-arguments: name a function's argument type its PascalCase name plus `Input`, and a component's its name plus `Props`.
+# TypeScript variant (.ts, .mts, .cts); argument-type-names-tsx.yml parses the same rule as JSX.
+# Keep the two identical except for `id`, `language`, and this comment.
+id: argument-type-names-typescript
+language: TypeScript
+severity: error
+message: "Type this destructured argument with a named type that ends in `Input`, or in `Props` for a component, such as `retryStep({ job }: RetryStepInput)`."
+note: |
+  Name the type for the function: `retryStep` takes `RetryStepInput`, the `post` method takes `PostInput`, and the `InvoiceRow` component takes `InvoiceRowProps`.
+  A function whose name starts with a capital letter is treated as a component; a constructor's type is named for its class, such as `LedgerInput`.
+  The rule checks the suffix only; review checks that the rest of the name is the function's own name.
+  It reads only a destructured parameter with a type annotation, in a function that is not written directly as a call's argument.
+  A type wrapped in an operator or utility, such as `Readonly<RetryStepInput>` or `Pick<Invoice, 'id'>`, is reported; declare a named type instead.
+  A parameter whose type a dependency declares, such as a framework's loader argument, is suppressed with a reason that names that type.
+utils:
+  # A function whose signature the repository writes: any function except one written directly as a call's argument.
+  owned-function:
+    any:
+      - kind: function_declaration
+      - kind: generator_function_declaration
+      - kind: function_expression
+      - kind: generator_function
+      - kind: arrow_function
+      - kind: method_definition
+      - kind: function_signature
+      - kind: abstract_method_signature
+    not:
+      inside:
+        kind: arguments
+  # A function bound to a capitalized name, such as `function InvoiceRow` or `const InvoiceRow = (...) =>`.
+  component:
+    any:
+      - all:
+          - any:
+              - kind: function_declaration
+              - kind: function_expression
+          - has:
+              field: name
+              regex: ^[A-Z]
+      - all:
+          - any:
+              - kind: arrow_function
+              - kind: function_expression
+          - inside:
+              kind: variable_declarator
+              field: value
+              has:
+                field: name
+                kind: identifier
+                regex: ^[A-Z]
+  # A named type, plain, qualified, or generic, whose name ends in `Input`, and one whose name ends in `Props`.
+  input-type:
+    any:
+      - kind: type_identifier
+        regex: Input$
+      - kind: nested_type_identifier
+        regex: Input$
+      - kind: generic_type
+        has:
+          field: name
+          regex: Input$
+  props-type:
+    any:
+      - kind: type_identifier
+        regex: Props$
+      - kind: nested_type_identifier
+        regex: Props$
+      - kind: generic_type
+        has:
+          field: name
+          regex: Props$
+  destructured-parameter:
+    any:
+      - kind: required_parameter
+      - kind: optional_parameter
+    all:
+      - has:
+          field: pattern
+          kind: object_pattern
+      - has:
+          field: type
+          kind: type_annotation
+rule:
+  matches: destructured-parameter
+  any:
+    # A component's argument whose type does not end in `Props`.
+    - all:
+        - not:
+            has:
+              field: type
+              has:
+                matches: props-type
+        - inside:
+            kind: formal_parameters
+            inside:
+              matches: owned-function
+              all:
+                - matches: component
+    # Any other function's argument whose type does not end in `Input`.
+    - all:
+        - not:
+            has:
+              field: type
+              has:
+                matches: input-type
+        - inside:
+            kind: formal_parameters
+            inside:
+              matches: owned-function
+              not:
+                matches: component

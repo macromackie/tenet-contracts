@@ -1,0 +1,17 @@
+# code-comment-form: write every doc comment as prose, with no section or tag for parameters, results, yielded values, errors, or panics.
+# Python variant; the TypeScript, Tsx, JavaScript, and Rust variants apply the same test to their doc comments.
+id: prose-doc-comments-python
+language: Python
+severity: error
+message: State this in the docstring's prose instead of a section, such as "Returns the receipt, and raises InvoiceRefunded when a refund closed it."
+note: |
+  The rule reports a string statement, such as a docstring, that holds a section line such as `Args:`, `Returns:`, `Yields:`, `Raises:`, or `Examples:`, alone or followed by text on its line.
+  It also reports a field such as `:param order:`, `:returns:`, or `:raises InvoiceRefunded:`, and a heading underlined with dashes, such as `Parameters` over `----------`.
+rule:
+  kind: string
+  inside:
+    kind: expression_statement
+  any:
+    - regex: '(?m)^\s*(?:Args|Arguments|Parameters|Params|Keyword Args|Keyword Arguments|Other Parameters|Returns|Return|Yields|Yield|Raises|Throws|Examples|Example)\s*:'
+    - regex: (?m)^\s*:(?:param|parameter|arg|argument|key|keyword|type|returns?|rtype|yields?|ytype|raises?|except|exception)\b
+    - regex: (?m)^\s*(?:Parameters|Other Parameters|Returns|Yields|Raises|Examples)\s*\n\s*-{3,}\s*$

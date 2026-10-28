@@ -5,7 +5,8 @@ message: Give each Rust type at most one impl block per file, make its fields al
 
 ## Rules
 
-Declare at most one inherent `impl` block for each self type in each file, where `Order<Draft>` and `Order<Placed>` are two self types but `impl<S> Order<S>` and `impl<T: Clone> Order<T>` share one, and move a bound that only some methods need into those methods' `where` clauses.
+Declare at most one inherent `impl` block for each self type in each file, and move a bound that only some methods need into those methods' `where` clauses.
+`Order<Draft>` and `Order<Placed>` are two self types, but `impl<State> Order<State>` and `impl<State: Clone> Order<State>` share one.
 Methods that serve one operation may live in that operation's file, beside the functions that use them.
 Give a struct either private fields and the methods that read and change them, or public fields and no invariant on their values, never a mix of public and private fields.
 Never give a field a scoped visibility, such as `pub(crate)` or `pub(super)`; make the field private behind a method, or make it public on a plain record.

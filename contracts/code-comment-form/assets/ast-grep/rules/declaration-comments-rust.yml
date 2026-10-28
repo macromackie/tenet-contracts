@@ -1,0 +1,62 @@
+# code-comment-form: write a comment above or beside a declaration, a member, or a module constant outside a function body as a doc comment.
+# Rust variant; the TypeScript and Tsx variants apply the same test with `/** */`.
+id: declaration-comments-rust
+language: Rust
+severity: error
+message: Write this comment as a `///` doc comment directly above the item, field, or variant it describes, because a plain comment never reaches its callers.
+note: |
+  The rule reads each `//` or `/* */` comment that is not a line doc comment, at module level or in the body of an `impl`, a trait, a struct, an enum, or an inline module, outside every function body.
+  It reports one that sits directly above such an item, field, or variant, or beside one on the same line.
+  A block doc comment, `/** */` or `/*! */`, is reported too, because a language with both doc comment forms writes the line form.
+  A `// SAFETY:` comment, which a lint reads above an unsafe item, and an `// ast-grep-ignore` directive keep their own form and are not reported.
+  The reason line directly above an `// ast-grep-ignore` directive, which `code-lint-suppressions` requires, is not reported either.
+utils:
+  plain-comment:
+    any:
+      - kind: line_comment
+      - kind: block_comment
+    not:
+      regex: ^(?:///|//!)
+  declaration:
+    any:
+      - kind: function_item
+      - kind: function_signature_item
+      - kind: struct_item
+      - kind: enum_item
+      - kind: union_item
+      - kind: trait_item
+      - kind: impl_item
+      - kind: type_item
+      - kind: const_item
+      - kind: static_item
+      - kind: mod_item
+      - kind: macro_definition
+      - kind: associated_type
+      - kind: field_declaration
+      - kind: enum_variant
+      - kind: attribute_item
+rule:
+  matches: plain-comment
+  not:
+    any:
+      - regex: ^(?://|/\*)\s*(?:SAFETY:|ast-grep-ignore\b)
+      - precedes:
+          regex: ^(?://|/\*)\s*ast-grep-ignore\b
+      - inside:
+          kind: block
+          stopBy: end
+  inside:
+    any:
+      - kind: source_file
+      - kind: declaration_list
+      - kind: field_declaration_list
+      - kind: enum_variant_list
+  any:
+    - precedes:
+        matches: declaration
+    - follows:
+        any:
+          - matches: declaration
+          - regex: ^[;,]$
+            follows:
+              matches: declaration

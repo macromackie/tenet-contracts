@@ -1,0 +1,112 @@
+# code-spelled-out-names: the word list maps `get`, `fetch`, and `load` to `read`, so no declared name starts with one of those words.
+# TypeScript variant (.ts, .mts, .cts); lookup-names-tsx.yml differs only in `id`, `language`, and this line.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-spelled-out-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: lookup-names-typescript
+language: TypeScript
+severity: error
+message: Start this name with `read` rather than `get`, `fetch`, or `load`, such as `readInvoice` for `getInvoice`, `fetchInvoice`, or `loadInvoice`.
+note: |
+  A variable, a parameter, a destructured or rest binding, a loop or catch binding, an import or export alias, a function, a class, a method, a field, a property signature, an object key, a type, a type parameter, including a mapped type's key and an `infer` type, a namespace, an enum, and an enum member are checked.
+  The first word is the name's leading run after any `#`, `_`, or `$`, in any case style, so `getInvoice`, `GetInvoiceInput`, and `GET_LIMIT` start with `get`, as `fetchInvoice` and `LOAD_LIMIT` start with `fetch` and `load`, while `getter`, `loader`, and `target` do not.
+  An accessor such as `get total()` is named `total`, and a call of another system's name, such as `rows.get(key)`, or an import that keeps it, such as `import { getConfig }`, declares nothing, so neither is checked.
+  A shorthand destructured binding, such as `const { getSession } = auth`, keeps its source's name, so the source's declaration is the one checked.
+  Suppress a name that an interface or framework outside the repository fixes, such as a route handler named `GET` or a platform's `fetch` handler, with a reason that names that system.
+utils:
+  # A name that a declaration introduces.
+  declared-name:
+    any:
+      - kind: identifier
+        any:
+          - inside:
+              field: name
+              any:
+                - kind: variable_declarator
+                - kind: function_declaration
+                - kind: generator_function_declaration
+                - kind: function_expression
+                - kind: enum_declaration
+          - inside:
+              field: pattern
+              any:
+                - kind: required_parameter
+                - kind: optional_parameter
+          - inside:
+              field: parameter
+              kind: arrow_function
+          - inside:
+              any:
+                - kind: array_pattern
+                - kind: rest_pattern
+                - kind: import_clause
+                - kind: namespace_import
+          - inside:
+              field: value
+              kind: pair_pattern
+          - inside:
+              field: left
+              any:
+                - kind: assignment_pattern
+                - kind: for_in_statement
+          - inside:
+              field: parameter
+              kind: catch_clause
+          - inside:
+              field: name
+              any:
+                - kind: function_signature
+                - kind: internal_module
+                - kind: module
+          - inside:
+              field: alias
+              any:
+                - kind: import_specifier
+                - kind: export_specifier
+      - matches: type-name
+      - kind: property_identifier
+        any:
+          - inside:
+              field: name
+              any:
+                - kind: method_definition
+                - kind: method_signature
+                - kind: abstract_method_signature
+                - kind: property_signature
+                - kind: public_field_definition
+                - kind: enum_assignment
+          - inside:
+              field: key
+              kind: pair
+          - inside:
+              kind: enum_body
+      - kind: private_property_identifier
+        inside:
+          field: name
+          any:
+            - kind: method_definition
+            - kind: public_field_definition
+  # A name that only a type, a type parameter, or an enum takes.
+  type-name:
+    any:
+      - kind: type_identifier
+        inside:
+          field: name
+          any:
+            - kind: class_declaration
+            - kind: abstract_class_declaration
+            - kind: class
+            - kind: interface_declaration
+            - kind: type_alias_declaration
+            - kind: type_parameter
+            - kind: mapped_type_clause
+      - kind: type_identifier
+        nthChild: 1
+        inside:
+          kind: infer_type
+      - kind: identifier
+        inside:
+          field: name
+          kind: enum_declaration
+rule:
+  matches: declared-name
+  regex: ^[#_$]*((get|Get|fetch|Fetch|load|Load)([^a-z]|$)|(GET|FETCH|LOAD)([_0-9]|$))

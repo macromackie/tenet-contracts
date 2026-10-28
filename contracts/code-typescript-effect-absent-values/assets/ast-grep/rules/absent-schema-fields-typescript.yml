@@ -1,0 +1,17 @@
+# code-typescript-effect-absent-values: decode an empty or missing field into an `Option`.
+# TypeScript variant (.ts, .mts, .cts); absent-schema-fields-tsx.yml is identical except for `id`, `language`, and this line.
+id: absent-schema-fields-typescript
+language: TypeScript
+severity: error
+message: Decode a field that a foreign format writes as `null` with `Schema.OptionFromNullOr`, one it may leave out with `Schema.OptionFromOptionalKey`, and one either way with `Schema.OptionFromOptionalNullOr`, so the decoded type holds an `Option`.
+note: |
+  This reports `Schema.NullOr`, `Schema.UndefinedOr`, `Schema.NullishOr`, `Schema.Null`, `Schema.Undefined`, `Schema.optional`, and `Schema.optionalKey`.
+rule:
+  kind: member_expression
+  all:
+    - has:
+        field: object
+        regex: ^Schema$
+    - has:
+        field: property
+        regex: ^(NullOr|UndefinedOr|NullishOr|optional|optionalKey|Null|Undefined)$

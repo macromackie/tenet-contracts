@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "capitalized-comments": [
+      "error",
+      "always",
+      {
+        "ignoreConsecutiveComments": true,
+        "ignorePattern": "ast-grep-ignore|[a-z0-9]+(?:-[a-z0-9]+)*-allow\\b"
+      }
+    ]
+  }
+}

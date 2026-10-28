@@ -6,7 +6,7 @@ message: Write a command-line program's result to standard output and every othe
 ## Rules
 
 Apply these rules to command-line programs, scripts, eval runners, and test harnesses.
-A server writes its log lines only through one logger module, and the repository's telemetry rules decide what those lines hold.
+Lines that `telemetry-application-tracing` covers, such as a server's log lines, follow that contract instead of these rules.
 Declare one output module for each program, and write to standard output and standard error only through it.
 Never call a console method or a print macro, or open a handle to either standard stream, outside the output module.
 A function that receives a writer from the output module may write to that writer.
@@ -25,7 +25,7 @@ Enforce these rules with the repository's lint, which reports every console call
 Suppress a finding only as `code-lint-suppressions` allows.
 
 Violation: a deploy step calls `console.log('deploy: waiting for readiness')` and then `process.exit(1)` in the middle of the script.
-Allowed: the deploy step calls the output module's `progress({ line: 'waiting for readiness' })`, and the entry point passes `ExitStatus.Refused` to `finish`.
+Allowed: the deploy step calls the output module's `reportProgress({ line: 'waiting for readiness' })`, and the entry point passes `ExitStatus.Refused` to `finish`.
 
 ## Checks
 

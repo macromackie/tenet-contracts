@@ -1,0 +1,25 @@
+# code-typescript-effect-schemas: derive a schema's type once, in an alias that shares the schema's name, and refer to that alias everywhere else.
+# Tsx variant (.tsx); schema-types-typescript.yml is identical except for `id`, `language`, and this line.
+id: schema-types-tsx
+language: Tsx
+severity: error
+message: Refer to the schema's type by its alias, such as `Invoice`, declared once beside the schema as `type Invoice = typeof Invoice.Type`.
+note: |
+  The only allowed place for `typeof Invoice.Type` is the whole value of a type alias whose name equals the schema's, such as `export type Invoice = typeof Invoice.Type`.
+  An alias with another name, such as `type InvoiceRecord = typeof Invoice.Type`, and the derived type written inline, such as `(input: typeof Invoice.Type)`, are reported.
+  The helper form `Schema.Schema.Type<typeof Invoice>` is reported everywhere, even in an alias that shares the schema's name, so each alias is written `type Invoice = typeof Invoice.Type`.
+  A schema's other derived types, such as `typeof Invoice.Encoded`, are left to review.
+rule:
+  any:
+    - kind: type_query
+      has:
+        kind: member_expression
+        has:
+          field: property
+          regex: ^Type$
+      not:
+        inside:
+          pattern: type $SCHEMA = typeof $SCHEMA.Type
+    # `Schema.Schema.Type<typeof Invoice>`, the helper form of the same derived type.
+    - kind: generic_type
+      regex: ^Schema\.Schema\.Type\s*<

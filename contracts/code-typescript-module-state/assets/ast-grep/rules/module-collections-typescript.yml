@@ -1,0 +1,66 @@
+# code-typescript-module-state: type each module-level `Set` or `Map` as `ReadonlySet<T>` or `ReadonlyMap<K, V>`.
+# TypeScript variant (.ts, .mts, .cts); module-collections-tsx.yml differs only in `id`, `language`, and this line.
+id: module-collections-typescript
+language: TypeScript
+severity: error
+message: "Annotate this module-level collection as `ReadonlySet<T>` or `ReadonlyMap<K, V>`, such as `const roles: ReadonlySet<Role> = new Set([...])`, or move a collection that code fills into the object or closure that owns it."
+note: |
+  A top-level `const`, exported or not, whose value is `new Set(...)` or `new Map(...)` is reported unless its annotation is `ReadonlySet<...>` or `ReadonlyMap<...>`.
+  The `new` expression may sit inside parentheses or an `as` or `satisfies` clause, neither of which makes the collection read-only.
+  A collection that code fills after the module loads, such as a cache, is module state, which the annotation turns into a compile error; move it to its owner instead.
+  A collection that another call returns, and a `WeakSet` or `WeakMap`, are left to review.
+  Scripts and test files are exempt by the path patterns under `ignores`; replace them with the repository's declared paths.
+ignores:
+  # Scripts, whose top level code-script-entry-points governs.
+  - "**/scripts/**"
+  # Test files.
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/testing/**"
+  - "**/__tests__/**"
+utils:
+  # A `const` declarator at the top level of the module, exported or not.
+  module-const:
+    kind: variable_declarator
+    inside:
+      kind: lexical_declaration
+      regex: ^const\s
+      inside:
+        any:
+          - kind: program
+          - kind: export_statement
+            inside:
+              kind: program
+  # `new Set(...)` or `new Map(...)`.
+  new-collection:
+    kind: new_expression
+    has:
+      field: constructor
+      regex: ^(Set|Map)$
+  # A node that wraps a value without changing it, such as `(value)` or `value satisfies ReadonlySet<Role>`.
+  value-wrapper:
+    any:
+      - kind: parenthesized_expression
+      - kind: as_expression
+      - kind: satisfies_expression
+  # A collection, bare or inside wrappers.
+  collection-value:
+    any:
+      - matches: new-collection
+      - matches: value-wrapper
+        has:
+          matches: new-collection
+          stopBy:
+            not:
+              matches: value-wrapper
+rule:
+  matches: module-const
+  has:
+    field: value
+    matches: collection-value
+  not:
+    has:
+      field: type
+      regex: ^:\s*Readonly(Set|Map)\s*<

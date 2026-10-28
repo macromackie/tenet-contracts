@@ -1,0 +1,84 @@
+# code-typescript-object-literal-functions: an object literal holds each function by name, never as a method or a function-valued property.
+# TypeScript variant (.ts, .mts, .cts); object-literal-functions-tsx.yml adds the JSX boundaries.
+# Keep the two otherwise identical; they differ only in `id`, `language`, and `utils.boundary`.
+# Keep `utils.argument-stop` and `utils.boundary` in step with code-typescript-call-arguments' argument-object-functions rule.
+id: object-literal-functions-typescript
+language: TypeScript
+severity: error
+message: Declare this function by name and list it in the object, such as `return { settleInvoice }`.
+note: |
+  Write `function settleInvoice(...)` or `const settleInvoice: SettleInvoice = ...`, then `{ settleInvoice }` or `{ fetch: handleRequest }`.
+  A getter or setter stays where it is written, and a class body is not an object literal.
+  A function in an array, or passed directly as an argument, such as `{ paidInvoices: invoices.filter((invoice) => invoice.isPaid) }`, is not held by the object.
+  A call that returns a function, such as `memoize(...)`, still gives the property a function, which this rule cannot see; bind its result by name and list that name.
+  code-typescript-call-arguments reports a function written in an object or array in a call's arguments, so this rule skips it.
+utils:
+  # A function, class, or JSX element restarts the search, as in code-typescript-call-arguments' argument-object-functions rule.
+  boundary:
+    any:
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: function_declaration
+      - kind: generator_function
+      - kind: generator_function_declaration
+      - kind: method_definition
+      - kind: class
+      - kind: class_declaration
+      - kind: abstract_class_declaration
+  # tree-sitter parses a tagged template as a call whose arguments are the template.
+  tagged-template:
+    kind: call_expression
+    has:
+      field: arguments
+      kind: template_string
+  # Copied from argument-object-functions: it reports a function whose nearest one of these is an argument list.
+  argument-stop:
+    any:
+      - kind: arguments
+      - kind: call_expression
+        not:
+          matches: tagged-template
+      - kind: new_expression
+      - matches: boundary
+  # The nearest of these above a function expression decides whether an object property holds it.
+  # Parentheses, operators, `as` assertions, and `satisfies` expressions pass through to the property.
+  holder-stop:
+    any:
+      - kind: pair
+      - kind: object
+      - kind: array
+      - kind: arguments
+      - kind: call_expression
+      - kind: new_expression
+      - kind: computed_property_name
+      - matches: boundary
+  # A method written in an object literal, except a getter or setter.
+  object-method:
+    kind: method_definition
+    inside:
+      kind: object
+    not:
+      has:
+        field: name
+        follows:
+          regex: ^(get|set)$
+  # A function expression that is the value of an object literal's property.
+  property-function:
+    any:
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: generator_function
+    inside:
+      kind: pair
+      stopBy:
+        matches: holder-stop
+rule:
+  any:
+    - matches: object-method
+    - matches: property-function
+  # Leave each function that argument-object-functions reports to it, so no site is reported twice.
+  not:
+    inside:
+      kind: arguments
+      stopBy:
+        matches: argument-stop

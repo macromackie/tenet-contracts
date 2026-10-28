@@ -1,0 +1,77 @@
+# code-diagnostic-messages: start each diagnostic with a lowercase word unless that word is a proper noun or an identifier written as it is spelled.
+# Python variant; the TypeScript and Tsx variants apply the same first-word test to their error constructors and calls.
+id: diagnostic-case-python
+language: Python
+severity: error
+message: Start this diagnostic with a lowercase word, such as `order 42 was not found`, unless its first word is a proper noun or an identifier.
+note: |
+  The first word is the leading run of letters, with apostrophes and hyphens, of a string literal, after any prefix such as `f`.
+  A word that holds a capital after its first letter or any digit, dot, or underscore, such as `GitHub`, `URL`, or `SHA-256`, is an identifier and is allowed.
+  A message that starts with an interpolated value, a quote, or another non-letter, such as `f"{path!r}: not found"`, is allowed.
+  The rule reads each string argument, and the `detail`, `message`, and `msg` arguments, of a raised call, such as `raise ValueError("...")`.
+  It also reads the first argument of `warnings.warn`, `sys.exit`, `sys.stderr.write`, and `print` with `file=sys.stderr`.
+  A diagnostic that another function writes, such as an output module's `fail(line)`, is left to review.
+utils:
+  # A string literal whose first word is one capital followed by lowercase letters, and not a declared proper noun.
+  capitalized-text:
+    kind: string
+    regex: ^[rRbBuUfF]{0,2}(?:"""|'''|"|')[A-Z][a-z]*(?:'[a-z]+)?(?:-[a-z]+)*(?:[\s:,;!?)"']|\.(?:\s|["']))
+    not:
+      matches: proper-noun-text
+  # A call that warns, exits, or writes to standard error with a message for a person.
+  diagnostic-call:
+    kind: call
+    any:
+      - has:
+          field: function
+          regex: ^(?:warnings\.warn|sys\.exit|sys\.stderr\.write)$
+      - all:
+          - has:
+              field: function
+              regex: ^print$
+          - has:
+              field: arguments
+              has:
+                kind: keyword_argument
+                all:
+                  - has:
+                      field: name
+                      regex: ^file$
+                  - has:
+                      field: value
+                      regex: ^sys\.stderr$
+  # A string argument, given alone or as the first part of an implicit concatenation.
+  argument-text:
+    any:
+      - inside:
+          kind: argument_list
+      - nthChild: 1
+        inside:
+          kind: concatenated_string
+          inside:
+            kind: argument_list
+rule:
+  matches: capitalized-text
+  any:
+    # `raise ValueError("...")`, positionally or as `detail=`, `message=`, or `msg=`.
+    - any:
+        - matches: argument-text
+        - inside:
+            kind: keyword_argument
+            field: value
+            has:
+              field: name
+              regex: ^(?:detail|message|msg)$
+      inside:
+        stopBy: end
+        kind: call
+        inside:
+          kind: raise_statement
+    # `warnings.warn("...")`, `sys.exit("...")`, and `print("...", file=sys.stderr)`.
+    - nthChild: 1
+      matches: argument-text
+      inside:
+        stopBy: end
+        kind: argument_list
+        inside:
+          matches: diagnostic-call

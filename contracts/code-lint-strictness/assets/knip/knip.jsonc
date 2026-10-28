@@ -1,0 +1,52 @@
+// The strictest knip settings that code-lint-strictness requires.
+// Every issue type is reported at error, class members and the exports of entry files included, and no issue type is off.
+//
+// knip reads only its own file, so copy this file to `knip.jsonc` at the repository root.
+// Add the repository's `entry`, `project`, and `workspaces` to that copy, naming every script its task runner runs,
+// because knip finds entry files only from a package manifest and the tools it has plugins for.
+// Run it from the repository root twice: once over every file, and once over production code alone,
+// where a dependency only tests and tools use counts as unused:
+//   knip
+//   knip --production --strict
+// Turn one more issue off in that copy only beside a comment that starts with its reason letters.
+// A new knip version adds issue types, so this file is tested against knip 5.88.1;
+// pin that exact version and raise it in a reviewed upgrade.
+{
+  "ignoreExportsUsedInFile": false,
+  "include": [
+    "binaries",
+    "catalog",
+    "classMembers",
+    "dependencies",
+    "devDependencies",
+    "duplicates",
+    "enumMembers",
+    "exports",
+    "files",
+    "nsExports",
+    "nsTypes",
+    "optionalPeerDependencies",
+    "types",
+    "unlisted",
+    "unresolved",
+  ],
+  "includeEntryExports": true,
+  "rules": {
+    "binaries": "error",
+    "catalog": "error",
+    "classMembers": "error",
+    "dependencies": "error",
+    "devDependencies": "error",
+    "duplicates": "error",
+    "enumMembers": "error",
+    "exports": "error",
+    "files": "error",
+    "nsExports": "error",
+    "nsTypes": "error",
+    "optionalPeerDependencies": "error",
+    "types": "error",
+    "unlisted": "error",
+    "unresolved": "error",
+  },
+  "treatConfigHintsAsErrors": true,
+}

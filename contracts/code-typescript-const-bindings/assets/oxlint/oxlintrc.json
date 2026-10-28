@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "func-style": ["error", "declaration", { "allowTypeAnnotation": true }],
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": false }]
+  }
+}

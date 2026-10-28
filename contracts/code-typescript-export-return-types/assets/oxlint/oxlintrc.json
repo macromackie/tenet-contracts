@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "typescript/explicit-module-boundary-types": [
+      "error",
+      {
+        "allowArgumentsExplicitlyTypedAsAny": true,
+        "allowDirectConstAssertionInArrowFunctions": false,
+        "allowHigherOrderFunctions": false,
+        "allowOverloadFunctions": false,
+        "allowTypedFunctionExpressions": true,
+        "allowedNames": []
+      }
+    ]
+  }
+}

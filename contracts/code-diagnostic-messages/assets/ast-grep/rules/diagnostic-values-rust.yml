@@ -1,0 +1,116 @@
+# code-diagnostic-messages: quote every value a diagnostic interpolates with `{value:?}`, and append a cause's own message after a colon as `{error:#}`.
+# Rust variant; the TypeScript and Tsx variants apply the same test to their error messages.
+id: diagnostic-values-rust
+language: Rust
+severity: error
+message: Quote this interpolated value as `{value:?}`, such as `invoice {invoice_id:?} is closed`, unless it is a cause's message after a colon, written `{error:#}`.
+note: |
+  The rule reads each placeholder of a format string that is an error's or a panic's message, and allows only `{value:?}`, `{0:?}`, or `{:?}`, and a cause's message.
+  A cause's message is a placeholder in the alternate form that follows `: `, such as `read {path:?}: {error:#}`, which prints a chained error's whole chain.
+  A placeholder such as `{}`, `{name}`, `{0}`, or `{count:>5}` is reported, whatever the value's type; a number is quoted too.
+  An error's or a panic's message is the format string of `anyhow!`, `bail!`, `ensure!`, `panic!`, `unreachable!`, `todo!`, `unimplemented!`, the assert macros, and `#[error(...)]`.
+  It is also a `format!` string passed to `.context(...)`, `.with_context(...)`, `.expect(...)`, `.map_err(...)`, `.ok_or(...)`, `.ok_or_else(...)`, or `Err(...)`.
+  A log line is a record, not a diagnostic, and a line a print macro writes is the output module's, so neither is read; a diagnostic that another function writes is left to review.
+utils:
+  # A format string with a placeholder that neither quotes its value nor appends a cause after a colon.
+  unquoted-placeholder:
+    all:
+      - any:
+          - kind: string_literal
+          - kind: raw_string_literal
+      - any:
+          # `{}`, `{name}`, and `{0}`.
+          - regex: '(?:^r?#*"|[^{])\{[^{}:]*\}'
+          # `{count:>5}`, `{name:#?}`, and every other form but `{name:?}` and `{name:#}`.
+          - regex: '(?:^r?#*"|[^{])\{[^{}:]*:(?:[^{}]{2,}|[^{}?#]|)\}'
+          # `{error:#}` anywhere but after `: `.
+          - regex: '(?:^r?#*"|[^ {]|[^:] )\{[^{}:]*:#\}'
+  # The first string literal of a macro's arguments.
+  first-string:
+    not:
+      follows:
+        any:
+          - kind: string_literal
+          - kind: raw_string_literal
+        stopBy: end
+  # A macro that fails or panics with its first argument as the message.
+  message-macro:
+    kind: macro_invocation
+    has:
+      field: macro
+      regex: (?:^|::)(?:anyhow|bail|panic|unreachable|todo|unimplemented)$
+  # A macro whose message follows a condition.
+  condition-macro:
+    kind: macro_invocation
+    has:
+      field: macro
+      regex: (?:^|::)(?:ensure|(?:debug_)?assert)$
+  # A macro whose message follows the two compared values.
+  comparison-macro:
+    kind: macro_invocation
+    has:
+      field: macro
+      regex: (?:^|::)(?:debug_)?assert_(?:eq|ne)$
+  # A call that attaches or states a message, such as `.context(format!(...))`, or builds an error, `Err(format!(...))`.
+  message-call:
+    kind: call_expression
+    any:
+      - has:
+          field: function
+          kind: field_expression
+          has:
+            field: field
+            regex: ^(?:context|with_context|expect|map_err|ok_or|ok_or_else)$
+      - has:
+          field: function
+          regex: ^Err$
+rule:
+  matches: unquoted-placeholder
+  any:
+    # `bail!("...")`, `anyhow!("...")`, and `panic!("...")`.
+    - matches: first-string
+      inside:
+        kind: token_tree
+        inside:
+          matches: message-macro
+    # `ensure!(ready, "...")` and `assert!(ready, "...")`.
+    - follows:
+        regex: ^,$
+        stopBy: end
+      inside:
+        kind: token_tree
+        inside:
+          matches: condition-macro
+    # `assert_eq!(left, right, "...")`.
+    - follows:
+        regex: ^,$
+        stopBy: end
+        follows:
+          regex: ^,$
+          stopBy: end
+      inside:
+        kind: token_tree
+        inside:
+          matches: comparison-macro
+    # `#[error("...")]`.
+    - matches: first-string
+      inside:
+        kind: token_tree
+        inside:
+          kind: attribute
+          has:
+            regex: ^error$
+    # `.with_context(|| format!("..."))` and `Err(format!("..."))`.
+    - matches: first-string
+      inside:
+        kind: token_tree
+        inside:
+          kind: macro_invocation
+          has:
+            field: macro
+            regex: ^format$
+          inside:
+            stopBy: end
+            kind: arguments
+            inside:
+              matches: message-call

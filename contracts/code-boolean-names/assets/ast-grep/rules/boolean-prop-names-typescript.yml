@@ -1,0 +1,93 @@
+# code-boolean-names: start the name of every boolean field of a component's props type with a declared prefix, unless it is a declared boolean attribute name.
+# TypeScript variant (.ts, .mts, .cts); it differs from the Tsx variant only in `id`, `language`, and this line.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-boolean-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: boolean-prop-names-typescript
+language: TypeScript
+severity: error
+message: Start this boolean prop's name with a declared prefix, such as `isBusy` rather than `busy`, unless it is a declared attribute name such as `disabled` that the component forwards.
+note: |
+  A field declared `boolean`, required or optional, is checked anywhere inside a component's props type, including a nested object or a callback's argument.
+  That is a type alias or interface whose name ends in `Props`, such as `SaveButtonProps`, or the type written on a parameter of a function whose name starts with a capital letter.
+  A name passes when it starts with a predicate or option prefix, the `predicate-prefixed-name` and `option-prefixed-name` rules in ../utils.
+  A prop itself, not a field nested inside one, named on the `boolean-attribute-name` list in ../utils, such as `disabled` or `open`, passes too, and review confirms that the component forwards it.
+  A props type written only as an inline type argument, such as `FC<{ visible: boolean }>`, or on an unnamed default-exported function is left to review.
+  These are the only boolean fields that this folder checks, so configure every other form that code-boolean-names names in the repository's own lint.
+  Suppress a name that an interface or framework outside the repository fixes, with a reason that names that system.
+utils:
+  # A component, which is a function whose name starts with a capital letter, such as `function SaveButton` or `const SaveButton = (...) =>`.
+  component-function:
+    any:
+      - any:
+          - kind: function_declaration
+          - kind: function_expression
+        has:
+          field: name
+          regex: ^[A-Z]
+      - any:
+          - kind: arrow_function
+          - kind: function_expression
+        inside:
+          kind: variable_declarator
+          has:
+            field: name
+            regex: ^[A-Z]
+      # A component wrapped in a call, such as `const Row = memo((props: RowProps) => ...)`.
+      - any:
+          - kind: arrow_function
+          - kind: function_expression
+        inside:
+          kind: arguments
+          inside:
+            kind: call_expression
+            inside:
+              kind: variable_declarator
+              has:
+                field: name
+                regex: ^[A-Z]
+  # A component's props type: a named type ending in `Props`, or the type written on a component's parameter.
+  props-type:
+    any:
+      - any:
+          - kind: type_alias_declaration
+          - kind: interface_declaration
+        has:
+          field: name
+          regex: Props$
+      - kind: type_annotation
+        inside:
+          any:
+            - kind: required_parameter
+            - kind: optional_parameter
+          inside:
+            kind: formal_parameters
+            inside:
+              matches: component-function
+rule:
+  kind: property_identifier
+  inside:
+    field: name
+    kind: property_signature
+    has:
+      field: type
+      has:
+        kind: predefined_type
+        regex: ^boolean$
+    inside:
+      stopBy: end
+      matches: props-type
+  not:
+    any:
+      - matches: predicate-prefixed-name
+      - matches: option-prefixed-name
+      # Only a prop, not a field nested inside one, may carry a declared attribute name.
+      - matches: boolean-attribute-name
+        not:
+          inside:
+            stopBy: end
+            kind: object_type
+            inside:
+              stopBy: end
+              any:
+                - kind: object_type
+                - kind: interface_body

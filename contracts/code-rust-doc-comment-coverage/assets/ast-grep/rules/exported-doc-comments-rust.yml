@@ -1,0 +1,88 @@
+# code-rust-doc-comment-coverage: give every item that a library crate exports a doc comment.
+# Rust only; the contract covers no other language.
+# Scan each library crate with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-rust-doc-comment-coverage/assets/ast-grep/sgconfig.yml --globs '!target/**'`.
+id: exported-doc-comments-rust
+language: Rust
+severity: error
+message: Write a `///` doc comment above this exported item that states what its callers need, because the crate exports it.
+note: |
+  The rule reads an item whose visibility is exactly `pub` as exported, because the denied `unreachable_pub` lint makes every unexported `pub` item `pub(crate)` or narrower.
+  It reports each such function, inherent method, struct, enum, union, trait, type alias, constant, static, and inline module that has no `///` comment above it.
+  It reports each method, associated type, and constant that a `pub` trait declares, and each `#[macro_export]` macro, the same way.
+  Attributes between the doc comment and the item are skipped, and `#[doc = "..."]` counts as a doc comment.
+  An inline module may carry its doc comment as `//!` at the top of its body instead.
+  An item of a trait implementation, a field, and a variant are not reported.
+  A `pub mod name;` declaration is not reported, because its doc comment is the `//!` summary at the top of its own file.
+utils:
+  documented:
+    follows:
+      any:
+        - kind: line_comment
+          regex: ^///(?:[^/]|$)
+        - kind: attribute_item
+          regex: ^#\[doc\s*=
+      stopBy:
+        not:
+          kind: attribute_item
+  exported-item:
+    any:
+      - kind: function_item
+      - kind: struct_item
+      - kind: enum_item
+      - kind: union_item
+      - kind: trait_item
+      - kind: type_item
+      - kind: const_item
+      - kind: static_item
+    has:
+      kind: visibility_modifier
+      regex: ^pub$
+  exported-module:
+    kind: mod_item
+    has:
+      kind: visibility_modifier
+      regex: ^pub$
+    all:
+      - has:
+          field: body
+          kind: declaration_list
+      - not:
+          has:
+            field: body
+            has:
+              kind: line_comment
+              regex: ^//!
+  trait-member:
+    any:
+      - kind: function_signature_item
+      - kind: function_item
+      - kind: associated_type
+      - kind: const_item
+    inside:
+      kind: declaration_list
+      inside:
+        kind: trait_item
+        has:
+          kind: visibility_modifier
+          regex: ^pub$
+  exported-macro:
+    kind: macro_definition
+    follows:
+      kind: attribute_item
+      regex: ^#\[macro_export
+      stopBy:
+        not:
+          kind: attribute_item
+rule:
+  any:
+    - matches: exported-item
+    - matches: exported-module
+    - matches: trait-member
+    - matches: exported-macro
+  not:
+    any:
+      - matches: documented
+      - inside:
+          kind: block
+          stopBy: end

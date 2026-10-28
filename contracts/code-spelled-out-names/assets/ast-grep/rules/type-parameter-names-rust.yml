@@ -1,0 +1,32 @@
+# code-spelled-out-names: name every type parameter with a word, such as `Row` or `Catalog`, never one character such as `T`.
+# Rust variant; it checks type, const, and lifetime parameters, so `fn read_first<'input, Row>` passes and `fn read_first<'a, T>` does not.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-spelled-out-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: type-parameter-names-rust
+language: Rust
+severity: error
+message: Name this generic parameter with a word for what it stands for, such as `Row`, `CAPACITY`, or `'input`, rather than one character.
+note: |
+  A type parameter, a const parameter, a lifetime parameter, and a lifetime that `for<...>` declares are checked, wherever they appear in a function, an `impl`, a type, or a trait.
+  A name of one character in any case is reported; the anonymous lifetime `'_`, `'static`, and longer names, such as `Row` and `'input`, are not.
+  A use of a parameter, such as `&'input str` or `where Row: Clone`, is a reference and is not checked.
+rule:
+  regex: ^.$
+  any:
+    - kind: type_identifier
+      inside:
+        kind: type_parameter
+        field: name
+    - kind: identifier
+      inside:
+        kind: const_parameter
+        field: name
+    - kind: identifier
+      inside:
+        kind: lifetime
+        any:
+          - inside:
+              kind: lifetime_parameter
+              field: name
+          - inside:
+              kind: for_lifetimes

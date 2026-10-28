@@ -1,0 +1,11 @@
+# code-typescript-effect-absent-values: never mark one field both `?:` and `Option`.
+# TypeScript variant (.ts, .mts, .cts); optional-option-fields-tsx.yml is identical except for `id`, `language`, and this line.
+id: optional-option-fields-typescript
+language: TypeScript
+severity: error
+message: "Declare an always-present field that may hold no value as `field: Option.Option<T>`, or an input a caller may leave out as `field?: T`, never both."
+rule:
+  any:
+    - kind: property_signature
+    - kind: public_field_definition
+  regex: '^(?:(?:public|private|protected|static|declare|override|readonly|abstract|accessor)\s+)*[\w$#]+\?\s*:\s*Option(\.Option)?<'

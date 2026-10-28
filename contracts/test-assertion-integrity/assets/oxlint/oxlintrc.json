@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+      "plugins": ["vitest"],
+      "rules": {
+        "vitest/no-conditional-in-test": "error",
+        "vitest/prefer-expect-assertions": "error"
+      }
+    }
+  ]
+}

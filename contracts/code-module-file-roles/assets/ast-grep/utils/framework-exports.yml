@@ -1,0 +1,8 @@
+# code-module-file-roles: the names that route frameworks require a file to export, matched by every rule in ../rules as `framework-export-name`.
+# They count toward neither the one-function limit nor the component-only limit, whose list in ../../oxlint/oxlintrc.json holds the same names.
+# A repository adds its own frameworks' names in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one, and in its own setting of the oxlint rule.
+# The regex reads only a name's text, so the TypeScript, Tsx, and JavaScript rules share it.
+id: framework-export-name
+language: TypeScript
+rule:
+  regex: "^(?:DELETE|GET|HEAD|OPTIONS|PATCH|POST|PUT|action|clientAction|clientLoader|clientMiddleware|dynamic|dynamicParams|fetchCache|generateMetadata|generateStaticParams|generateViewport|headers|links|loader|maxDuration|meta|metadata|middleware|preferredRegion|revalidate|runtime|shouldRevalidate|viewport)$"

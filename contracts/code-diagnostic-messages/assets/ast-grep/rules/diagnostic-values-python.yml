@@ -1,0 +1,68 @@
+# code-diagnostic-messages: quote every value a diagnostic interpolates with `{value!r}`, and append a cause's own message after a colon as `{error!s}`.
+# Python variant; the TypeScript and Tsx variants apply the same test to their error messages.
+id: diagnostic-values-python
+language: Python
+severity: error
+message: Quote this interpolated value as `{value!r}`, such as `invoice {invoice_id!r} is closed`, unless it is a cause's message after a colon, written `{error!s}`.
+note: |
+  The rule reads each `{...}` of an f-string that is an error's message, and allows only `{value!r}` and a cause's message.
+  A cause's message is a `{name!s}` that follows `: `, such as `read {path!r}: {error!s}`.
+  A bare `{value}`, `{value!s}` elsewhere, and `{count:>5}` are reported, whatever the value's type; a number is quoted too.
+  An error's message is each f-string argument, and the `detail`, `message`, and `msg` arguments, of a raised call, such as `raise ValueError(f"...")`, and of `sys.exit` and `warnings.warn`, and an `assert` statement's message.
+  A log line is a record, not a diagnostic, and a line `print` writes is the output module's, so neither is read; a diagnostic that another function writes is left to review.
+utils:
+  # A string argument, given alone or as a part of an implicit concatenation.
+  argument-text:
+    any:
+      - inside:
+          kind: argument_list
+      - inside:
+          kind: concatenated_string
+          inside:
+            kind: argument_list
+      - inside:
+          kind: keyword_argument
+          field: value
+          has:
+            field: name
+            regex: ^(?:detail|message|msg)$
+  # A call that exits or warns with a message for a person.
+  message-call:
+    kind: call
+    has:
+      field: function
+      regex: ^(?:sys\.exit|warnings\.warn)$
+  # An f-string that is an error's message.
+  message-text:
+    kind: string
+    any:
+      # `raise ValueError(f"...")`, `sys.exit(f"...")`, and `warnings.warn(f"...")`.
+      - matches: argument-text
+        any:
+          - inside:
+              stopBy: end
+              kind: call
+              inside:
+                kind: raise_statement
+          - inside:
+              stopBy: end
+              kind: argument_list
+              inside:
+                matches: message-call
+      # `assert ready, f"..."`.
+      - nthChild: 2
+        inside:
+          kind: assert_statement
+rule:
+  kind: interpolation
+  not:
+    any:
+      # `{value!r}`.
+      - regex: '!r\}$'
+      # `: {error!s}`.
+      - regex: '!s\}$'
+        follows:
+          kind: string_content
+          regex: ':\s$'
+  inside:
+    matches: message-text

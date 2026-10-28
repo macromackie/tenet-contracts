@@ -1,0 +1,29 @@
+# code-typescript-effect-scheduling: poll and retry with a `Schedule`, never with a loop that sleeps between attempts.
+# TypeScript variant (.ts, .mts, .cts); sleep-loops-tsx.yml is identical except for `id`, `language`, and this line.
+id: sleep-loops-typescript
+language: TypeScript
+severity: error
+message: Poll with `Effect.repeat` and retry with `Effect.retry`, each with a `Schedule`, instead of a loop that sleeps between attempts.
+note: |
+  Write `readJob({ job }).pipe(Effect.repeat({ schedule: pollSchedule, until: isFinished }), Effect.timeout(JOB_DEADLINE))` for a poll.
+  Write `sendInvoice({ invoice }).pipe(Effect.retry({ schedule: sendRetries, while: isTransient }))` for a retry.
+  The rule reports a `for`, `while`, or `do` loop whose own body calls `Effect.sleep` or `Effect.delay`; a function written inside the loop starts afresh.
+rule:
+  any:
+    - kind: for_statement
+    - kind: for_in_statement
+    - kind: while_statement
+    - kind: do_statement
+  has:
+    any:
+      - pattern: Effect.sleep($$$)
+      - pattern: Effect.delay($$$)
+    stopBy:
+      any:
+        - kind: function_declaration
+        - kind: function_expression
+        - kind: arrow_function
+        - kind: generator_function
+        - kind: generator_function_declaration
+        - kind: method_definition
+        - kind: class_body

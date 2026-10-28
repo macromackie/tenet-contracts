@@ -1,6 +1,7 @@
 ---
 name: test-curation
 message: Treat development tests as disposable, and commit only checks that guard consequential regressions and declared example tests.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -30,7 +31,7 @@ Delete existing coverage only for a stated duplicate, a superseded requirement, 
 Never loosen or delete a check to hide a regression; difficulty, slowness, or an unfavorable result is not a reason to remove it.
 
 Synchronize concurrent tests with explicit gates and bounded cleanup rather than sleeps.
-Use a timeout only to bound a hung test, never to define expected ordering.
+Where the test runner takes a per-test timeout, give every test one as a number literal, only to bound a hung test, never to define expected ordering.
 Fix a flaky test's fixture ownership or synchronization instead of raising timeouts, adding retries, or deleting the only protection against a critical failure.
 Record live provider checks as separate evidence, and do not present a mocked provider as proof of live provider behavior.
 Write temporary test reports and outputs outside tracked source.
@@ -42,3 +43,4 @@ For each retained new check, can the author name the consequential regression, t
 For removed or weakened coverage, identify the remaining protection or the explicit acceptance of development-only verification.
 Temporarily break the critical behavior a changed check guards, confirm the check fails for that reason, then restore the implementation and remove the probe.
 Run the affected tests with the repository's standard test command.
+Run the repository's lint and this contract's `assets/` configuration over its test files from the repository root, and confirm they fail on a test that declares no timeout.

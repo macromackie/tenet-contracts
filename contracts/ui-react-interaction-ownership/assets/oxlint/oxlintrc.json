@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "react/no-array-index-key": "error",
+    "react/rules-of-hooks": "error",
+    "react/set-state-in-effect": "error"
+  }
+}

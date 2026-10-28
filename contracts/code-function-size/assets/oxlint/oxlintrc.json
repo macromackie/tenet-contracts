@@ -1,23 +1,26 @@
 {
   "jsPlugins": ["eslint-plugin-sonarjs"],
-  "rules": {
-    "max-lines-per-function": [
-      "error",
-      { "max": 50, "skipBlankLines": true, "skipComments": true, "IIFEs": true }
-    ],
-    "max-depth": ["error", { "max": 3 }],
-    "max-nested-callbacks": ["error", { "max": 3 }],
-    "sonarjs/cognitive-complexity": ["error", 15]
-  },
   "overrides": [
     {
       "files": ["**/*.tsx", "**/*.jsx"],
       "rules": {
         "max-lines-per-function": [
           "error",
-          { "max": 60, "skipBlankLines": true, "skipComments": true, "IIFEs": true }
+          { "IIFEs": true, "max": 60, "skipBlankLines": true, "skipComments": true }
         ]
       }
     }
-  ]
+  ],
+  "rules": {
+    "complexity": ["error", { "max": 10, "variant": "classic" }],
+    "max-depth": ["error", { "max": 3 }],
+    "max-lines-per-function": [
+      "error",
+      { "IIFEs": true, "max": 50, "skipBlankLines": true, "skipComments": true }
+    ],
+    "max-nested-callbacks": ["error", { "max": 3 }],
+    "max-statements": ["error", { "ignoreTopLevelFunctions": false, "max": 10 }],
+    "react/jsx-max-depth": ["error", { "max": 6 }],
+    "sonarjs/cognitive-complexity": ["error", 15]
+  }
 }

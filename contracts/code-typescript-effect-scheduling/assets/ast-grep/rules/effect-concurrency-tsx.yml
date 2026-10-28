@@ -1,0 +1,60 @@
+# code-typescript-effect-scheduling: run work over a collection with `Effect.forEach` and a declared, bounded concurrency.
+# Tsx variant (.tsx); effect-concurrency-typescript.yml is identical except for `id`, `language`, and this line.
+id: effect-concurrency-tsx
+language: Tsx
+severity: error
+message: Run an Effect for each member of a collection with `Effect.forEach` and a `concurrency` option set to a declared number, which is 1 for ordered work.
+note: |
+  Write `Effect.forEach(invoices, (invoice) => sendReminder({ invoice }), { concurrency: REMINDER_CONCURRENCY })`, and pass `{ concurrency: 1 }` to run the members in order.
+  `Effect.all` combines only a fixed set of distinct Effects written out as its array or object argument, such as `Effect.all({ account, invoice })`.
+  The rule reports an `Effect.forEach` without a `concurrency` option or with a string value, such as `'unbounded'` or `'inherit'`.
+  It also reports an `Effect.all` whose first argument is not an array or object literal or spreads a collection into one.
+rule:
+  any:
+    - kind: call_expression
+      all:
+        - has:
+            field: function
+            pattern: Effect.forEach
+        - not:
+            has:
+              field: arguments
+              has:
+                kind: object
+                has:
+                  any:
+                    # `{ concurrency }`.
+                    - kind: shorthand_property_identifier
+                      regex: ^concurrency$
+                    # `{ concurrency: 4 }`, but not a string such as `{ concurrency: 'unbounded' }` or `{ concurrency: 'inherit' }`.
+                    - kind: pair
+                      all:
+                        - has:
+                            field: key
+                            regex: ^concurrency$
+                        - not:
+                            has:
+                              field: value
+                              regex: ^['"`]
+    # `Effect.all(reminders)` after `const reminders = invoices.map((invoice) => sendReminder({ invoice }))`.
+    - kind: call_expression
+      all:
+        - has:
+            field: function
+            pattern: Effect.all
+        - has:
+            field: arguments
+            has:
+              nthChild: 1
+              any:
+                - not:
+                    any:
+                      - kind: array
+                      - kind: object
+                # `Effect.all([first, ...reminders])` and `Effect.all({ ...effects })` spread a collection into the literal.
+                - kind: array
+                  has:
+                    kind: spread_element
+                - kind: object
+                  has:
+                    kind: spread_element

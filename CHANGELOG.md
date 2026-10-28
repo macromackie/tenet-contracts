@@ -3,6 +3,739 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
+## v11.0.0
+
+`code-boolean-names`, `code-comment-form`, `code-constant-names`, `code-declaration-order`, `code-diagnostic-messages`,
+`code-lint-strictness`, `code-map-and-set-names`, `code-module-structure-and-control-flow`,
+`code-rust-doc-comment-coverage`, `code-rust-source-structure`, `code-spelled-out-names`,
+`code-typescript-boolean-conditions`, `code-typescript-collection-iteration`, `code-typescript-compiler-strictness`,
+`code-typescript-const-bindings`, `code-typescript-doc-comment-coverage`, `code-typescript-effect-absent-values`,
+`code-typescript-effect-scheduling`, `code-typescript-effect-schemas`, `code-typescript-export-return-types`,
+`code-typescript-expression-forms`, `code-typescript-function-arguments`, `code-typescript-function-member-signatures`,
+`code-typescript-function-scoping`, `code-typescript-import-extensions`, `code-typescript-import-statements`,
+`code-typescript-input-immutability`, `code-typescript-module-state`, `code-typescript-named-types`,
+`code-typescript-object-literal-functions`, `code-typescript-runtime-keyed-maps`, `code-typescript-type-assertions`,
+`telemetry-application-tracing`, `test-assertion-integrity`, `test-curation`, `test-scenario-functions`,
+`ui-design-tokens`, `ui-react-hook-calls`, `ui-react-interaction-ownership`, and `ui-react-typescript-jsx-attributes`
+now ship tool configuration under `assets/`, so installing or updating them needs Tenet 0.11.0 or later. The shipped
+lint files fail on code that complied before; run each tool's autofix where it has one, then rewrite or suppress what
+remains as `code-lint-suppressions` allows.
+
+### Tightened
+
+- `code-boolean-names`: every owned function and method that returns a boolean must start with a listed predicate
+  prefix, never an option prefix such as `include` or `skip`. This covers a function whose boolean arrives through a
+  promise, an effect, or a result that may fail. An accessor, which reads as a property or only returns a field, is
+  named as a field is. Any function, method, or function-typed constant, field, or member named `on` and a capital
+  letter, such as `onSubmit`, is an event handler and keeps that name, as `ui-react-typescript-jsx-attributes` requires.
+  A component's prop for an attribute on a declared list of markup boolean attributes, such as `disabled` or `open`, now
+  takes that bare name, never `isDisabled`. That holds, with no suppression, when the component forwards the prop to an
+  element or a dependency's component. Every other boolean prop takes a listed prefix, such as `isBusy` for `busy`. The
+  contract now ships ast-grep rules for TypeScript, Tsx, Python, and Rust that check functions, methods, and
+  function-typed constants, fields, and members. Each rule rejects one whose declared return type is such a boolean and
+  whose name has no predicate prefix. New TypeScript and Tsx rules, the boolean field rule's first shipped check, reject
+  a props type's boolean field that has no predicate or option prefix. A props type is a type whose name ends in `Props`
+  or the type written on a component's parameter. A prop itself, rather than a nested field, also passes when its name
+  is on the attribute list, and the rules check no other boolean field. The default predicate prefixes, option prefixes,
+  and HTML boolean attribute names ship as shared rules that a repository replaces with its own copies. It requires
+  Tenet 0.11.0.
+- `code-closed-value-sets`: declare each whole closed set, and each subset of two or more members, that code tests
+  membership in once, as a module-level read-only set such as `ReadonlySet<SandboxState>`, `frozenset`, or a constant
+  array where a module constant cannot hold a set, and test it with its lookup, such as `endedStates.has(state)`, never
+  with a collection written at the test, such as `[A, B].includes(state)` or `new Set([A, B]).has(state)`, even for two
+  members. Compare a value with one member directly. Test two or more members only with a declared set's lookup, never
+  with comparisons or a pattern written at the test: comparisons of one value joined by a logical or, such as `state ===
+  SandboxState.Stopped || state === SandboxState.Failed`, their negation joined by a logical and, and a pattern such as
+  `matches!(state, SandboxState::Stopped | SandboxState::Failed)` no longer comply, and the Allowed line for them is
+  removed. A branch that names every member, with members that share a result in one case or arm, stays the form for a
+  test that must narrow a type or whose members no constant can hold, as `code-exhaustive-branches` requires, and a new
+  Allowed line shows it. A member's literal value is now allowed as a key of a style definition whose library compiles
+  only literal keys, when the type checker rejects a key outside the set, so a definition whose type argument is
+  `Record<Tone, Style>` that writes `neutral` and `positive` as keys, which violated the contract before, now complies;
+  a new Allowed line shows it. The `http-method-literals` rules for TypeScript and Tsx no longer report a key of an
+  object passed to `stylex.create`, the one style definition call they declare, and a repository replaces that pattern
+  with its own library's call; their counts in the four measured repositories are unchanged. The stored-value and
+  migration rules are now one line, with no change to compliance. New ast-grep rules (TypeScript and Tsx) report an
+  array literal of fixed values tested with `includes`, an inline `new Set` of them, with or without `as const`, tested
+  with `has`, and `includes` on a module-level constant array, including one ending in `as const`; a fixed value is a
+  literal, a member of a capitalized name such as `SandboxState.Stopped`, or a SCREAMING_SNAKE_CASE constant, so a list
+  of run-time properties such as `[user.id, owner.id]` is not reported. New ast-grep rules
+  `member-chains-typescript.yml`, `member-chains-tsx.yml`, `member-chains-python.yml`, and `member-chains-rust.yml`
+  report two or more equality comparisons of one value with fixed values joined by a logical or, and inequality
+  comparisons joined by a logical and, once per chain, including chains of literals such as `kind === 'draft' || kind
+  === 'sent'`; `member-patterns-rust.yml` reports a `matches!`, `if let`, `while let`, or `let ... else` pattern that
+  joins two or more members or literals with `|`, ranges excepted. None has an autofix, and a comparison with the value
+  on the right or inside another macro's arguments is left to review. A new oxlint file enables `unicorn/prefer-set-has`
+  for named arrays used only with `includes`. The lint check now confirms the lint reports `state === A || state === B`,
+  a new review check asks whether each style definition a change keys by a closed set's literal values has a type that
+  rejects a key outside the set, the suppression rule joins the asset-loading rule, and the path-pattern rule now also
+  names the style definition call, so the contract keeps 25 rules.
+- `code-comment-content`: a doc comment on any field that may hold no value, such as an `Option` field, must now say
+  what the field's absence means, where the rule covered only optional or nullable fields, and the review check asks the
+  same of each changed doc comment. A field that can be either omitted or null still says what each means, and the
+  example is now `/** Absent when the check sent no model request. */`. The scope rule splits into three lines and says
+  that `code-comment-form` governs task markers, commented-out code, step labels, and the form, placement, and layout of
+  comments. The stored-format allowance splits into two lines under 30 words, and its example is now a capitalized
+  sentence, "Revisions written before format 2 list their files in each assessment." The Allowed comment now sits inside
+  the signing function, where `code-comment-form` puts a plain line comment.
+- `code-comment-form`: write every comment and doc comment as one or more sentences that start with a capital letter.
+  Line comments on consecutive lines form one comment. Put a code identifier that opens a comment in backticks, such as
+  ``// `retryAfter` is absent.``. The lint skips a comment that opens with no letter, with a link, with a type
+  annotation such as `@type`, or with a listed directive word. The lint, the shipped configuration, or a repository's
+  copy lists those directive words. A new `assets/oxlint/oxlintrc.json` sets oxlint's native `capitalized-comments` to
+  `always` with `ignoreConsecutiveComments`. Its `ignorePattern` covers `ast-grep-ignore` and a check's `-allow`
+  directive, beside the lint and formatter directives the rule skips by default. Its `--fix` capitalizes the first
+  letter, so a comment that opens with an identifier is rewritten into backticks by hand. New ast-grep rules
+  `comment-capitals-python` and `comment-capitals-rust` report the same comments, and Python docstrings, skip each
+  language's directive words, and have no fix. Never number or letter a step in a comment, such as `// 4.` or `// (g)`;
+  give each step a function named for what it does. A numbered list inside a doc comment stays allowed. Outside a
+  function body, every comment above or beside a declaration, a class, type, interface, or enum member, or a module
+  constant is a doc comment directly above it. It takes the line form where a language has both, such as `///`. Inside a
+  function body a comment is a plain line comment, never a doc comment. Where the doc comment is a string, it is the
+  function's or class's docstring, or a string directly below a module constant's or class field's assignment. A tool's
+  directive, such as a lint suppression, and the reason line that `code-lint-suppressions` puts above one keep their
+  tool's form. Every file that `code-script-entry-points` covers opens with a summary that says what it does and how to
+  run it. New ast-grep rules report step labels in TypeScript, Tsx, JavaScript, Rust, and Python. They report plain
+  comments above or beside declarations and members outside function bodies in TypeScript, Tsx, Rust, and Python. They
+  report doc comments inside function bodies in TypeScript, Tsx, and Rust. In all five languages, they report an
+  executable file under `scripts/` or `bin/` whose first comment after its required opening lines is not a doc comment.
+  A repository replaces those path patterns in its own copy. The message now names capitalized sentences, and the
+  task-marker, member, and suppression sentences merge into their neighbors without changing what they require. The
+  commented-out code example now reads `// Receipts.send({ order });` and the step-label example `// (b) Copy the
+  rows.`, so each breaks only its own rule. A new example pair and review check cover a comment that opens with an
+  identifier. Every doc comment in every language is prose, with no section or tag for parameters, results, yielded
+  values, errors, panics, or usage examples. Those include `@param`, `@returns`, `@yields`, `@throws`, `Args:`,
+  `Returns:`, `Raises:`, `# Errors`, `# Panics`, `# Examples`, `Examples:`, and `@example`. `# Safety` is the only
+  section allowed. New ast-grep rules `prose-doc-comments-<language>` report them in all five languages. They also
+  report `@typeParam`, `@template` outside JavaScript, a tag right after a leading asterisk, and a Python section with
+  text on its line. No source file carries a copyright or license notice, because the repository's `LICENSE` file states
+  the license once. A license notice is no longer a tool directive or an allowed opening line before a file summary. The
+  exemption regexes of the declaration-comment and file-summary rules drop it. New ast-grep rules
+  `license-notices-<language>` report a comment in any of the five languages that opens with `Copyright`, `©`, `(c)` and
+  a year, `Licensed under`, `@license`, or `SPDX-License-Identifier:`. They also report a Python module docstring that
+  opens with `Copyright`, `©`, or `SPDX-License-Identifier:`. The message names license notices and prose doc comments,
+  and a new example pair covers a tagged doc comment and an SPDX line. The commented-out-code and empty-doc-comment
+  sentences and the two asset-loading sentences merge without changing what they require. It requires Tenet 0.11.0.
+- `code-conditional-expressions`: choose between branches of markup in a component whose `if` statements, or `switch`
+  cases for a closed set, each return one branch, extracted from any larger markup, never in sibling children on a
+  condition and its negation such as `{isPaid && <Receipt />}` beside `{!isPaid && <PaymentForm />}`. Show one piece of
+  markup or nothing with one `&&` child where it is rendered. Give a component a visibility prop such as `isVisible`
+  only when it stays mounted while hidden to keep its elements' state or to animate out, hide it with styles, and never
+  return nothing from a component when a boolean prop alone, or its negation, decides it, such as `if (!isVisible) {
+  return null; }`. The message now names markup chosen with extracted components. New ast-grep rules (Tsx and
+  JavaScript, since markup cannot occur in `.ts` files) report a child `{C && A}` or `{C && D && A}` beside a sibling
+  `{!C && B}` or `{!C && E && B}`, and a child `{x === v && A}` or `{x === v && D && A}` beside a sibling `{x !== v &&
+  B}` or `{x !== v && E && B}`. They also report, in a component, an `if` on a bare prop or its negation, whether
+  destructured in the parameters or the body or read from the props object, that returns `null`, or that returns markup
+  just before `return null`; a component is a function or arrow bound to a capitalized name. The review check on values
+  is unchanged, a new check asks that each markup choice be one `&&` child, a branch an extracted component returns, or
+  a component kept mounted while hidden, and the lint check now names the forms this contract configures instead of
+  listing them. The oxlint `no-ternary` file is unchanged and still reports conditional operators in markup. The
+  `pending = refreshToken()` example is removed because it reassigns outside a loop or callback. Example booleans take a
+  predicate prefix, as in `isReady ? total : 0`, as `code-boolean-names` requires. The `limit` examples become
+  `shippingDays` and `chooseShippingDays({ order })`, which carry a unit as `code-measured-value-names` requires. The
+  immediately invoked function Violation returns `RUSH_DAYS` or `STANDARD_DAYS` after a blank line, so it breaks only
+  the rule it shows.
+- `code-diagnostic-messages`: start every diagnostic with a lowercase word in every language, so that messages chain
+  after a colon, as in `tag "v0.3.1": the working tree has changes`. A first word that is a proper noun, an identifier,
+  or a code keeps its spelling. A message that starts with an interpolated value starts with that value as it is. Quote
+  every value a diagnostic interpolates, whatever its type, with the language's form that prints a string literal with
+  escapes, such as `JSON.stringify(value)`, `{value:?}`, or `{value!r}`. Quoting keeps an empty, padded, or multi-line
+  value from producing a misleading line. A number is quoted too, and a `bigint` is quoted as its text, such as
+  `JSON.stringify(amountText)` after `const amountText = String(amount)`. No other conversion, such as `String(value)`,
+  and no hand-written quotes or backticks are allowed. Carry a cause's own message in the error's cause chain when the
+  output module prints that chain, and otherwise append it after a colon as text. Write that text as a `message` read,
+  `{error:#}`, or `{error!s}`. A log or trace record that the program exports is not a diagnostic;
+  `telemetry-application-tracing` governs it. The case rule covers error messages, the message templates that error
+  types declare, context added to a cause, and standard error lines; the trailing-period rule is unchanged. The contract
+  now ships `assets/ast-grep/` rules for TypeScript, Tsx, Rust, and Python, and it declares `requires-tenet: 0.11.0`.
+  The `diagnostic-case-*` rules report a capitalized first word. The `diagnostic-values-*` rules report an unquoted
+  value in each message an error carries, whether thrown, failed, declared by its type, or returned beside its code. An
+  output module writes the line it receives unquoted after the program's prefix, and the lint leaves those lines to
+  review. The default proper nouns live once, in the shared util `assets/ast-grep/utils/proper-nouns.yml` (id
+  `proper-noun-text`), which every case rule matches. They are month and weekday names except May, which reads as the
+  verb, and Git, Linux, Postgres, Python, and Rust. A repository adds its own names in its own copy of that util with
+  the same id, loaded through its own `utilDirs` in place of the shipped one. It edits no shipped file. The Allowed
+  examples now quote each value they interpolate, numbers included.
+- `code-exhaustive-branches`: `assets/oxlint/oxlintrc.json` no longer turns off 16 type-aware rules that it turned off
+  only to keep its own test cases focused, such as `typescript/no-floating-promises` and `typescript/unbound-method`,
+  because an off entry in an extended file beats every category and so switched those rules off in every adopting
+  repository; they now run at the level the repository's other configuration sets. Never end a branch that names every
+  member with a default case or wildcard arm, because a member added later would take it unreviewed;
+  `typescript/switch-exhaustiveness-check` now sets `allowDefaultCaseForExhaustiveSwitch` to false, and the lint check
+  confirms that a default after every member fails. A test with the lookup of a declared subset of two or more members,
+  such as `endedStates.has(state)`, is not a wildcard, so its `else` may serve the remaining members; a test for one
+  member whose other branch serves every remaining member stays a wildcard. The final-`else` review check now passes a
+  final `else` that follows a declared subset's lookup. The Violation's `else if` chain now tests `OrderStatus.Paid`,
+  `OrderStatus.Refunded`, and `OrderStatus.Cancelled` one at a time, so it no longer also joins members with a logical
+  or, which `code-closed-value-sets` now rejects.
+- `code-function-size`: declare a maximum depth of markup elements nested inside one another, and enforce it with the
+  repository's lint on markup written in code, including test code. Move the markup past it into a child component,
+  which starts its own count. An element's depth is the number of elements and fragments enclosing it, including through
+  a condition, callback, call, local variable, or attribute value. Its `assets/oxlint/oxlintrc.json` now sets oxlint's
+  native `react/jsx-max-depth` to 6, which a repository may override like the file's other limits. The rule takes effect
+  where the repository's own configuration enables the `react` plugin, and has no autofix. At 6 the rule reports 49
+  elements in 12 files of the largest measured repository, whose deepest markup is 8 levels, and none in the other
+  three. Declare a maximum number of statements per function too, counting every statement in its body, including those
+  inside its blocks, and leaving each nested function to its own count. Declare a maximum complexity in each measure a
+  language's lint computes, such as cyclomatic and cognitive complexity. The shipped file now sets `max-statements` to
+  10 and `complexity` to 10 in its classic variant, beside the cognitive complexity of 15, and a repository may override
+  each. The cyclomatic maximum of 10 matches the `max-complexity` of 10 that `code-lint-strictness` ships for ruff's
+  C901, so both languages declare one value. In the four measured repositories, the two rules report 430 / 58 / 25 / 71
+  and 204 / 37 / 12 / 33 functions, with no autofix. A language may go without any of these limits only when the
+  repository declares the language, the limit, and the reason beside its limits. One such reason is that no lint for the
+  language counts statements. This one exemption replaces the separate complexity exemption, so length, nesting, and
+  callback limits may now be exempted the same way. The message now names markup depth. The checks now run the
+  repository's lint and count depth through the calls, callbacks, and local variables the lint does not follow. For each
+  language the repository lints, they ask whether its lint enforces each declared limit or a declaration names the
+  language, limit, and reason. The shipped file's keys are now in code point order, as `code-key-order` requires, with
+  no change to its settings.
+- `code-guard-clauses`: in a language whose blocks take braces, write every `if`, `else`, and loop body in braces, even
+  one statement. An `else` followed by `if`, as in `else if`, is the one exception. A new rule configures the lint to
+  reject an `if`, `else`, or loop body without braces, wherever the lint supports that rule. The Allowed guard example
+  now reads `if (order.lines.length === 0) { return; }`.
+- `code-module-file-roles`: export only user interface components, their props types, and declared framework names from
+  a source file whose code holds markup, such as a `.tsx` or `.jsx` file. Put the hooks, contexts, and constants that
+  components share in source files without markup, so a development server can hot-swap a component file and keep its
+  state. Declare the names the repository's frameworks require a file to export, such as `generateMetadata` or `loader`;
+  they count toward neither the component-only nor the one-function limit. A page file that exports `generateMetadata`
+  beside its component, which violated the one-function limit before, now complies. The names also apply in files
+  without markup, so a route handler that exports `GET` and `POST`, which violated the one-function limit before, now
+  complies. Declare at most one class and at most one user interface component in each source file, exported or not. A
+  file that declares a component and an unexported child component it renders, or two classes, no longer complies. A
+  module's error classes, such as tagged error classes, may share one declared errors file, and its schema classes one
+  declared schemas file, each holding only those classes. Errors join the example roles. A route, story, or test file,
+  which a framework loads by its path, may keep its component unexported and export only what that framework loads, such
+  as `Route`. A new `assets/oxlint/oxlintrc.json` turns on oxlint's native `react/only-export-components`,
+  `react/no-multi-comp` with `ignoreStateless: false`, and `max-classes-per-file` at 1 with `ignoreExpressions: false`.
+  Its default `allowExportNames` list holds route framework names, such as `metadata`, `generateMetadata`,
+  `generateStaticParams`, `loader`, `action`, `meta`, `links`, and the HTTP method names. It turns the component-only
+  rule off for `.tsx` and `.jsx` files under a `routes` folder and for story and test files by their `.stories.`,
+  `.test.`, and `.spec.` suffixes. It does the same for files under `test`, `tests`, `testing`, and `__tests__` folders,
+  and turns the class rule off in `errors.ts` and `schemas.ts`. The component rules take effect where the repository's
+  own configuration enables the `react` plugin, and none has an autofix. A new
+  `assets/ast-grep/utils/framework-exports.yml` (id `framework-export-name`) holds the same default names. The
+  `exported-functions` rules for TypeScript, Tsx, and JavaScript now skip an exported function, or a declarator whose
+  value is one, under one of them. The same statement's other functions still count. A repository adds its own names in
+  its own copy of that util, with the same id, loaded through its own `utilDirs`. It adds them to its own setting of the
+  oxlint rule too, and covers its own route and test paths with its own override. The lint rule now enforces the
+  one-class and one-component limits beside the declared length and the one-function limit. A language may leave any of
+  the three to review only by declaring it and the reason. The lint-loading rule now also says to turn on the lint's
+  markup plugin where code holds markup. The function-valued constants rule and the lookup-table rule are now one line,
+  and the suppression and generated-file rules are now one line. The contract keeps 25 rules, and neither merge changes
+  compliance. The message now names the class and component limits and components in markup files, and no longer names
+  the sibling types file, whose rule is unchanged. The lint checks now confirm that the lint reports a second class
+  outside errors and schemas files, in every language not left to review. They also confirm it reports a second
+  component in a file with markup. A new review check asks what each markup file exports. New examples move a
+  `useInvoiceDialog` hook that returns an unexported component's markup out of `use-invoice-dialog.tsx` into
+  `use-invoice-dialog.ts`. They also move an unexported `InvoiceRow` out of `invoice-list.tsx` into `invoice-row.tsx`,
+  beside an `invoice-import/errors.ts` that declares two tagged error classes. Each off entry in the oxlint file carries
+  a comment naming its reason. The comment example in the `exported-functions` rules now reads `export const openOrder =
+  () => OrderStatus.Open, closeOrder = () => OrderStatus.Closed` instead of writing a bare 2. The oxlint file reports 37
+  exports in markup files, 101 second components, and 3 second classes in the largest measured repository, and none in
+  the next two. It reports 1 second class in the fourth, and the skipped names remove 4 one-function findings in two
+  page files of the fourth.
+- `code-module-structure-and-control-flow`: every owned function, method, function-typed member, and function-valued
+  constant whose name begins in lowercase must start with a verb from a declared list, matched in every case style and
+  rejected by lint. The list also holds the predicate prefixes of `code-boolean-names`, `on` for event handlers, `use`
+  for hooks, and per-language constructor and conversion prefixes such as `new` and `into`. Capitalized names,
+  language-defined names such as constructors, the `main` function, accessors, including a method that only returns a
+  field, test fixtures, and tests titled by their names are exempt, and a name an interface or framework fixes is
+  suppressed with a reason. The contract now ships a default verb list and ast-grep rules for TypeScript, Tsx, Rust, and
+  Python, and requires Tenet 0.11.0. The default list leaves out `get`, `fetch`, and `load`, which
+  `code-spelled-out-names` maps to `read`.
+- `code-numeric-literals`: only -1, 0, and 1 may stay bare, in every language, so 2 now takes a named constant like
+  every other number, and a repository no longer declares its own list of bare numbers. The shipped
+  `assets/oxlint/oxlintrc.json` now sets `no-magic-numbers` to ignore -1, 0, and 1 only, and a repository may override
+  its test pattern alone; the test-file off entry carries a comment naming its reason. The rule against listing a
+  quantity among the bare numbers is removed, because the list is now fixed. The message, the one-literal rule, and the
+  bare-number review check now name -1, 0, and 1. The Allowed example now derives `BYTES_PER_MEBIBYTE =
+  BYTES_PER_KIBIBYTE * BYTES_PER_KIBIBYTE`, and the Violation names the 2 in `5 * 1024 ** 2`. The reassigned-variable
+  and parameter-default examples are now `let maxAttempts = 50` and `listInvoices({ maxPages = 50 }:
+  ListInvoicesInput)`, whose names end in counted nouns as `code-measured-value-names` requires and whose function takes
+  one destructured object argument as `code-typescript-function-arguments` requires. The type example is now `{
+  retryCount: 3 | 5 }`, matching `type RetryCount = 3 | 5`. Dropping 2 adds 117 / 37 / 22 / 37 findings in the four
+  measured repositories, with no autofix.
+- `code-rust-doc-comment-coverage`: the contract now ships an ast-grep rule for Rust that reports each exported item
+  with no `///` doc comment: a `pub` function, inherent method, struct, enum, union, trait, type alias, constant,
+  static, or inline module, each method, associated type, and constant of a `pub` trait, and each `#[macro_export]`
+  macro. It requires Tenet 0.11.0. The example function is now `pub fn compute_price`, which starts with a verb, and
+  each doc comment takes the prose form that `code-comment-form` requires.
+- `code-rust-numeric-conversions`: suffix each numeric literal whose type nothing else fixes, after an underscore, such
+  as `let mut retry_count = 0_u32;`, so its type never falls back to `i32` or `f64`. Compute each integer sum,
+  difference, product, quotient, remainder, and negation with a `checked_*` method. Clamp with `saturating_*` only a
+  quantity that stops at its type's bound by design, and wrap with `wrapping_*` only a value whose magnitude means
+  nothing, such as a hash. Every Clippy conversion and arithmetic lint stays denied, as the lint table that
+  `code-lint-strictness` ships denies them. The ratio function also suppresses `clippy::float_arithmetic`, which that
+  table denies, with a reason that names the ratio it computes. The lint check runs the Clippy check that
+  `code-rust-workspace-checks` requires, and a new check reviews each `clippy::float_arithmetic` suppression. A new
+  example pair shows `used_bytes.checked_add(reserved_bytes)`, and the integer-arithmetic example is now
+  `item_count.div_ceil(ITEMS_PER_PAGE)`.
+- `code-rust-source-structure`: every function whose callers branch on its failure returns an error type the crate owns,
+  such as `Result<Receipt, SettleError>`, in binary and library crates alike. An opaque error type, such as
+  `anyhow::Error`, stays only in a binary crate, for a failure no caller branches on. Each error type derives its
+  `Display` and `std::error::Error` implementations with the one derive macro the repository declares, such as
+  `thiserror`'s `#[derive(Error)]`. Each error type gives its message in that derive's attribute, on a struct or each
+  enum variant, as `code-diagnostic-messages` requires. It carries an underlying error as the derive's source field.
+  Code never recovers a type from an opaque error, a cause, or a `dyn Any` value with `downcast_ref`, `downcast_mut`,
+  `downcast`, or `is`, in tests too. It matches an `enum`'s variants instead. Only the call that receives a dependency's
+  opaque value, such as a panic payload, downcasts it, under a suppression as `code-lint-suppressions` requires. Code
+  binds each value a call returns and handles each `#[must_use]` value, such as a `Result` with `?`. It discards any
+  other unused value only with a typed wildcard binding, such as `let _: Option<u64> = counts.insert(name, count);`. The
+  contract now ships ast-grep rules for Rust that reject each downcast, each hand-written `std::error::Error`
+  implementation, and each hand-written `Display` for a type that derives `Error`. It requires Tenet 0.11.0.
+- `code-rust-workspace-checks`: format with the `rustfmt.toml` that `code-lint-strictness` ships, using the rustfmt of
+  one dated nightly toolchain pinned in the repository's check task, such as `cargo +nightly-2026-10-27 fmt`, while
+  `rust-toolchain.toml` pins the stable toolchain with its Clippy component. Clippy runs with `--all-features` and the
+  lint tables and `clippy.toml` that `code-lint-strictness` ships, which deny every rustc, Clippy, and rustdoc lint and
+  group, including Clippy's nursery and restriction groups, apart from the listed off entries;
+  `clippy::allow_attributes`, `clippy::allow_attributes_without_reason`, and `unfulfilled_lint_expectations` stay denied
+  through those tables. A crate that needs `unsafe` code copies the workspace lint table into its own `[lints]` table
+  with `unsafe_code` at deny instead of inheriting it, and every other member crate inherits it. A new check runs `cargo
+  doc`, which fails on a rustdoc finding.
+- `code-spelled-out-names`: name every type parameter with a word for what it stands for, such as `Row` or `Catalog`.
+  The exception for a type parameter of one capital letter, such as `T`, is removed, so the one-character ban now covers
+  type parameters, including a mapped type's key, an inferred type, a type variable that an assignment declares, a const
+  generic parameter, and a lifetime parameter, so `'a` becomes a word such as `'input`; `_` stays allowed only for a
+  value that the code never reads. The repository word list must map `get`, `fetch`, and `load` to `read`, so every
+  lookup of one value starts with `read`, whatever its medium, such as `readInvoice` for `getInvoice` or `fetchInvoice`,
+  and every language's lint holds these mappings, even a language that defines `get` as a keyword. A search by a
+  condition starts with `find` and a lookup of many values with `list`, and an accessor's `get` keyword, as in `get
+  total()`, is not part of its name. Case each acronym or initialism inside a name as a word, such as `callbackUrl`,
+  `parseJson`, and `HttpClient`, never `callbackURL` or `HTTPClient`, so no name that holds a lowercase letter holds two
+  capitals in a row, so a one-letter word before another word, such as `XAxis`, is reported too. A name of capitals,
+  digits, and underscores alone, such as the constant `MAX_URL_LENGTH`, stays allowed, except as a type's name, such as
+  `type URL = string`. A declared name that a framework or dependency fixes, such as a library option `baseURL` or a
+  wire field `HTTPStatusCode`, keeps its spelling with a suppression whose reason names that system, and reading another
+  system's name, such as an imported `parseURL`, declares nothing. The contract now ships `assets/ast-grep/` rules for
+  TypeScript, Tsx, JavaScript, Python, and Rust that reject a one-character type parameter (`type-parameter-names-*`, in
+  every language but JavaScript, which declares none), a declared name whose first word is `get`, `fetch`, or `load`
+  (`lookup-names-*`), and a declared name that holds a lowercase letter and two capitals in a row or a type, class,
+  interface, enum, trait, type parameter, or type variable named in capitals alone (`acronym-names-*`), says to run them
+  with the repository's lint, and declares `requires-tenet: 0.11.0`. The lookup and acronym rules check the same
+  declarations, including type parameters and a trait's associated types. The message now names acronyms, the lint check
+  confirms no acronym is reported, and a new review check asks about an acronym the lint misses, such as `runE2E`, where
+  a digit splits the capitals. Never declare a name that the code already binds where the declaration appears, in an
+  enclosing scope or earlier in the same block, in every language, such as a callback parameter `invoice` inside
+  `computeTotal({ invoice })`; the strictness configuration enforces it with `no-shadow` and Clippy's shadow lints,
+  which report 234 / 46 / 13 / 13 TypeScript and 142 / n/a / n/a / 204 Rust findings.
+- `code-typescript-call-arguments`: the function-binding rule, its check, and `assets/oxlint/oxlintrc.json` move to
+  `code-typescript-const-bindings`, which governs how TypeScript variables are declared. A function bound from an
+  argument object is bound as that contract requires. A repository that installs this contract without
+  `code-typescript-const-bindings` no longer gets the rule. The message no longer names it. Bind the value of an `await`
+  or `yield*` expression to a name before reading a member of it, such as `const invoice = await readInvoice({ id })`,
+  then `invoice.status`, never `(await readInvoice({ id })).status`. Calling a method and indexing count as reading a
+  member, and the rule holds through parentheses and type or non-null assertions, such as `((await read()) as
+  Reply).result`. Destructuring in the declaration that binds the value, such as `const { status } = await readInvoice({
+  id })`, counts as binding it. A new `assets/oxlint/oxlintrc.json`, at the path the function-binding file left, turns
+  on oxlint's native `unicorn/no-await-expression-member`; its automatic fix rewrites a declaration that reads a
+  same-named member or the first or second element into destructuring, and oxlint 1.80.0 applies it only with
+  `--fix-dangerously`. New ast-grep rules `awaited-members-typescript.yml` and `awaited-members-tsx.yml` report what
+  that rule misses: a member read from a `yield*` value, and from an awaited value behind an assertion or extra
+  parentheses. The message and the lint check now name the rule. The examples now name functions with listed verbs:
+  `invoices.listForAccount({ account }).findLatest()`, `computeTotal`, `applyDiscount`, `recordPrice`, `readInvoice`,
+  `readOrder`, and `readAmount`, and the rule files' notes write `const invoice = await readInvoice({ id })` and `const
+  order = yield* readOrder({ id })`. The pipeline examples pass each function as an inline arrow that names its
+  arguments, such as `map((price) => applyDiscount({ price }))`. The schema-file example nests `Schema` constructors, as
+  in `Schema.Struct({ tags: Schema.Array(Schema.String) })`, and the rule files' comment on schema files nests `Schema`
+  constructors too.
+- `code-typescript-compiler-strictness`: every package's compiler configuration now extends the compiler configuration
+  that `code-lint-strictness` ships, directly or through a base it extends, so every option that file sets applies,
+  including `exactOptionalPropertyTypes` and `verbatimModuleSyntax` beside `strict` and `noUncheckedIndexedAccess`, and
+  no package, directory, or file relaxes any of them. The contract states why the last two matter. Under the first, an
+  argument field declared `dueAt?: Date` may be left out, but a caller can never set it to `undefined`. The second keeps
+  each import's runtime effect visible in the source, which type stripping needs, because an unmarked type-only import
+  fails when the module loads. The configuration check now reads the compiler's `--showConfig` output against the
+  shipped file's options. A new `assets/oxlint/oxlintrc.json` sets `typescript/ban-ts-comment` to reject `@ts-nocheck`,
+  `@ts-ignore`, and `@ts-expect-error` without a description, the lint check replaces the search, and the contract
+  declares `requires-tenet: 0.11.0`. The Allowed example's package extends a base that extends the shipped configuration
+  first, and its test leaves out `dueAt` for an invoice with no due date.
+- `code-typescript-const-bindings`: bind a function to a variable only as a function declaration or as a constant
+  annotated with a function type, such as `const writeEvent: EventSink = ...`; `any`, `unknown`, `satisfies`, and `as`
+  do not count as that annotation. The rule, its check, and `assets/oxlint/oxlintrc.json`, which sets oxlint's native
+  `func-style` to `declaration` with `allowTypeAnnotation`, move here from `code-typescript-call-arguments`. A
+  repository that installs this contract without `code-typescript-call-arguments` now gets them. The contract declares
+  `requires-tenet: 0.11.0`. Add or subtract one with `+= 1` or `-= 1`, never `++` or `--`, even on a property or in a
+  `for` loop's update clause. `assets/oxlint/oxlintrc.json` now also sets oxlint's native `no-plusplus` with
+  `allowForLoopAfterthoughts` false, beside `func-style`. The rule has no `--fix`; its suggestion rewrites a statement
+  such as `index++` safely but turns `++count > limit` into `count += 1 > limit`, so rewrite an increment whose value is
+  used by hand. The lint check now confirms the lint rejects `index++` in a `for` loop's update clause, and the
+  suppression rule and check cover increments. The message names the rule and is shortened. A `let` may now be
+  reassigned inside a callback, meaning a function declared inside the function that declares the `let` and handed to
+  other code to call, as well as inside a loop that carries its value. A `let` at a module's top level has no declaring
+  function, so only a loop among the module's top-level statements may reassign it. A `let` declared in a loop's body or
+  in a `for...of` or `for...in` head starts fresh on each pass, so that loop does not carry it. A value that a loop or
+  callback changes is held in its own `let`, never in a field of an object literal, which
+  `code-typescript-effect-absent-values` forbids assigning after the literal; such holder objects complied before and
+  now violate. The lint must now reject a `let` reassigned outside both a loop and a callback, and the contract ships
+  `assets/ast-grep/` rules for TypeScript and Tsx, `let-reassignments-typescript` and `let-reassignments-tsx`, which
+  report a plain, augmented, parenthesized, or destructuring assignment with no loop or function between it and the
+  `let` it writes, and any write from a function to a module-level `let`, even inside a loop. The rules have no autofix;
+  return the chosen value from a function instead. The branch Violation example no longer also omits the initializer, a
+  holder-object Violation and a callback Allowed example are added, the increment examples step a `failures` `let` in a
+  loop instead of a `summary` field, the lint check confirms the new rule, and the review check now asks only whether a
+  loop carries each reassigned `let` or other code calls the nested function that reassigns it. A function may update an
+  entry of a closed-set record that it declares, such as `counts[check.state] += 1` in its loop, because
+  `code-typescript-runtime-keyed-maps` treats it as a lookup, not a field; this narrows the holder-object rule only for
+  that record. A constant whose value a call returns, such as a guard built with `Schema.is`, takes that call's declared
+  type and needs no annotation.
+- `code-typescript-effect-errors`: where promises remain, such as at entry points, in functions that `Effect.tryPromise`
+  calls, and in tests and scripts, code never calls a promise's `then` or `finally` method. It declares every function
+  that returns a promise `async`, even one without `await`, writes `return await` for each promise it returns, and
+  discards a promise only with `void`. `assets/oxlint/oxlintrc.json` now runs with type information and turns on
+  `typescript/promise-function-async` with its full options, `allowAny` false and an empty `allowedPromiseNames`. It
+  turns on `typescript/return-await` set to `always` and `preserve-caught-error` with `requireCatchParameter` true. Its
+  `typescript/no-floating-promises` runs with its full options, `ignoreVoid` and `checkThenables` true, `ignoreIIFE`
+  false, and empty allow lists, so an unhandled thenable also fails. It keeps `require-await` and
+  `typescript/require-await` off with their reason comments, turns no other type-aware rule off, and lists its rules in
+  code point order. New `assets/ast-grep/rules/promise-chains-typescript.yml` and `promise-chains-tsx.yml` reject each
+  `then` or `finally` call. The lint check now runs with type information and confirms that no type configuration error
+  makes the lint skip files. Run oxlint's fix twice, since an added `async` exposes a `return` that the second run
+  awaits. The examples and the `catch-handlers` notes now name the error builder `buildRequestDropped` and each lookup
+  with `read`, such as `const invoice = yield* readInvoice({ id })`. The `catch-handlers` notes and the async Allowed
+  example write `Effect.tryPromise({ catch: buildRequestDropped, try: readInvoice })`, with its keys in code point
+  order. The `then` Violation passes the inline arrow `(response) => response.json()`. The `promise-chains` comment
+  gives `then` and `finally` inline arrows, such as `readInvoice({ id }).then((invoice) => sumTotal({ invoice }))`. The
+  `Effect.orDie` Violation calls `Effect.orDie(refunding)` on a bound Effect instead of passing `Effect.orDie` to `pipe`
+  by name. The tagged error example and the `untagged-errors` notes declare classes with `Schema.TaggedErrorClass`, the
+  Effect 4 name. The `then` Violation and the async Allowed example take `Readonly<AbortSignal>`, as
+  `code-typescript-input-immutability` requires. The bare-error Violation now braces its `if` body, as
+  `code-guard-clauses` requires, so it breaks only the rule it shows. The async Allowed example declares
+  `Promise<unknown>`, so it returns the parsed body as `unknown`, as `code-typescript-type-assertions` requires.
+- `code-typescript-effect-schemas`: name each schema constant in PascalCase for the value it decodes, never in camelCase
+  or with a `Schema` suffix, and derive its type once, directly below it, in an alias that shares its name, written
+  `type Invoice = typeof Invoice.Type`; every other use refers to that alias, never to an inline `typeof Invoice.Type`.
+  A schema class needs no alias, a decoder or guard built from a schema keeps a camelCase name, such as `decodeInvoice`
+  or `const isInvoice = Schema.is(Invoice)`, and a schema built from a closed set's declaration is written inline where
+  it is used. Every decode now passes `{ onExcessProperty: 'error' }` beside the schema, so an owned shape rejects
+  unknown fields; a foreign payload, which another system declares and may extend, is marked loose in its own schema
+  with an index-signature rest such as `Schema.Record(Schema.String, Schema.Unknown)`, and a framework or common
+  validator interface that decodes for the code gets the same option. Making an existing reader of stored or shipped
+  data reject unknown fields ships only as `data-stored-and-shipped-formats` allows. The contract ships ast-grep rules
+  for TypeScript and Tsx under `assets/ast-grep/` that report non-PascalCase schema constants, derived types outside
+  their alias, the helper form `Schema.Schema.Type<typeof Invoice>` anywhere, and decode calls without the option, and
+  declares `requires-tenet: 0.11.0`. The message now names unknown fields and the shared PascalCase name.
+- `code-typescript-function-arguments`: a default for an optional field of a function's argument object now sits where
+  the signature destructures it, such as `function poll({ pollMs = POLL_MS }: PollInput)`, never with `??`, `??=`, or
+  `||` where the body reads the field. A default may read an earlier field or make a synchronous call, a default that
+  needs `await` becomes a defaulted function, and a nested options field is destructured with its default in the
+  signature. A field that takes a signature default is optional, never nullable, and a function that forwards an
+  optional field repeats no default. A callback written directly as a call's argument and a parameter whose type a
+  dependency declares are outside the default rules. The contract now ships ast-grep rules for TypeScript and Tsx and
+  requires Tenet 0.11.0. Name each function's argument type its PascalCase name plus `Input`, such as `retryStep` taking
+  `RetryStepInput`, and a component's, whose name starts with a capital letter, its name plus `Props`, such as
+  `InvoiceRowProps`. A method's or function member's type is named for the member alone, a constructor's or function
+  type's for its class or type, and a function whose only caller passes it every field of its argument takes the
+  caller's type. Name each overload's argument type for its function, a word for its case, and `Input`, such as
+  `ListInvoicesByCustomerInput` and `ListInvoicesByPageInput` for `listInvoices`, since a lookup of one value starts
+  with `read` and a lookup of many with `list`. Shipped ast-grep rules `argument-type-names-typescript` and
+  `argument-type-names-tsx` report a destructured argument whose type lacks the suffix, including on overload, `declare
+  function`, and abstract method signatures; review checks the rest of the name. Write every function that a call takes
+  as an argument inline, as an arrow or generator function that names the arguments it reads, such as
+  `lines.flatMap((line) => parseLine({ line }))`, never by name, such as `lines.flatMap(parseLine)` or
+  `emitter.on('message', recordMessage)`, because the callee decides which arguments it passes; a function in an object
+  field or markup attribute, such as `onSave={onSave}`, may still be named. Remove a listener that an inline arrow
+  registers by aborting its signal or calling its registration's stop function, such as from the finalizer of the scope
+  that registered it, and suppress only a listener that a dependency removes solely by name. The shipped ast-grep rules
+  `function-reference-arguments-typescript` and `function-reference-arguments-tsx` report a name that the module or an
+  enclosing block declares as a function, and a method or function-valued field of the enclosing class read through
+  `this`, never an accessor, passed to any call or `new`, plus every bare reference passed to an array method on any
+  receiver except a capitalized namespace. Review checks each call for an imported or parameter-held function passed by
+  name, which the rules cannot see. The domain-object and callback sentences merge into neighboring rules without
+  changing their meaning, the export and discriminated-union rules and the two external-signature rules join into one
+  line each, the options type is now called an argument type, and the positional-parameter rule says a type's function
+  member where it said an interface method, since owned object types are declared with `type`. The callback example now
+  reads a dependency's `string | undefined`, such as `matches.map((match) => match[1] ?? '')`.
+- `code-typescript-input-immutability`: never use the `delete` operator, even on an object the function created. Drop a
+  key by rest destructuring, such as `const { secret, ...publicRecord } = record`, and a key known only at run time by a
+  computed key. Drop the entries that fail a condition by building the lookup as `code-typescript-runtime-keyed-maps`
+  requires. A test file, matched by a declared path pattern, may delete an environment variable it changes. It restores
+  each variable one at a time, never by replacing the environment object. The ast-grep assets add `delete-operator` and
+  `delete-environment` rules in TypeScript and Tsx variants. The oxlint asset runs `no-unused-vars` at error and ignores
+  the keys a rest destructuring drops. Write every array type as `readonly T[]` and every tuple type as `readonly [A,
+  B]`. This covers parameters, object and class properties, return types, type aliases, type arguments, and module-level
+  constants. One exception is a local variable's own annotation inside a function body that builds the array. The other
+  is the annotation of a private `#name` class field that only its own class fills. A public field, a getter's return
+  type, and every parameter stay read-only, and a type inside either annotation is still written `readonly`. Never write
+  `Array<T>` or `ReadonlyArray<T>`, and pass a copy such as `[...rows]` to a dependency whose declared type requires a
+  mutable array. The contract now ships ast-grep rules, whose fix prepends `readonly`, and an oxlint configuration for
+  `typescript/array-type`, so it requires Tenet 0.11.0. The note on values a function created now names collections
+  only, such as an array, `Map`, or `Set`, and points to `code-typescript-effect-absent-values` for an object's fields.
+  Give every parameter that declares its type a deeply read-only type, so that each property it reaches is `readonly`.
+  Write a dependency's type in its read-only form, such as `Readonly<AbortSignal>`. List each dependency type that has
+  none, such as `Request`, in the lint's declared allow list. The oxlint asset now runs with type information and sets
+  `typescript/prefer-readonly-parameter-types` with `ignoreInferredTypes` and `checkParameterProperties` true and
+  `treatMethodsAsReadonly` false. Its allow list holds the standard library's `ReadonlyMap` and `ReadonlySet`, which
+  `code-typescript-module-state` requires. It also holds `AbortController`, `Request`, `Response`, `Uint8Array`, and
+  `URL`, which have no read-only form. The three lint-configuration rules merge into one line, which asks the lint to
+  reject each forbidden form wherever a tool supports it. The lint check now runs with type information and confirms
+  that a parameter type with a property that is not `readonly` fails. The message now also names `delete` and `readonly`
+  array and tuple types. Rewrite each reported parameter type by hand; the rule has no autofix.
+- `code-typescript-module-boundaries`: declare a maximum number of distinct modules that one file imports, counting
+  type-only imports and not re-exports; the shipped `assets/oxlint/oxlintrc.json` sets `import/max-dependencies` to 10
+  with type imports counted, which a repository may override. The shipped file no longer turns off `import/default` and
+  `import/namespace`, which it turned off only to focus its own test cases, so an extending configuration keeps them at
+  the level its categories set. Its keys are now in code point order, as `code-key-order` requires, with no change to
+  its settings.
+- `code-typescript-module-state`: end each module-level object or array literal with `as const`, exported or not, and
+  follow it with `satisfies T` when it must match a declared type. A read-only annotation such as `Readonly<Record<K,
+  V>>` or `readonly T[]` no longer satisfies the rule. Never annotate the constant that holds such a literal, and never
+  wrap it in `Object.freeze`. Write each array type after its `satisfies` read-only, even inside a type argument, as
+  `code-typescript-input-immutability` requires. Annotate each module-level `Set` or `Map` as `ReadonlySet<T>` or
+  `ReadonlyMap<K, V>`. Primitive constants and values that a call returns need neither form. Where code needs a wider
+  type, annotate where the value is read, and pass a dependency that needs a mutable array a copy. The contract now
+  ships `assets/ast-grep/` rules in TypeScript and Tsx variants that report each form except an array type after
+  `satisfies`, which `code-typescript-input-immutability`'s rules report, and declares `requires-tenet: 0.11.0`. The
+  rules also report an anonymous default export whose literal lacks `as const`, such as `export default { fetch:
+  handleRequest }`, or that `Object.freeze` wraps, and accept `export default { ... } as const satisfies T`. The
+  sentence about a dependency that requires a mutable array now names `code-typescript-input-immutability`, which owns
+  the copy rule, instead of restating it with its own example.
+- `code-typescript-named-types`: declare every object type as a `type` alias, never as an `interface`, including empty
+  and generic types and types in tests, scripts, and hand-written declaration files. Write `interface` only to merge
+  members into a dependency's declaration inside `declare module` or `declare global`, with a suppression that names the
+  dependency. Never merge into a type the repository declares. An interface's `extends` clause becomes an intersection,
+  `type Order = Audited & Owned & { id: string }`, whose one object type literal is now allowed. An empty interface that
+  extends one type becomes an alias of it. An `extends Record<string, unknown>` that only made an interface assignable
+  to a record is dropped. A class implements a `type` alias as it would an interface. Generated files and copied
+  third-party source may be exempted by a path pattern declared in the lint configuration. The contract ships
+  `assets/oxlint/oxlintrc.json`, which sets oxlint's native `typescript/consistent-type-definitions` to `type`, and
+  declares `requires-tenet: 0.11.0`. Suppress each augmenting interface before running the autofix, which otherwise
+  rewrites an augmentation inside `declare module` into an alias that no longer merges. The inline-type examples now
+  name `buildCommand`, and the Violation types its argument `BuildCommandInput`, as `code-typescript-function-arguments`
+  requires, and writes only its return type inline, so it breaks only this rule.
+- `code-typescript-node-scripts`: the relative-import extension rule, its Violation, and its check move to
+  `code-typescript-import-extensions`, which this contract now extends. A repository that installs this contract without
+  `code-typescript-import-extensions` no longer gets the rule. The script type-check rule and its `--showConfig` check
+  no longer list `verbatimModuleSyntax`, which `code-typescript-compiler-strictness` now requires of every package
+  configuration, scripts included. The rule now names that contract's settings, its reason has its own line, and
+  `assets/typescript/tsconfig.json` still sets the flag, now with its options in code point order. The Allowed script
+  now opens with `#!/usr/bin/env node` and a summary of what it does and how to run it, as `code-comment-form` requires
+  of every executed script. Scripts call each Node function in its asynchronous form, such as `readFile` from
+  `node:fs/promises`, never `readFileSync` or `execFileSync`. The contract now ships `assets/oxlint/oxlintrc.json`,
+  which turns on oxlint's native `node/no-sync` for `.mts` files, and says to load it from the repository's lint. The
+  lint check now confirms that the lint rejects `readFileSync` in a script.
+- `code-typescript-type-assertions`: annotate a constant or field that must match a declared type where it is declared,
+  such as `const reminders: ReminderSchedule = { ... }`, write `satisfies` instead only where later code reads the
+  narrower inferred type, and bind any other value that needs a declared type to an annotated constant; the contract no
+  longer accepts either form at will. Such reads include a story's `typeof meta`, a table's literal keys, an anonymous
+  default export a runtime loads, and a module-level literal's `as const` type, which `code-typescript-module-state`
+  requires. The lint must also list each `satisfies` expression for review without failing, through the shipped ast-grep
+  rules `satisfies-expressions-typescript` and `satisfies-expressions-tsx` at severity info, and a new check asks, for
+  each listed `satisfies` in changed code, whether later code reads the inferred type. Never write a type predicate,
+  such as `invoice is PaidInvoice`, or an assertion signature, such as `asserts value is Invoice`, in any file; tests
+  and scripts lose their exception for assertion signatures, and may still call a dependency's assertion function such
+  as `assert.ok(row)`. Test an `unknown` value against a schema with the guard that the schema library builds from it,
+  named as `code-typescript-effect-schemas` requires, and narrow every other value inline; TypeScript 5.5 and later
+  infer a predicate from an inline callback's check, such as `orders.filter((order) => order.status ===
+  OrderStatus.Paid)`. The lint must also reject type predicates and assertion signatures, including a predicate in a
+  function type such as `(value: unknown) => value is Invoice`, and the contract ships ast-grep rules
+  `type-predicates-typescript` and `type-predicates-tsx` under `assets/ast-grep/`, says to load them from the
+  repository's lint configuration, and declares `requires-tenet: 0.11.0`. The examples now follow round 5. The non-null
+  examples are `rows[0]!`, `invoices.get(id)!.total`, and the Violation `const invoice =
+  this.#invoices.get(this.#invoiceId)!;`, and the Allowed accessor is `this.#readInvoice()`, which starts with a listed
+  verb. The default example is `paymentTimes.get(invoice.id) ?? 0` for a paid invoice. The return-only type parameter
+  examples are `parseJson<Value>({ text }: ParseJsonInput): Value`, `parseLines<Line>({ text }: ParseLinesInput):
+  readonly Line[]`, and `request<Body>({ path }: RequestInput): Promise<Body>`. A Violation and Allowed pair contrasts
+  `orders.filter((order): order is PaidOrder => ...)` with the inferred form, and another contrasts `const reminders = {
+  ... } satisfies ReminderSchedule` with its annotation; three more Allowed lines show `StoryObj<typeof meta>` after
+  `const meta = { component: InvoiceCard } as const satisfies Meta<typeof InvoiceCard>`, `layouts.compact` after a keyed
+  table's `as const satisfies Record<string, ColumnLayout>`, and `export default { fetch: handleRequest } as const
+  satisfies ExportedHandler<Bindings>`. The default rule, the lint configuration rule, and the lint check each split
+  into two lines under 30 words, and the rule on reading a record whose absence breaks an invariant is shortened to one
+  line under 30 words. The message now names type predicates and says to annotate declared types unless code reads
+  inferred ones.
+- `contract-maintenance`: each rule names one allowed form for each case it covers, never a choice between equivalent
+  forms, and states the observable condition that tells its cases apart. Each violation example breaks only the rule it
+  illustrates, and each allowed example breaks no contract the repository adopts. Each rule's form is chosen because it
+  is clean, readable, consistent with other adopted rules, easily enforced by a lint or an agent reading code, and needs
+  the fewest exceptions, never because most scoped code already follows it; counting the code a form would change only
+  plans its rollout. A rule's verification path is a tool's command with its working directory wherever a tool can check
+  the rule; otherwise a focused behavior check or a review question that reviewers answer the same way every time. The
+  ban on requiring new checkers for subjective style now names checker scripts, so shipped tool configuration may check
+  a style choice. Defining shared obligations once and nested contracts' inheritance now share one sentence, with no
+  change in meaning. A new check asks whether each added or tightened rule allows one form per case, chosen without
+  prevalence as a reason, and whether a tool checks it wherever one can.
+- `library-contract-format`: each rule names one allowed form for each case it covers, never a choice between equivalent
+  forms, and two forms are allowed only for disjoint cases with the observable condition that tells them apart. A
+  requirement is written in a form a tool can check whenever such a form expresses the same decision; where a tool can
+  check a rule, the contract ships that tool's configuration under `assets/<tool>/` and a check that runs it, and a
+  shipped file turns a rule off only for a reason `code-lint-strictness` lists, never to scope that file's own test
+  cases. A rule is left to review alone only when two reviewers would decide each case the same way. Each violation
+  example breaks only the rule it illustrates, and each allowed example breaks no library contract that would govern it.
+  Two checks cover these rules.
+- `library-contract-generality`: a team-chosen number becomes a requirement to declare its maximum or minimum, instead
+  of a bounded value. When a shipped `assets/` file enforces the number, that file sets the default and the text may
+  state it as a value a repository may override, and the file may set a different value for one kind of code when the
+  text names the kind and its reason. Each rule's form is chosen because it is clean, readable, consistent with other
+  library rules, easily enforced by a lint or an agent reading code, and needs the fewest exceptions, never because most
+  code in the source projects already follows it; counting the code a form would change only plans its rollout. A new
+  check asks whether the pull request for any added or tightened rule gives how much code already follows a form as a
+  reason for choosing it.
+- `library-skill-portability`: each code example in a skill obeys every library contract that governs that code, except
+  a labeled bad example, which breaks only the rule it illustrates.
+- `telemetry-application-tracing`: every server, and every other process a host runs until it is stopped, writes each
+  log line as one JSON object. It passes the logger module's function one object literal whose `event` field names a
+  member of the closed set that module declares. That set follows `code-closed-value-sets`, and the field names a
+  member, such as `LogEvent.InvoiceSettled`, never the member's literal value. Each value of that set is two snake case
+  parts joined by a dot, such as `invoice.settle_failed`. The logger input's `event` field is typed as the set, so an
+  undeclared event fails the type check. Every other value is its own field, never interpolated into a string. A failure
+  is an `error` field that lists its cause chain outermost first, never the exception object. Each cause appears as its
+  error type, or as a generic error's safe error code. Code outside the logger module calls no console method, print
+  function or macro, or logging library function, and opens no standard stream. A command-line program's lines for its
+  user follow `cli-output-channels` instead, and browser code is not covered. The contract now ships
+  `assets/oxlint/oxlintrc.json`, which reports console calls and `process.stdout`, `process.stderr`, and
+  `globalThis.console` outside the `logger/log` file. It also ships ast-grep rules for TypeScript and Tsx. They report a
+  call of the logger function, `log` by default, whose first argument is not an object literal with an `event` field.
+  They also report an `event` value written with a string or template literal, and a value of the `LogEvent` declaration
+  in another form. Outside the `logger/log` file, they report an import or re-export of `stdout` or `stderr` from
+  `node:process` or `process`. A repository may rename the file, the function, and the set. It adds its command-line
+  output module and its browser code to the console allowance. It now needs Tenet 0.11.0. The error-recording and
+  boundary-sanitizing rules, the exporter-credential and local-destination rules, and the two sampling rules each merge
+  into one sentence without changing what they require. The message now names log lines.
+- `test-assertion-integrity`: write no branch in a test case's body, such as an `if`, a `switch`, a conditional
+  expression, or `&&`, `||`, or `??`. Where the test runner counts assertions, open each test by declaring how many it
+  must run, such as `expect.assertions(1)`, never `expect.hasAssertions()`. Assert with the runner's plain assertion and
+  error expectation, such as `assert total == 42`, never a test-case class's methods, such as `self.assertEqual` or
+  `self.assertRaises`. The contract now ships `assets/oxlint/oxlintrc.json`, which sets `vitest/no-conditional-in-test`
+  and `vitest/prefer-expect-assertions` in test files. It also ships ast-grep rules for TypeScript and Tsx that reject
+  `expect.hasAssertions()`, which `vitest/prefer-expect-assertions` accepts. Two new Violation examples, a new Allowed
+  example, and two lint checks that run the shipped files cover these rules, and it requires Tenet 0.11.0. The Allowed
+  example now rewords `order not found` to `no order with ID "42"`, so its diagnostics start lowercase and quote the id
+  as `code-diagnostic-messages` requires.
+- `test-curation`: where the test runner takes a per-test timeout, give every test an explicit one, written as a number
+  literal. It is still used only to bound a hung test and never to define expected ordering. A new
+  `assets/oxlint/oxlintrc.json` sets `vitest/require-test-timeout` in test files, a new check runs the lint and that
+  configuration for a test with no timeout, and it requires Tenet 0.11.0.
+- `test-scenario-functions`: in every test file whose runner declares suites by a call, every case and every setup or
+  teardown hook sits in one top-level suite, such as `describe('order export', ...)`. A new
+  `assets/oxlint/oxlintrc.json` sets `vitest/require-top-level-describe` with `maxNumberOfTopLevelDescribes` 1 in test
+  files. A new check confirms that the lint run reports a case or hook outside a top-level suite and a second top-level
+  suite. The contract requires Tenet 0.11.0.
+- `ui-design-tokens`: where styles are defined as an object keyed by name, select a variant's style by indexing one
+  definition keyed by the variant's members, such as `toneStyles[tone]`. Never pick that style by comparing the variant
+  with a member, such as `tone === Tone.Positive && styles.positive`. Give every member a key, with an empty style for a
+  member that adds nothing. Give that definition a type argument keyed by the variant's set, such as `Record<Tone,
+  Style>`, so the type checker rejects a missing member and a key outside the set. `code-closed-value-sets` requires
+  that type argument of a style definition that writes members' literal values as keys. The contract now ships
+  `assets/ast-grep/` rules for TypeScript and Tsx, `variant-style-comparisons-typescript` and
+  `variant-style-comparisons-tsx`, which target StyleX. They report a comparison with `===`, `==`, `!==`, or `!=`
+  against a fixed value when it is an operand of `&&` inside the arguments of `stylex.props`. Such a comparison inside
+  an array argument reports too. A fixed value is a string literal or a member of a capitalized name, such as
+  `Tone.Positive`. A comparison of two run-time values, such as `row.id === selectedId`, and a `typeof` test stay
+  allowed, and the rules have no autofix. The contract says to load that configuration from the repository's lint and to
+  suppress a finding only as `code-lint-suppressions` allows. It adds a Violation and an Allowed example, whose
+  definition's type argument is `Record<Tone, Style>`, and a lint check, and declares `requires-tenet: 0.11.0`. The
+  rules report 17 comparisons in 5 files of the largest measured repository and none in the other three.
+- `ui-react-interaction-ownership`: an effect may no longer call a state setter synchronously in its body, directly or
+  through a function the body calls, even under a condition; it sets state only in code that runs after its body
+  returns, such as a subscription's listener or code after an `await`. State that resets when its data changes identity
+  now resets through a `key` from that data on the component that holds it, and every list item is keyed by a value of
+  the item, never its array index. The contract now ships `assets/oxlint/oxlintrc.json`, which turns on
+  `react/no-array-index-key` and `react/set-state-in-effect` and sets no plugins, so a repository loads it and turns on
+  its lint's React plugin; without that plugin the lint ignores every rule in the file. The shipped file also turns on
+  `react/rules-of-hooks`, and the lint check now confirms it rejects a conditional hook, an index key, and a setter in
+  an effect's body; a new check reviews every added key, including in lists built by `Array.from`, which the shipped
+  lint does not follow, and another asks whether a function an effect's body calls sets state synchronously, which the
+  shipped lint also misses. It requires Tenet 0.11.0.
+- `ui-react-typescript-component-apis`: an empty prop value now takes the type `code-typescript-effect-absent-values`
+  requires, so `value: number | null` no longer complies.
+
+### Loosened
+
+- `cli-output-channels`: lines that `telemetry-application-tracing` covers, such as a server's log lines, follow that
+  contract instead of these rules. This contract no longer requires a server to write its log lines through one logger
+  module, because `telemetry-application-tracing` now owns that requirement. A repository that installs this contract
+  without `telemetry-application-tracing` no longer gets that rule. The Allowed example's progress function is now
+  `reportProgress({ line })`, which starts with a verb.
+- `code-lint-suppressions`: a rule turned off with one of the reasons `code-lint-strictness` lists, named in the comment
+  above its entry, is no longer a violation, and the configuration check asks about rules turned off without such a
+  reason.
+
+### Added
+
+- 22 contracts:
+  - code: `code-constant-names`, `code-declaration-order`, `code-key-order`, `code-lint-strictness`,
+    `code-map-and-set-names`, `code-python-doc-comment-coverage`, `code-python-function-arguments`,
+    `code-typescript-boolean-conditions`, `code-typescript-collection-iteration`,
+    `code-typescript-doc-comment-coverage`, `code-typescript-effect-absent-values`, `code-typescript-effect-scheduling`,
+    `code-typescript-export-return-types`, `code-typescript-expression-forms`,
+    `code-typescript-function-member-signatures`, `code-typescript-function-scoping`,
+    `code-typescript-import-extensions`, `code-typescript-import-statements`,
+    `code-typescript-object-literal-functions`, `code-typescript-runtime-keyed-maps`.
+  - ui: `ui-react-hook-calls`, `ui-react-typescript-jsx-attributes`.
+
+### Clarified
+
+- `api-typescript-request-paths`: the path functions in the examples now start with a verb. `packs/pack-paths.ts`
+  exports `formatPack` and `formatChunk`, callers request `PackPaths.formatChunk({ index, key })`, and the shipped lint
+  rules' message names that call. The generic request example now passes one object argument with an `HttpMethod` member
+  and still writes a path template at the call site. It reads `request({ account, method: HttpMethod.Get, path:
+  '/accounts/{account}/invoices' })`. Both calls list their keys in code point order, as `code-key-order` requires.
+- `code-blank-lines`: the one-line example now reads `if (orders.length === 0) { return []; }`, a braced body of one
+  statement, because `code-guard-clauses` requires braces on every block. The spacing rules are unchanged. The shipped
+  `assets/oxlint/oxlintrc.json` now lists its keys in code point order, as `code-key-order` requires, with no change to
+  its settings.
+- `code-comment-attribution`: the Python attribution example now puts the contract name that opens it in backticks, ``#
+  `orders-retention-lifecycle`: purge closed orders``, as `code-comment-form` requires of a comment that opens with an
+  identifier.
+- `code-duplicated-blocks`: the Allowed example now calls `startWorker({ log, port })`, with its keys in code point
+  order as `code-key-order` requires. No code's compliance changes.
+- `code-export-consumers`: the Violation's `export function formatUsd` now declares its `string` return type, so it
+  breaks only the rule it shows.
+- `code-python-none-guards`: the `connect` and `handle` examples now take keyword-only parameters, as
+  `code-python-function-arguments` requires, and write each `None` check as a block rather than a one-line `if`
+  statement. The allowed-check line splits into two lines under 30 words, without the `Optional[X]` form that the
+  shipped ruff configuration reports. The `connect` example's parameter is now `timeout_seconds`, defaulted from
+  `DEFAULT_TIMEOUT_SECONDS`, as `code-measured-value-names` requires. No code's compliance changes.
+- `code-rust-type-ownership`: the impl examples name their type parameter `State`, as in `impl<State> Order<State>` and
+  `impl<State: Clone> Order<State>`. The one-impl-block rule splits into two lines under 30 words: the rule itself, and
+  a line saying which impl blocks share a self type. What code must do is unchanged.
+- `code-shared-utilities`: the misplaced utility in the Violation is now `clip({ text })`, which takes one object
+  argument as `code-typescript-function-arguments` requires. No code's compliance changes.
+- `code-typescript-class-declarations`: the client example's lookup of many invoices is now `listInvoices`, as
+  `code-spelled-out-names` requires. Both the plain-record example's `listInvoices({ account })` and the Allowed factory
+  that returns `{ listInvoices }` use it. The plain-record call no longer passes a `path`, which
+  `api-typescript-request-paths` builds with a path function. The plain-record example's fields are now `readonly`, as
+  `code-typescript-input-immutability` requires of a parameter's type. The plain-record rule splits into two lines under
+  30 words: the rule and its example. No code's compliance changes.
+- `code-typescript-entry-points`: the exported-object examples now end in `as const`, such as `export const uuidModule =
+  { generate, validate } as const`, as `code-typescript-module-state` requires of a module-level literal, so each breaks
+  only the rule it shows. The first Violation now says that `invoice-export/index.ts` imports three exporters and
+  declares the `exporters` record from them, instead of quoting the literal. The rule against exporting such an object
+  splits into two lines under 30 words. What code must do is unchanged.
+- `data-record-identifiers`: the derived id function example is now `deriveRefundEffectId({ invoice })`, which starts
+  with a verb as `code-module-structure-and-control-flow` requires. No code's compliance changes.
+- `data-sql-store-boundaries`: the example functions now start with a verb. The forbidden function that runs
+  caller-supplied SQL is `readFirstRow({ query, values })`, and the transaction function is `runInTransaction`. The
+  transaction rule splits into two lines under 30 words.
+- `data-store-ownership`: the example store functions now start with a verb, as `code-module-structure-and-control-flow`
+  requires. The read functions are `readFinishedResults({ run })` and `listPendingInvoices()`, and the transaction
+  function is `runInTransaction`. The storage-operation examples are now `read`, `write`, `put`, and `execute`, names on
+  the default verb list that a function only the store module calls may take. The storage-operation exception splits
+  into two lines under 30 words.
+- `security-interpreter-injection`: the query-text Violation now interpolates the order identifier with a template
+  literal instead of `+`, as `code-typescript-expression-forms` requires, so it breaks only the rule it shows.
+- `tenet-code-curation`: the Rust reference's module entry-point example re-exports `stream::parse_events` instead of
+  `stream::interpret`, so its function name starts with a verb on the default list that
+  `code-module-structure-and-control-flow` ships. The TypeScript reference's stage function is now `chooseNextStage`,
+  which also starts with a verb. The new state comes from `advanceJob`, which declares its `JobProgress` return type and
+  lists `lastEventAtMs` before `stage`, in code point order.
+- `tenet-contract-curation`: a new "What makes a good contract" section names what `contract-maintenance` requires (one
+  form per case, chosen on its merits, examples that obey other contracts, and a tool check where one can decide) and
+  how to meet it: look for a formatter, lint, or structural-search rule before writing prose and ship its configuration
+  under `assets/<tool>/` (Tenet 0.11.0 or later) with the command under `Checks`; leave to review only what two
+  reviewers decide alike; allow one of two equivalent forms, or write the condition that picks between them; write the
+  rule's examples in each candidate form and pick the one that is clean, readable, consistent with the project's other
+  rules, easily enforced by a lint or an agent reading code, and needs the fewest exceptions, counting the code each
+  form would change only to plan the rollout; keep chosen numbers in tool configuration as a declared maximum, with a
+  separate maximum and reason for a kind of code such as components; and check every example against every other adopted
+  contract. A mechanical requirement is enforced with a tool the project already runs, and a project script only when no
+  tool can check it.
+- `tenet-test-curation`: the TypeScript examples assert with `expect(output).toBe(...)`, `toMatch(/.../v)`, and
+  `not.toContain("\u001B")` instead of `node:assert`.
+- `test-example-suite`: the Allowed example's case now calls `computeOrderTotal({ prices: [300, 200] })`, which starts
+  with a verb, and its sentence is shorter. What code must do is unchanged.
+
 ## v10.0.0
 
 `api-typescript-request-paths`, `code-closed-value-sets`, `code-conditional-expressions`, `code-exhaustive-branches`,

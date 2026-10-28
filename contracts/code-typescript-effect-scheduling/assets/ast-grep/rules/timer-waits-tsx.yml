@@ -1,0 +1,64 @@
+# code-typescript-effect-scheduling: sleep with `Effect.sleep` and bound waits with `Effect.timeout`, never with a timer or a deadline signal.
+# Tsx variant (.tsx); timer-waits-typescript.yml is identical except for `id`, `language`, and this line.
+id: timer-waits-tsx
+language: Tsx
+severity: error
+message: Sleep with `Effect.sleep` and bound a wait with `Effect.timeout` or `Effect.timeoutOrElse`, instead of a timer, a promise timers module, or `AbortSignal.timeout`.
+note: |
+  Sleep with `yield* Effect.sleep(POLL_INTERVAL)`, repeat with `Effect.repeat` and a `Schedule`, and bound a wait with `Effect.timeout`.
+  A foreign call stops at the deadline when it receives the `signal` that `Effect.tryPromise` hands its function.
+  A component delays or repeats work by forking the Effect in its effect callback and interrupting the fiber in that callback's cleanup.
+  The rule reports `setTimeout` and `setInterval`, called, passed by name, or read from `globalThis`, `window`, or `self`, an import of a promise timers module or of `setTimeout` or `setInterval` from a timers module, and `AbortSignal.timeout`.
+rule:
+  any:
+    # `setTimeout(resolve, 250)` and `promisify(setTimeout)`.
+    # An import of the name is reported once, by its import statement, and a type such as `ReturnType<typeof setTimeout>` is not reported.
+    - kind: identifier
+      regex: ^(setTimeout|setInterval)$
+      not:
+        any:
+          - inside:
+              kind: import_statement
+              stopBy: end
+          - inside:
+              kind: type_query
+    # `globalThis.setTimeout(...)` and `window.setInterval(...)`.
+    - kind: member_expression
+      all:
+        - has:
+            field: object
+            kind: identifier
+            regex: ^(globalThis|window|self)$
+        - has:
+            field: property
+            regex: ^(setTimeout|setInterval)$
+        - not:
+            inside:
+              kind: type_query
+    # `import { setTimeout as sleep } from 'node:timers/promises'`.
+    - kind: import_statement
+      has:
+        field: source
+        regex: ^['"](node:)?timers/promises['"]$
+    # `import { setTimeout as wait } from 'node:timers'`, but not `import { setImmediate } from 'node:timers'`.
+    - kind: import_statement
+      all:
+        - has:
+            field: source
+            regex: ^['"](node:)?timers['"]$
+        - has:
+            stopBy: end
+            kind: import_specifier
+            has:
+              field: name
+              regex: ^(setTimeout|setInterval)$
+    # `signal: AbortSignal.timeout(60_000)`.
+    - kind: member_expression
+      all:
+        - has:
+            field: object
+            kind: identifier
+            regex: ^AbortSignal$
+        - has:
+            field: property
+            regex: ^timeout$

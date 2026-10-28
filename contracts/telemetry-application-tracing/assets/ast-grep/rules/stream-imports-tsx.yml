@@ -1,0 +1,31 @@
+# telemetry-application-tracing: open a handle to a standard stream only in the logger module.
+# Tsx variant (.tsx); stream-imports-typescript.yml is identical except for `id`, `language`, and this line.
+id: stream-imports-tsx
+language: Tsx
+severity: error
+message: "Write this line through the logger function; only the logger module imports `stdout` or `stderr` from `node:process`."
+note: |
+  The oxlint configuration reports `process.stdout` and `process.stderr`; this rule reports the named import that `code-typescript-import-statements` requires instead, such as `import { stderr } from 'node:process'`.
+  It reads `node:process` and `process`, aliased names such as `{ stdout as out }`, and re-exports such as `export { stderr } from 'node:process'`, but not a type-only `import type` statement.
+  The logger module is exempt by the path under `ignores`, and a repository whose logger module has another path edits `ignores`.
+# The logger module, the only file allowed stream handles.
+ignores:
+  - "**/logger/log.ts"
+rule:
+  any:
+    - kind: import_specifier
+    - kind: export_specifier
+  has:
+    field: name
+    regex: ^(?:stderr|stdout)$
+  inside:
+    any:
+      - kind: import_statement
+      - kind: export_statement
+    stopBy: end
+    # A type-only import opens no stream handle.
+    not:
+      regex: ^import\s+type\b
+    has:
+      field: source
+      regex: ^['"](?:node:)?process['"]$

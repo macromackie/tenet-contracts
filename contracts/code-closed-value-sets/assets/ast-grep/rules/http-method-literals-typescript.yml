@@ -9,6 +9,7 @@ note: |
   `HEAD`, which also names a version-control ref, and a method in another case, such as `'get'`, are reported only where a method belongs.
   Those places are a property named `method`, `formMethod`, `httpMethod`, or `requestMethod`, a comparison or `switch` on a method, and a list or union that holds another method.
   A method inside a longer string, such as `'GET /orders'`, is left to review.
+  A key of a declared style definition call, such as `stylex.create({ 'GET': {} })`, is not reported.
   The module that declares the method set and the test files are exempt by the path patterns under `ignores`; replace them with the repository's declared paths.
 ignores:
   # The module that declares the method set.
@@ -99,8 +100,24 @@ utils:
               stopBy: end
               matches: method-token
 rule:
-  any:
-    - matches: method-token
-    - all:
-        - matches: any-case-method-token
-        - matches: method-position
+  all:
+    - any:
+        - matches: method-token
+        - all:
+            - matches: any-case-method-token
+            - matches: method-position
+    # A key of a style definition, which may write a member's value because its library compiles only literal keys.
+    # The declared definition call is `stylex.create`; a repository replaces this pattern with its own style library's call.
+    - not:
+        inside:
+          kind: pair
+          field: key
+          inside:
+            kind: object
+            inside:
+              kind: arguments
+              inside:
+                kind: call_expression
+                has:
+                  field: function
+                  regex: ^(stylex\.create)$

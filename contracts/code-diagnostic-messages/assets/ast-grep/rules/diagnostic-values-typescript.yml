@@ -1,0 +1,177 @@
+# code-diagnostic-messages: quote every value a diagnostic interpolates with `JSON.stringify(value)`, and append a cause's own message after a colon unquoted.
+# TypeScript variant (.ts, .mts, .cts); diagnostic-values-tsx.yml is identical except for `id`, `language`, and this line.
+id: diagnostic-values-typescript
+language: TypeScript
+severity: error
+message: Quote this interpolated value as `${JSON.stringify(value)}`, such as `invoice ${JSON.stringify(invoiceId)} is closed`, unless it is a cause's message after a colon.
+note: |
+  The rule reads each `${...}` of a template literal that is an error's message, and allows only `${JSON.stringify(value)}` and a cause's message.
+  A cause's message is a `message` read, such as `${error.message}`, that follows `: ` in the template, as in `read ${JSON.stringify(path)}: ${error.message}`.
+  `String(value)` and a bare value are reported, whatever the value's type; a number is quoted too, and a `bigint` is quoted as `JSON.stringify(String(amount))`.
+  An error's message is the first argument of an error constructor whose name ends in `Error` or `Exception`, of `Effect.fail`, `Effect.die`, or `Effect.dieMessage`, and a thrown template.
+  It is also the `message` of a thrown or failed error's object argument, the first argument of `super(...)` and a `message` field or getter in an error class, and a `message` beside a `code` or `_tag` in an error result.
+  A log line is a record, not a diagnostic, and a line written to standard error is the output module's, so neither is read; a diagnostic that another function writes, such as `fail({ line })`, is left to review.
+utils:
+  # A substitution that quotes its value, `${JSON.stringify(value)}`.
+  quoted-value:
+    has:
+      kind: call_expression
+      has:
+        field: function
+        regex: ^JSON\.stringify$
+  # A substitution that appends a cause's message after a colon, `: ${error.message}`.
+  cause-message:
+    has:
+      kind: member_expression
+      has:
+        field: property
+        regex: ^message$
+    follows:
+      kind: string_fragment
+      regex: ':\s$'
+  # A constructor or call that names an error type, such as `new InvoiceError(...)` or `TypeError(...)`.
+  error-constructor:
+    any:
+      - kind: new_expression
+        has:
+          field: constructor
+          regex: (?:Error|Exception)$
+      - kind: call_expression
+        has:
+          field: function
+          kind: identifier
+          regex: ^(?:[A-Z][A-Za-z]*)?(?:Error|Exception)$
+        not:
+          inside:
+            kind: class_heritage
+            stopBy: end
+  # A call that fails or dies with a message in Effect.
+  failing-call:
+    kind: call_expression
+    has:
+      field: function
+      regex: ^Effect\.(?:fail|die|dieMessage)$
+  # A place where a constructed error is thrown or failed, such as `throw new InvoiceMissing({ ... })`.
+  failed-error:
+    kind: new_expression
+    any:
+      - inside:
+          any:
+            - kind: throw_statement
+            - kind: yield_expression
+      - inside:
+          kind: arguments
+          inside:
+            matches: failing-call
+      - inside:
+          kind: arrow_function
+          field: body
+          any:
+            - inside:
+                kind: pair
+                field: value
+                has:
+                  field: key
+                  regex: ^catch$
+            - inside:
+                kind: arguments
+                inside:
+                  kind: call_expression
+                  has:
+                    field: function
+                    regex: (?:^|\.)(?:mapError|orElseFail)$
+  # A class that extends an error type, such as `Data.TaggedError('InvoiceMissing')` or `Schema.TaggedErrorClass<JobLate>()(...)`.
+  error-class:
+    kind: class_declaration
+    has:
+      kind: class_heritage
+      regex: (?:Error|Exception)(?:Class)?\b
+  # A template literal that is an error's message.
+  message-template:
+    kind: template_string
+    any:
+      # `new Error(`...`)`, `TypeError(`...`)`, and `Effect.fail(`...`)`.
+      - nthChild: 1
+        inside:
+          kind: arguments
+          inside:
+            any:
+              - matches: error-constructor
+              - matches: failing-call
+      # `super(`...`)` in an error class's constructor.
+      - nthChild: 1
+        inside:
+          kind: arguments
+          inside:
+            kind: call_expression
+            has:
+              field: function
+              kind: super
+            inside:
+              stopBy: end
+              matches: error-class
+      # `throw `...``.
+      - inside:
+          kind: throw_statement
+      # `new InvoiceMissing({ message: `...` })` where it is thrown or failed, or inside any error constructor.
+      - inside:
+          kind: pair
+          field: value
+          has:
+            field: key
+            regex: ^["']?message["']?$
+          inside:
+            kind: object
+            nthChild: 1
+            inside:
+              kind: arguments
+              inside:
+                any:
+                  - matches: error-constructor
+                  - matches: failed-error
+      # `return { ok: false, code: 'order_closed', message: `...` }`, a message beside a code or tag in an error result.
+      - inside:
+          kind: pair
+          field: value
+          has:
+            field: key
+            regex: ^["']?message["']?$
+          inside:
+            kind: object
+            has:
+              any:
+                - kind: pair
+                  has:
+                    field: key
+                    regex: ^["']?(?:code|_tag)["']?$
+                - kind: shorthand_property_identifier
+                  regex: ^(?:code|_tag)$
+      # `get message() { return `...` }` and `readonly message = `...`` in an error class.
+      - inside:
+          kind: return_statement
+          inside:
+            stopBy: end
+            kind: method_definition
+            has:
+              field: name
+              regex: ^message$
+            inside:
+              stopBy: end
+              matches: error-class
+      - inside:
+          kind: public_field_definition
+          field: value
+          has:
+            field: name
+            regex: ^message$
+          inside:
+            stopBy: end
+            matches: error-class
+rule:
+  kind: template_substitution
+  not:
+    any:
+      - matches: quoted-value
+      - matches: cause-message
+  inside:
+    matches: message-template

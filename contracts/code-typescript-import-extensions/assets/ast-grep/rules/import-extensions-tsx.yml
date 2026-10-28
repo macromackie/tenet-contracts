@@ -1,0 +1,51 @@
+# code-typescript-import-extensions: a relative specifier names the imported file by its own name and extension, such as `./harness.ts`.
+# Tsx variant (.tsx); the TypeScript and Tsx variants differ only in `id`, `language`, and this line.
+id: import-extensions-tsx
+language: Tsx
+severity: error
+message: Name the imported file by its own name and extension, such as `./harness.ts` or `./orders/index.ts`, never a bare path, a folder, or the emitted `.js` name.
+note: |
+  A relative specifier starts with `./` or `../`, or is `.` or `..`, in an import, a re-export, an import-equals declaration, a dynamic import, or an `import()` type.
+  It passes when it ends in `.ts`, `.tsx`, `.mts`, `.cts`, or a data or asset extension listed in `utils.named-file`, optionally followed by a bundler query such as `?raw`.
+  A repository that imports another kind of data or asset file adds its extension to that list, but never a dotted part of a source file's name, such as `gen` in `route-tree.gen.ts`.
+  An accepted data or asset extension also passes a source file that carries it as a dotted part, such as `./theme.css` for `theme.css.ts`; a repository with such files removes that extension from the list, or reviews their imports when it also imports that kind of file.
+  A specifier that code computes, such as `import(path)`, and package specifiers, such as `@acme/orders/client`, are left to review.
+  Exempt generated files by their declared path pattern in a scan of these rules alone, such as `ast-grep scan --filter '^import-extensions-' --globs '!src/generated/**'`.
+utils:
+  # A string, or a template without substitutions, that starts a relative path.
+  relative-literal:
+    any:
+      - kind: string
+      - kind: template_string
+        not:
+          has:
+            kind: template_substitution
+    regex: '^[''"`]\.\.?(/|[''"`])'
+  # A specifier that ends in a TypeScript extension or a data or asset extension, optionally followed by a query.
+  named-file:
+    regex: '\.(ts|tsx|mts|cts|json|jsonc|css|scss|sass|less|md|mdx|txt|html|svg|png|jpe?g|gif|webp|avif|ico|wasm|woff2?|ttf|otf|yaml|yml|toml|csv|sql|graphql|gql)(\?[^''"`]*)?[''"`]$'
+  # The source of an import, a re-export, or an import-equals declaration.
+  statement-source:
+    kind: string
+    inside:
+      field: source
+      any:
+        - kind: import_statement
+        - kind: export_statement
+        - kind: import_require_clause
+  # The argument of a dynamic import or of an `import()` type, which both parse as a call of `import`.
+  import-call-argument:
+    inside:
+      kind: arguments
+      inside:
+        kind: call_expression
+        has:
+          field: function
+          kind: import
+rule:
+  matches: relative-literal
+  any:
+    - matches: statement-source
+    - matches: import-call-argument
+  not:
+    matches: named-file

@@ -1,0 +1,27 @@
+# ui-react-typescript-jsx-attributes: never name a function that an inline event handler calls `handle` and what it handles; name it for what it does.
+# The rule matches a call by its own name, such as `handleSave()`, so a received member such as `props.handleSave()` keeps its name and is not checked.
+id: handle-calls-tsx
+language: Tsx
+severity: error
+message: Name this function for what it does, such as `saveDraft`, never `handle` and what it handles, such as `handleSave`.
+note: |
+  An event attribute is one whose name is `on` followed by a capital letter, such as `onClick` or `onSave`.
+  The rule reports a `handle` call anywhere inside an inline function passed to one, such as `onClick={() => handleSave({ draft })}`.
+rule:
+  kind: identifier
+  regex: ^handle[A-Z]
+  inside:
+    field: function
+    kind: call_expression
+    inside:
+      stopBy: end
+      any:
+        - kind: arrow_function
+        - kind: function_expression
+      inside:
+        kind: jsx_expression
+        inside:
+          kind: jsx_attribute
+          has:
+            kind: property_identifier
+            regex: ^on[A-Z]

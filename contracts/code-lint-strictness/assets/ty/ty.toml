@@ -1,0 +1,23 @@
+# The strictest ty type-check settings that code-lint-strictness requires.
+# Every rule runs at error, and no rule is off.
+# Turn a rule off only for a reason code-lint-strictness names, in a comment on the line directly above it that starts with its letters and gives the evidence:
+# C contradicts a contract, R contradicts another enabled rule, F conflicts with the formatter,
+# and Q reports code the contracts require.
+#
+# ty has no setting that extends another file, so copy this file as the repository's own ty.toml,
+# or pass the installed copy with `ty check --config-file <path>`.
+# Add the repository's `[environment]` and `[src]` tables, and any `[[overrides]]` path scope, to that copy,
+# because they name the repository's own paths.
+# ty has no version setting, so pin its exact version in the repository's tool manager.
+# This file was tested with ty 0.0.92; a new version adds rules, so raise it in a reviewed upgrade.
+
+[analysis]
+# A bare `# type: ignore` stops suppressing, so every suppression names the ty rule it silences.
+respect-type-ignore-comments = false
+
+[rules]
+all = "error"
+
+[terminal]
+# A rule a later edit sets to warn still fails the check.
+error-on-warning = true

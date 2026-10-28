@@ -1,0 +1,86 @@
+---
+# The strictest yamllint settings that code-lint-strictness requires.
+# Every rule runs at error, and each option takes the form a contract requires or the value that reports the most code.
+# Each entry left off or below that value names its reason on the line above it:
+# C contradicts a contract, R contradicts another enabled rule, F conflicts with the formatter,
+# and Q reports code the contracts require.
+#
+# Extend this file from the repository's own .yamllint.yaml, as that file's first key:
+#   "extends": ".contracts/<number>-code-lint-strictness/assets/yamllint/yamllint.yaml"
+# yamllint does not carry `locale` through `extends`, so set `"locale": "C"` in that file too.
+# yamllint resolves that path from the working directory, so run `yamllint --strict .` from the repository root.
+# `--strict` fails on a warning too, so a rule that a later edit lowers to warning still fails the check.
+# Turn one more rule off there, beside a comment that starts with its reason letters.
+# Where a map's key order is behavior, such as a serialized field order, suppress `key-ordering` at that site,
+# as code-lint-suppressions allows.
+# A new yamllint version adds rules and options, so this file is tested against yamllint 1.38.0;
+# pin that exact version and raise it in a reviewed upgrade.
+
+# Compare keys by code point, as code-key-order requires, whatever locale the machine runs in.
+"locale": "C"
+"rules":
+  "anchors":
+    "forbid-duplicated-anchors": true
+    "forbid-undeclared-aliases": true
+    "forbid-unused-anchors": true
+  "braces":
+    # R: `forbid: true` leaves an empty map no spelling, because empty-values reports the null spelling.
+    "forbid": "non-empty"
+    "max-spaces-inside-empty": 0
+  "brackets":
+    # R: `forbid: true` leaves an empty list no spelling, because empty-values reports the null spelling.
+    "forbid": "non-empty"
+    "max-spaces-inside-empty": 0
+  "colons": "enable"
+  "commas": "enable"
+  "comments":
+    "ignore-shebangs": false
+    # F: the formatter writes one space between a value and the comment after it.
+    "min-spaces-from-content": 1
+    "require-starting-space": true
+  "comments-indentation": "enable"
+  "document-end":
+    "present": true
+  "document-start":
+    "present": true
+  "empty-lines": "enable"
+  "empty-values":
+    "forbid-in-block-mappings": true
+    "forbid-in-block-sequences": true
+    "forbid-in-flow-mappings": true
+  "float-values":
+    "forbid-inf": true
+    "forbid-nan": true
+    "forbid-scientific-notation": true
+    "require-numeral-before-decimal": true
+  "hyphens": "enable"
+  "indentation":
+    # Q: reports the indented `then` body of a shell script in a workflow step's `run: |` block,
+    # which every other shipped check passes.
+    "check-multi-line-strings": false
+    "indent-sequences": true
+    # F: the formatter sets the indent width; `consistent` reports any file that mixes widths.
+    "spaces": "consistent"
+  "key-duplicates":
+    "forbid-duplicated-merge-keys": true
+  "key-ordering": "enable"
+  # F: the formatter owns line breaks, and it leaves a long string, URL, or command on one line.
+  "line-length": "disable"
+  "new-line-at-end-of-file": "enable"
+  "new-lines":
+    "type": "unix"
+  "octal-values":
+    "forbid-explicit-octal": true
+    "forbid-implicit-octal": true
+  "quoted-strings":
+    "check-keys": true
+    # F: the formatter picks the quote character from its own setting.
+    "quote-type": "any"
+    "required": true
+  "trailing-spaces": "enable"
+  "truthy":
+    "allowed-values":
+      - "false"
+      - "true"
+    "check-keys": true
+...

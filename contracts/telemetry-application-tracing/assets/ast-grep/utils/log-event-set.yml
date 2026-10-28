@@ -1,0 +1,7 @@
+# telemetry-application-tracing: the name of the constant object that declares the closed set of log events, matched by the log-event-names rules in ../rules as `log-event-set`.
+# A repository whose event set has another name sets it in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
+# The regex reads only the declared name's text, so the TypeScript and Tsx rules share it.
+id: log-event-set
+language: TypeScript
+rule:
+  regex: ^LogEvent$

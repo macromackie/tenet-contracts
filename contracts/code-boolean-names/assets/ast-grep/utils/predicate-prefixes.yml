@@ -1,0 +1,9 @@
+# code-boolean-names: the declared predicate prefixes, matched by every rule in ../rules as `predicate-prefixed-name`.
+# A name passes when, after any leading `#`, `_`, or `$`, it starts with a listed prefix in lower, capitalized, or upper case, such as `isPaid`, `has_lines`, `IsPaid`, or `IS_READY`; an upper-case prefix passes only before `_`, a digit, or the end, so `ISLAND` fails.
+# A repository adds or removes each prefix in all three spellings in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
+# The verb list of code-module-structure-and-control-flow also holds these prefixes.
+# The regex reads only a name's text, so the TypeScript, Tsx, Python, and Rust rules share it.
+id: predicate-prefixed-name
+language: TypeScript
+rule:
+  regex: ^[#_$]*(?:(?:is|has|can|should|was|needs|Is|Has|Can|Should|Was|Needs)(?:[^a-z]|$)|(?:IS|HAS|CAN|SHOULD|WAS|NEEDS)(?:[_0-9]|$))

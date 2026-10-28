@@ -1,0 +1,17 @@
+# The strictest shellcheck settings that code-lint-strictness requires.
+# Every optional check is on, and no check is off.
+#
+# shellcheck reads only its own file, so copy this file to `.shellcheckrc` at the repository root,
+# or pass the installed copy with `shellcheck --rcfile <path>`.
+# Run it from the repository root on every shell script, at style severity, which reports every finding:
+#   shellcheck --severity=style --external-sources <scripts>
+# Turn one check off in that copy only with a `disable=` line, beside a comment that starts with its reason letters.
+# A new shellcheck version adds checks, so this file is tested against shellcheck 0.11.0;
+# pin that exact version and raise it in a reviewed upgrade.
+
+# Run every optional check, such as braces around every variable and a masked return in a command substitution.
+enable=all
+extended-analysis=true
+# Follow each sourced file, so the variables and functions it defines are checked where they are used.
+external-sources=true
+source-path=SCRIPTDIR

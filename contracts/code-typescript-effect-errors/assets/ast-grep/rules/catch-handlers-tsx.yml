@@ -5,7 +5,7 @@ language: Tsx
 severity: error
 message: Wrap the foreign call with `Effect.try` or `Effect.tryPromise` and map its failure in the `catch` option, instead of catching it here.
 note: |
-  Wrap each foreign call that can fail once, where it is called, such as `Effect.tryPromise({ try: fetchInvoice, catch: toRequestDropped })`.
+  Wrap each foreign call that can fail once, where it is called, such as `Effect.tryPromise({ catch: buildRequestDropped, try: readInvoice })`.
   Only an entry point's one defect handler catches a defect, through the Effect it runs or a user interface's error boundary, never a catch clause.
   A `try` statement with only a `finally` clause, and a combinator of an Effect module such as `Effect.catch`, are not reported.
   A promise's `catch` method is reported when its handler is written inline; a handler passed by name is left to review.

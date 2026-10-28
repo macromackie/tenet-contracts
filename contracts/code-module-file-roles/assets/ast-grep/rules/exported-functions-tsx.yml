@@ -12,6 +12,7 @@ note: |
   A function declaration, a function expression, an arrow function, and a generator count, whether named or default.
   A function value counts inside parentheses and type assertions such as `as` and `satisfies`.
   Overload signatures and ambient declarations are not functions.
+  A function exported under a name that a route framework requires, such as `loader` or `generateMetadata`, is not counted.
   Review covers a function that an export list such as `export { a, b }` or a default export such as `export default main` names.
   Review also covers a function that a call returns, that `exports.name =` or `module.exports` binds, or that an exported `namespace` block holds.
   A file that an entry point re-exports under one namespace, such as `export * as Uuid from './uuid.ts'`, is exempt through its declared path pattern.
@@ -39,23 +40,32 @@ utils:
           stopBy:
             not:
               matches: value-wrapper
-  # A declarator whose value is a function, such as `parseLine = () => ...`.
+  # A declarator whose value is a function, such as `parseLine = () => ...`, under a name no route framework requires, such as `loader`.
   function-declarator:
     kind: variable_declarator
     has:
       field: value
       matches: function-value
+    not:
+      has:
+        field: name
+        matches: framework-export-name
   # A top-level export statement that exports a function.
   exported-function:
     kind: export_statement
     inside:
       kind: program
+    # Each branch skips a function under a name that a route framework requires, such as `loader`, so the statement's other functions still count.
     any:
       - has:
           field: declaration
           any:
             - kind: function_declaration
             - kind: generator_function_declaration
+          not:
+            has:
+              field: name
+              matches: framework-export-name
       - has:
           field: declaration
           any:
@@ -73,7 +83,7 @@ rule:
       follows:
         matches: exported-function
         stopBy: end
-    # A function declarator after an earlier one in the same exported declaration, such as `export const a = () => 1, b = () => 2`.
+    # A function declarator after an earlier one in the same exported declaration, such as `export const openOrder = () => OrderStatus.Open, closeOrder = () => OrderStatus.Closed`.
     - matches: function-declarator
       follows:
         matches: function-declarator

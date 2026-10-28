@@ -1,0 +1,30 @@
+{
+  "options": { "typeAware": true },
+  "rules": {
+    "typescript/prefer-nullish-coalescing": [
+      "error",
+      {
+        "ignoreBooleanCoercion": false,
+        "ignoreConditionalTests": true,
+        "ignoreIfStatements": false,
+        "ignoreMixedLogicalExpressions": false,
+        "ignorePrimitives": { "bigint": false, "boolean": false, "number": false, "string": false },
+        "ignoreTernaryTests": false
+      }
+    ],
+    "typescript/strict-boolean-expressions": [
+      "error",
+      {
+        "allowAny": false,
+        "allowNullableBoolean": false,
+        "allowNullableEnum": false,
+        "allowNullableNumber": false,
+        "allowNullableObject": true,
+        "allowNullableString": false,
+        "allowNumber": false,
+        "allowString": false
+      }
+    ],
+    "unicorn/explicit-length-check": ["error", { "non-zero": "greater-than" }]
+  }
+}

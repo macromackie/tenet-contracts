@@ -1,0 +1,5 @@
+{
+  "rules": {
+    "typescript/method-signature-style": ["error", "property"]
+  }
+}

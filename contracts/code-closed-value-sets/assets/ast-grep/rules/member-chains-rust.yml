@@ -1,0 +1,63 @@
+# code-closed-value-sets: test two or more members of a closed set with its declared module-level set, such as `ENDED_STATES.contains(&state)`.
+# Rust variant; the TypeScript and Tsx variants apply the same test to `===` and `!==` chains.
+id: member-chains-rust
+language: Rust
+severity: error
+message: "Declare these members once as a module-level `const` slice, such as `ENDED_STATES`, and test it with `contains`, or, where no constant can hold the members, branch with a `match` that names every member, instead of a chain of comparisons."
+note: |
+  Two or more `==` comparisons of one value with fixed values joined by `||` are reported, such as `state == SandboxState::Stopped || state == SandboxState::Failed`.
+  So are two or more `!=` comparisons joined by `&&`, the same test negated.
+  A `matches!` or `let` pattern that joins members or literals with `|` is reported by member-patterns-rust.yml.
+  A fixed value is a string, character, or number literal, a path whose type is capitalized, such as `SandboxState::Stopped`, or a SCREAMING_SNAKE_CASE constant.
+  Comparisons with run-time values, such as a field or a call, and comparisons of different values are not reported.
+  A comparison written with the value on the right, or with a comment between its comparisons, is left to review.
+  Comparisons inside a macro's arguments, such as `assert!(...)` or `ensure!(...)`, are left to review.
+  A chain is reported once, at its first comparison, even when it holds more members or follows another operand, such as `is_ready || state == A || state == B`.
+  A `match` whose arms name every member, grouping members that share a result, such as `SandboxState::Stopped | SandboxState::Failed => ...`, branches on the set and is not reported.
+utils:
+  # One fixed value: a string, character, or number literal, a path whose type is capitalized, or a SCREAMING_SNAKE_CASE constant.
+  fixed-value:
+    any:
+      - kind: string_literal
+      - kind: char_literal
+      - kind: integer_literal
+      - kind: float_literal
+      - kind: scoped_identifier
+        has:
+          field: path
+          regex: '(^|::)[A-Z][A-Za-z0-9_]*$'
+      - kind: identifier
+        regex: ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$
+rule:
+  any:
+    - kind: binary_expression
+      all:
+        - any:
+            - pattern: $VALUE == $FIRST || $VALUE == $SECOND
+            - pattern:
+                context: 'let _ = $REST || $VALUE == $FIRST || $VALUE == $SECOND;'
+                selector: binary_expression
+        - not:
+            inside:
+              field: left
+              pattern:
+                context: 'let _ = $OUTER || $VALUE == $NEXT;'
+                selector: binary_expression
+    - kind: binary_expression
+      all:
+        - any:
+            - pattern: $VALUE != $FIRST && $VALUE != $SECOND
+            - pattern:
+                context: 'let _ = $REST && $VALUE != $FIRST && $VALUE != $SECOND;'
+                selector: binary_expression
+        - not:
+            inside:
+              field: left
+              pattern:
+                context: 'let _ = $OUTER && $VALUE != $NEXT;'
+                selector: binary_expression
+constraints:
+  FIRST:
+    matches: fixed-value
+  SECOND:
+    matches: fixed-value

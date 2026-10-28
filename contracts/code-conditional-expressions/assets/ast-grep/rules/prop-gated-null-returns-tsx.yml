@@ -1,0 +1,154 @@
+id: prop-gated-null-returns-tsx
+language: Tsx
+severity: error
+message: Let the caller show or skip this component with one && child; a component that stays mounted while hidden hides itself with styles instead of returning null.
+utils:
+  returns-null:
+    any:
+      - pattern: return null;
+      - kind: statement_block
+        has:
+          pattern: return null;
+  component:
+    any:
+      - kind: function_declaration
+        has:
+          field: name
+          regex: ^[A-Z]
+      - kind: function_expression
+        has:
+          field: name
+          regex: ^[A-Z]
+      - any:
+          - kind: arrow_function
+          - kind: function_expression
+        inside:
+          kind: variable_declarator
+          has:
+            field: name
+            regex: ^[A-Z]
+  destructured-prop:
+    any:
+      - kind: shorthand_property_identifier_pattern
+        pattern: $PROP
+      - kind: object_assignment_pattern
+        has:
+          field: left
+          pattern: $PROP
+      - kind: pair_pattern
+        has:
+          field: value
+          pattern: $PROP
+  destructuring-component:
+    matches: component
+    has:
+      field: parameters
+      has:
+        nthChild: 1
+        any:
+          - kind: required_parameter
+          - kind: optional_parameter
+        has:
+          field: pattern
+          kind: object_pattern
+          has:
+            matches: destructured-prop
+  props-object-component:
+    matches: component
+    any:
+      - has:
+          field: parameters
+          has:
+            nthChild: 1
+            any:
+              - kind: required_parameter
+              - kind: optional_parameter
+            has:
+              field: pattern
+              kind: identifier
+              pattern: $PROPS
+      - has:
+          field: parameter
+          kind: identifier
+          pattern: $PROPS
+  prop-test:
+    any:
+      - all:
+          - has:
+              field: condition
+              kind: parenthesized_expression
+              has:
+                any:
+                  - kind: identifier
+                    pattern: $PROP
+                  - kind: unary_expression
+                    regex: ^!
+                    has:
+                      field: argument
+                      kind: identifier
+                      pattern: $PROP
+          - inside:
+              kind: statement_block
+              inside:
+                matches: destructuring-component
+      - all:
+          - has:
+              field: condition
+              any:
+                - pattern: (!$PROPS.$PROP)
+                - pattern: ($PROPS.$PROP)
+          - inside:
+              kind: statement_block
+              inside:
+                matches: props-object-component
+      - all:
+          - has:
+              field: condition
+              kind: parenthesized_expression
+              has:
+                any:
+                  - kind: identifier
+                    pattern: $PROP
+                  - kind: unary_expression
+                    regex: ^!
+                    has:
+                      field: argument
+                      kind: identifier
+                      pattern: $PROP
+          - follows:
+              stopBy: end
+              kind: lexical_declaration
+              has:
+                kind: variable_declarator
+                all:
+                  - has:
+                      field: name
+                      kind: object_pattern
+                      has:
+                        matches: destructured-prop
+                  - has:
+                      field: value
+                      kind: identifier
+                      pattern: $PROPS
+          - inside:
+              kind: statement_block
+              inside:
+                matches: props-object-component
+rule:
+  any:
+    - kind: if_statement
+      has:
+        field: consequence
+        matches: returns-null
+      matches: prop-test
+    - pattern: return null;
+      follows:
+        kind: if_statement
+        matches: prop-test
+        has:
+          field: consequence
+          any:
+            - kind: return_statement
+            - kind: statement_block
+              has:
+                kind: return_statement

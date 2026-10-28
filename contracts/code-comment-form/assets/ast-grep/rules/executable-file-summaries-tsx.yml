@@ -1,0 +1,27 @@
+# code-comment-form: open every file that the repository executes directly with a doc comment that says what it does and how to run it.
+# Tsx variant (.tsx); the TypeScript and JavaScript variants are identical except for `id`, `language`, and this line.
+# A repository replaces the shipped `files` patterns with the executable path patterns it declares, in its own copy of this rule.
+id: executable-file-summaries-tsx
+language: Tsx
+severity: error
+message: Open this executable file with a `/** */` summary that says what it does and how to run it, such as the command that runs it.
+note: |
+  The rule reports a file under the declared executable path patterns that holds no `/** */` comment above its first statement.
+  Only a shebang or a directive, such as `// @ts-nocheck` or a lint suppression, may come before the summary.
+files:
+  - "**/scripts/**"
+  - "**/bin/**"
+rule:
+  kind: program
+  not:
+    has:
+      kind: comment
+      regex: ^/\*\*
+      not:
+        follows:
+          stopBy: end
+          not:
+            any:
+              - kind: hash_bang_line
+              - kind: comment
+                regex: ^(?://|/\*)\s*(?:@ts-|eslint-|oxlint-|ast-grep-ignore\b)

@@ -1,0 +1,23 @@
+# code-comment-form: open every file that the repository executes directly with a doc comment that says what it does and how to run it.
+# Rust variant; the TypeScript, Tsx, and JavaScript variants apply the same test with `/** */`.
+# A repository replaces the shipped `files` patterns with the executable path patterns it declares, in its own copy of this rule.
+id: executable-file-summaries-rust
+language: Rust
+severity: error
+message: Open this executable file with a `//!` summary that says what it does and how to run it, such as the command that runs it.
+note: |
+  The rule reports a file under the declared executable path patterns that holds no `//!` comment above its first item.
+  Nothing may come before the summary.
+files:
+  - "**/scripts/**"
+  - "**/bin/**"
+rule:
+  kind: source_file
+  not:
+    has:
+      kind: line_comment
+      regex: ^//!
+      not:
+        follows:
+          stopBy: end
+          regex: "[\\s\\S]"

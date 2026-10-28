@@ -1,0 +1,82 @@
+{
+  "overrides": [
+    {
+      "files": [
+        "**/routes/**/*.tsx",
+        "**/routes/**/*.jsx",
+        "**/*.stories.tsx",
+        "**/*.stories.jsx",
+        "**/*.test.tsx",
+        "**/*.test.jsx",
+        "**/*.spec.tsx",
+        "**/*.spec.jsx",
+        "**/test/**",
+        "**/tests/**",
+        "**/testing/**",
+        "**/__tests__/**"
+      ],
+      "rules": {
+        // C: code-module-file-roles lets a route, story, or test file export only what its framework loads.
+        "react/only-export-components": "off"
+      }
+    },
+    {
+      "files": ["**/errors.ts", "**/schemas.ts"],
+      "rules": {
+        // C: code-module-file-roles lets a module's tagged error classes share its errors file and its schema classes its schemas file.
+        "max-classes-per-file": "off"
+      }
+    }
+  ],
+  "rules": {
+    "max-classes-per-file": [
+      "error",
+      {
+        "ignoreExpressions": false,
+        "max": 1
+      }
+    ],
+    "react/no-multi-comp": [
+      "error",
+      {
+        "ignoreStateless": false
+      }
+    ],
+    "react/only-export-components": [
+      "error",
+      {
+        "allowExportNames": [
+          "DELETE",
+          "GET",
+          "HEAD",
+          "OPTIONS",
+          "PATCH",
+          "POST",
+          "PUT",
+          "action",
+          "clientAction",
+          "clientLoader",
+          "clientMiddleware",
+          "dynamic",
+          "dynamicParams",
+          "fetchCache",
+          "generateMetadata",
+          "generateStaticParams",
+          "generateViewport",
+          "headers",
+          "links",
+          "loader",
+          "maxDuration",
+          "meta",
+          "metadata",
+          "middleware",
+          "preferredRegion",
+          "revalidate",
+          "runtime",
+          "shouldRevalidate",
+          "viewport"
+        ]
+      }
+    ]
+  }
+}

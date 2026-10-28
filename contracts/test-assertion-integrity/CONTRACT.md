@@ -1,6 +1,7 @@
 ---
 name: test-assertion-integrity
 message: Change code to satisfy its tests; never weaken a test to match new behavior or special-case test inputs in production code.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -14,6 +15,10 @@ Regenerating snapshots or golden files so that unreviewed output becomes the exp
 Marking a test skipped, expected to fail, or quarantined because it fails violates this contract.
 Catching the assertion failure or the error under test inside the test, or replacing the code a test is named for with a stub, violates this contract.
 
+Write no branch in a test case's body, such as an `if`, a `switch`, a conditional expression, or `&&`, `||`, or `??`, because a branch can skip an assertion.
+Where the test runner counts assertions, open each test by declaring how many it must run, such as `expect.assertions(1)`, never `expect.hasAssertions()`, so a skipped assertion fails the test.
+Assert with the runner's plain assertion and its error expectation, such as `assert total == 42`, never with a test-case class's methods, such as `self.assertEqual` or `self.assertRaises`.
+
 Never make production code detect that it runs under test, such as by reading a test runner's environment variable or checking whether a test framework is loaded.
 Never return a test's expected output from production code for that test's specific input.
 
@@ -23,10 +28,15 @@ Updating an expected value is allowed when the change records a deliberate chang
 
 Violation: a change to invoice rounding also replaces `assert invoice.total == 110.25` with `assert invoice.total > 0`, and no changed file records a new requirement.
 Violation: production code returns stored exchange rates whenever an environment variable that the test runner sets is present.
-Allowed: a change that rewords `Order not found` to `No order with ID 42` updates the test's expected message and records the new wording in the changelog it edits.
+Allowed: a change that rewords `order not found` to `no order with ID "42"` updates the test's expected message and records the new wording in the changelog it edits.
+Violation: a test asserts the refund only `if (invoice.isRefunded)`.
+Violation: a test opens with `expect.hasAssertions()` instead of `expect.assertions(2)` before its two assertions.
+Allowed: a test of a refunded invoice opens with `expect.assertions(1)`, binds `const settling = settleInvoice({ invoice })`, and ends with `await expect(settling).rejects.toThrow(InvoiceRefunded)`.
 
 ## Checks
 
+Run the repository's lint with this contract's `assets/` over test files from the repository root; confirm it fails on a branch, a missing assertion count, and `self.assertEqual`.
 For each changed expected value, snapshot, golden file, tolerance, or skip marker, find the requirement change that the change records.
 Search changed production code for references to test runners, test environment variables, test framework modules, and fixture values.
 Run each test whose assertions changed against the base revision's production code; when it passes there too, confirm that its assertions did not become weaker.
+Confirm that the same run rejects a test that opens with `expect.hasAssertions()`.

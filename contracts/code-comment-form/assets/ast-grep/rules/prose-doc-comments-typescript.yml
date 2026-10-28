@@ -1,0 +1,12 @@
+# code-comment-form: write every doc comment as prose, with no section or tag for parameters, results, yielded values, errors, or panics.
+# TypeScript variant (.ts, .mts, .cts); the other variants apply the same test to their language's doc comments.
+id: prose-doc-comments-typescript
+language: TypeScript
+severity: error
+message: State this in the doc comment's prose instead of a tag, such as "Returns the receipt, and fails with InvoiceRefunded when a refund closed it."
+note: |
+  The rule reports a `/** */` doc comment that holds a `@param`, `@typeParam`, `@template`, `@arg`, `@argument`, `@return`, `@returns`, `@yield`, `@yields`, `@throws`, `@exception`, or `@example` tag, also right after a leading asterisk.
+  Other tags, such as `@deprecated` or `@see`, and a type annotation such as `/** @type {Order} */` are not reported.
+rule:
+  kind: comment
+  regex: ^/\*\*(?:[\s\S]*?[\s*])?@(?:param|typeParam|template|arg|argument|returns?|yields?|throws|exception|example)\b

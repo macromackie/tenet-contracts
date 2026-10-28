@@ -1,0 +1,118 @@
+# code-map-and-set-names: end the name of every map and set with a plural noun of what it holds.
+# TypeScript variant (.ts, .mts, .cts); the TypeScript and Tsx variants differ only in `id`, `language`, and this line.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-map-and-set-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: map-and-set-names-typescript
+language: TypeScript
+severity: error
+message: End this map's or set's name with a plural noun of what it holds, such as `pendingJobs` or `seenOrderIds` rather than `pending` or `seen`.
+note: |
+  A variable, class field, accessor, object literal key, type member, or parameter is checked when its annotation or return type is `Map`, `Set`, `ReadonlyMap`, `ReadonlySet`, `WeakMap`, `WeakSet`, or one of Effect's `HashMap`, `HashSet`, `MutableHashMap`, and `MutableHashSet` types, alone, in a union, or inside `Option.Option`.
+  It is also checked when its value is `new` of a native one or an Effect `empty`, `make`, or `fromIterable` call, such as `HashSet.empty()`.
+  A schema struct key is checked when its value is `Schema.ReadonlySet`, `Schema.ReadonlyMap`, `Schema.HashSet`, or `Schema.HashMap`, such as `pending: Schema.ReadonlySet(OrderId)`.
+  The name passes when its last word ends in `s` but not in `ss` or `ous` and is not a listed singular noun, such as `status`, or when it is a listed irregular plural, such as `children`.
+  A map named for its keys and values, such as `ordersById`, is reported; name it for its values, such as `orders`.
+  A map or set that a call returns without an annotation is left to review.
+  Suppress a name that a system outside the repository fixes, with a reason that names that system.
+utils:
+  # A map or set type, such as `ReadonlyMap<OrderId, Order>` or Effect's `HashSet.HashSet<OrderId>`.
+  collection-type:
+    kind: generic_type
+    has:
+      field: name
+      any:
+        - kind: type_identifier
+          regex: ^(Map|Set|ReadonlyMap|ReadonlySet|WeakMap|WeakSet)$
+        - kind: nested_type_identifier
+          regex: ^(HashMap\.HashMap|HashSet\.HashSet|MutableHashMap\.MutableHashMap|MutableHashSet\.MutableHashSet)$
+  # An annotation whose type is a map or set, alone, in a union, or inside `Option.Option`.
+  collection-annotation:
+    kind: type_annotation
+    has:
+      any:
+        - matches: collection-type
+        - kind: generic_type
+          all:
+            - has:
+                field: name
+                regex: ^Option\.Option$
+            - has:
+                field: type_arguments
+                has:
+                  matches: collection-type
+        - kind: union_type
+          has:
+            matches: collection-type
+            stopBy:
+              not:
+                kind: union_type
+  # `new Map(...)`, `new Set(...)`, or an Effect constructor such as `HashSet.empty()`, bare or inside parentheses, `as`, or `satisfies`.
+  collection-value:
+    any:
+      - kind: new_expression
+        has:
+          field: constructor
+          regex: ^(Map|Set|WeakMap|WeakSet)$
+      - kind: call_expression
+        has:
+          field: function
+          regex: ^(HashMap|HashSet|MutableHashMap|MutableHashSet)\.(empty|make|fromIterable)$
+      - any:
+          - kind: parenthesized_expression
+          - kind: as_expression
+          - kind: satisfies_expression
+        has:
+          matches: collection-value
+  # A declaration, field, key, member, or parameter that holds a map or set.
+  collection-holder:
+    any:
+      - has:
+          field: type
+          matches: collection-annotation
+      - has:
+          field: value
+          matches: collection-value
+rule:
+  all:
+    - any:
+        - kind: identifier
+        - kind: property_identifier
+        - kind: private_property_identifier
+    - not:
+        matches: plural-name
+    # The holder's own name, never a name inside its value or type.
+    - any:
+        - inside:
+            field: name
+            any:
+              - kind: variable_declarator
+              - kind: public_field_definition
+              - kind: property_signature
+            matches: collection-holder
+        - inside:
+            field: pattern
+            any:
+              - kind: required_parameter
+              - kind: optional_parameter
+            matches: collection-holder
+        - inside:
+            field: key
+            kind: pair
+            any:
+              - matches: collection-holder
+              # A schema struct key that decodes to a map or set, such as `pending: Schema.ReadonlySet(OrderId)`.
+              - has:
+                  field: value
+                  kind: call_expression
+                  has:
+                    field: function
+                    regex: ^Schema\.(ReadonlySet|ReadonlyMap|HashSet|HashMap)$
+        - inside:
+            field: name
+            kind: method_definition
+            all:
+              # An accessor `get pending()`, not a method named `get`.
+              - regex: ^(?:(?:static|override|public|protected|private|readonly)\s+)*get\s
+              - has:
+                  field: return_type
+                  matches: collection-annotation

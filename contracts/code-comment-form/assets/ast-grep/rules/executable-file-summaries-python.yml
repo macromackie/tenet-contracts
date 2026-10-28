@@ -1,0 +1,33 @@
+# code-comment-form: open every file that the repository executes directly with a doc comment that says what it does and how to run it.
+# Python variant; the TypeScript, Tsx, and JavaScript variants apply the same test with `/** */`.
+# A repository replaces the shipped `files` patterns with the executable path patterns it declares, in its own copy of this rule.
+id: executable-file-summaries-python
+language: Python
+severity: error
+message: Open this executable file with a module docstring that says what it does and how to run it, such as the command that runs it.
+note: |
+  The rule reports a file under the declared executable path patterns whose first statement is not a string, the module's docstring.
+  Only a shebang, a coding line, or an inline script metadata block from `# /// script` to `# ///` may come before the docstring.
+files:
+  - "**/scripts/**"
+  - "**/bin/**"
+rule:
+  kind: module
+  not:
+    has:
+      kind: expression_statement
+      has:
+        kind: string
+      not:
+        follows:
+          stopBy: end
+          not:
+            kind: comment
+            any:
+              - regex: ^#(?:!|\s*-\*-|\s*coding[:=]|\s*///\s*script\s*$|\s*///\s*$)
+              - follows:
+                  stopBy: end
+                  regex: ^#\s*///\s*script\s*$
+                precedes:
+                  stopBy: end
+                  regex: ^#\s*///\s*$

@@ -1,0 +1,92 @@
+# code-comment-form: write a comment above or beside a declaration, a member, or a module constant outside a function body as a doc comment.
+# TypeScript variant (.ts, .mts, .cts); declaration-comments-tsx.yml is identical except for `id`, `language`, and this line.
+id: declaration-comments-typescript
+language: TypeScript
+severity: error
+message: Write this comment as a `/** */` doc comment directly above the declaration or member it describes, because a plain comment never reaches its callers.
+note: |
+  The rule reads each `//` or non-doc `/* */` comment at module level or in the body of a class, interface, object type, or enum, outside every function body.
+  It reports one that sits directly above such a declaration, member, or export, or beside one on the same line, such as `a: string; // the id`.
+  A comment after a declaration that sits above a statement, such as `await main();` or a test registration, is not reported.
+  A directive that a tool reads keeps its own form and is not reported, such as `// @ts-expect-error`, a lint suppression, `// ast-grep-ignore`, or a `/// <reference>` line; a license notice is reported by `license-notices-typescript`.
+  The reason line directly above an `// ast-grep-ignore` directive, which `code-lint-suppressions` requires, is not reported either.
+  A comment inside a function body, an object literal, or an array stays a plain line comment and is not reported.
+  A comment inside the body of a namespace, a `declare module`, or a `declare global` block is read as at module level.
+utils:
+  declaration:
+    any:
+      - kind: export_statement
+      - kind: function_declaration
+      - kind: generator_function_declaration
+      - kind: function_signature
+      - kind: class_declaration
+      - kind: abstract_class_declaration
+      - kind: interface_declaration
+      - kind: type_alias_declaration
+      - kind: enum_declaration
+      - kind: lexical_declaration
+      - kind: variable_declaration
+      - kind: ambient_declaration
+      - kind: internal_module
+      - kind: public_field_definition
+      - kind: method_definition
+      - kind: method_signature
+      - kind: abstract_method_signature
+      - kind: property_signature
+      - kind: call_signature
+      - kind: construct_signature
+      - kind: index_signature
+      - kind: enum_assignment
+      - kind: property_identifier
+rule:
+  kind: comment
+  not:
+    any:
+      - regex: ^/\*\*
+      - regex: ^(?:///?|/\*)\s*(?:@ts-|eslint-|oxlint-|biome-ignore|prettier-ignore|istanbul\s|c8\s|v8\s|#(?:end)?region\b|<reference\b|ast-grep-ignore\b)
+      - precedes:
+          regex: ^(?://|/\*)\s*ast-grep-ignore\b
+      - inside:
+          kind: statement_block
+          stopBy: end
+          not:
+            inside:
+              any:
+                - kind: internal_module
+                - kind: module
+                - kind: ambient_declaration
+  inside:
+    any:
+      - kind: program
+      - kind: statement_block
+        inside:
+          any:
+            - kind: internal_module
+            - kind: module
+            - kind: ambient_declaration
+      - kind: class_body
+      - kind: interface_body
+      - kind: object_type
+      - kind: enum_body
+  any:
+    - precedes:
+        matches: declaration
+    - follows:
+        any:
+          - matches: declaration
+          - regex: ^[;,]$
+            follows:
+              matches: declaration
+      not:
+        precedes:
+          stopBy:
+            not:
+              kind: comment
+          any:
+            - kind: expression_statement
+            - kind: if_statement
+            - kind: for_statement
+            - kind: for_in_statement
+            - kind: while_statement
+            - kind: try_statement
+            - kind: switch_statement

@@ -1,0 +1,24 @@
+# code-comment-form: write a comment inside a function body as a plain line comment, never as a doc comment.
+# TypeScript variant (.ts, .mts, .cts); body-doc-comments-tsx.yml is identical except for `id`, `language`, and this line.
+id: body-doc-comments-typescript
+language: TypeScript
+severity: error
+message: Write this comment as a plain `//` line comment, because a comment inside a function body is never a doc comment.
+note: |
+  The rule reports a `/** */` comment inside a function body, including one above a local function or a property of an object built there.
+  A block comment that holds only a type, such as `/** @type {Order} */` or `/** @satisfies {Order} */`, is type syntax and is not reported.
+  The body of a namespace, a `declare module`, or a `declare global` block is not a function body.
+rule:
+  kind: comment
+  regex: ^/\*\*
+  not:
+    regex: ^/\*\*\s*@(?:type|satisfies)\b
+  inside:
+    kind: statement_block
+    stopBy: end
+    not:
+      inside:
+        any:
+          - kind: internal_module
+          - kind: module
+          - kind: ambient_declaration

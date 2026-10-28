@@ -1,0 +1,13 @@
+# code-comment-form: never number or letter steps in comments; give each step a named function instead.
+# TypeScript variant (.ts, .mts, .cts); the Tsx and JavaScript variants are identical except for `id`, `language`, and this line.
+id: step-labels-typescript
+language: TypeScript
+severity: error
+message: Remove this step label, such as `// 4.` or `// (g)`, and give the step a function whose name says what it does.
+note: |
+  The rule reports a plain comment that starts with a number or a letter followed by a period or a closing parenthesis, such as `// 4.`, `// 1)`, or `// a.`.
+  It also reports one that starts with a number, a letter, or a roman numeral in parentheses, such as `// (g)`, `// (10)`, or `// (ii)`.
+  A numbered list inside a doc comment is documentation and is not reported.
+rule:
+  kind: comment
+  regex: ^(?://|/\*)\s*(?:\d+[.)]|[a-zA-Z][.)]|\((?:\d+|[a-zA-Z]|[ivx]+)\))(?:\s|$)

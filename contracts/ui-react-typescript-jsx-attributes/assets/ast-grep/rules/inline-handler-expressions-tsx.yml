@@ -1,0 +1,32 @@
+# ui-react-typescript-jsx-attributes: write each function passed inline to an event attribute as an arrow whose body is one expression.
+# Scan with this folder's sgconfig.yml, such as `ast-grep scan -c .contracts/NNN-ui-react-typescript-jsx-attributes/assets/ast-grep/sgconfig.yml`.
+id: inline-handler-expressions-tsx
+language: Tsx
+severity: error
+message: Write this handler as an arrow with one expression, such as `onClick={() => save({ draft })}`, or move its block into a named `on` function passed by name, such as `onSave={onSave}`.
+note: |
+  An event attribute is one whose name is `on` followed by a capital letter, such as `onClick` or `onSave`.
+  Its inline function must be an arrow whose body is one expression, such as `onClick={() => save({ draft })}`.
+  A block body, a comma sequence, and a `function` expression are reported.
+utils:
+  event-attribute-value:
+    kind: jsx_expression
+    inside:
+      kind: jsx_attribute
+      has:
+        kind: property_identifier
+        regex: ^on[A-Z]
+rule:
+  inside:
+    matches: event-attribute-value
+  any:
+    - kind: function_expression
+    - kind: arrow_function
+      has:
+        field: body
+        any:
+          - kind: statement_block
+          - kind: sequence_expression
+          - kind: parenthesized_expression
+            has:
+              kind: sequence_expression

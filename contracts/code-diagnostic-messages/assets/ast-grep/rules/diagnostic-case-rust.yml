@@ -1,0 +1,96 @@
+# code-diagnostic-messages: start each diagnostic with a lowercase word unless that word is a proper noun or an identifier written as it is spelled.
+# Rust variant; the TypeScript and Tsx variants apply the same first-word test to their error constructors and calls.
+id: diagnostic-case-rust
+language: Rust
+severity: error
+message: Start this diagnostic with a lowercase word, such as `order 42 was not found`, unless its first word is a proper noun or an identifier.
+note: |
+  The first word is the leading run of letters, with apostrophes and hyphens, of a string literal.
+  A word that holds a capital after its first letter or any digit, dot, or underscore, such as `GitHub`, `URL`, or `Cargo.toml`, is an identifier and is allowed.
+  A message that starts with an interpolated value, a quote, or another non-letter, such as `{path:?}: not found`, is allowed.
+  The rule reads the first string of `anyhow!`, `bail!`, `panic!`, `unreachable!`, `eprintln!`, and `eprint!`, and the first string after a comma in `ensure!`.
+  It also reads the message of `#[error(...)]`, `.context(...)`, `.expect(...)`, and `.with_context(...)`, including a closure's string or `format!` string.
+  A diagnostic that another function writes, such as an output module's `fail(line)`, is left to review.
+utils:
+  # A string literal whose first word is one capital followed by lowercase letters, and not a declared proper noun.
+  capitalized-text:
+    kind: string_literal
+    regex: ^"[A-Z][a-z]*(?:'[a-z]+)?(?:-[a-z]+)*(?:[\s:,;!?)"]|\.(?:\s|"))
+    not:
+      matches: proper-noun-text
+  # The first string literal of a macro's arguments.
+  first-string:
+    not:
+      follows:
+        kind: string_literal
+        stopBy: end
+  # A method call that attaches or states a message, such as `.context("...")`.
+  message-method:
+    kind: call_expression
+    has:
+      field: function
+      kind: field_expression
+      has:
+        field: field
+        regex: ^(?:context|with_context|expect)$
+rule:
+  matches: capitalized-text
+  any:
+    # `bail!("...")`, `anyhow!("...")`, and `eprintln!("...")`.
+    - matches: first-string
+      inside:
+        kind: token_tree
+        inside:
+          kind: macro_invocation
+          has:
+            field: macro
+            regex: (?:^|::)(?:anyhow|bail|panic|unreachable|eprintln|eprint)$
+    # `ensure!(ready, "...")`.
+    - matches: first-string
+      follows:
+        regex: ^,$
+        stopBy: end
+      inside:
+        kind: token_tree
+        inside:
+          kind: macro_invocation
+          has:
+            field: macro
+            regex: (?:^|::)ensure$
+    # `#[error("...")]`.
+    - matches: first-string
+      inside:
+        kind: token_tree
+        inside:
+          kind: attribute
+          has:
+            regex: ^error$
+    # `.context("...")` and `.expect("...")`.
+    - nthChild: 1
+      inside:
+        kind: arguments
+        inside:
+          matches: message-method
+    # `.with_context(|| "...")` and `.with_context(|| format!("..."))`.
+    - inside:
+        kind: closure_expression
+        field: body
+        inside:
+          kind: arguments
+          inside:
+            matches: message-method
+    - matches: first-string
+      inside:
+        kind: token_tree
+        inside:
+          kind: macro_invocation
+          has:
+            field: macro
+            regex: ^format$
+          inside:
+            kind: closure_expression
+            field: body
+            inside:
+              kind: arguments
+              inside:
+                matches: message-method

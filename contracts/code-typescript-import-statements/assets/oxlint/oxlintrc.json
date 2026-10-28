@@ -1,0 +1,114 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+      "plugins": ["vitest"],
+      "rules": {
+        "no-restricted-globals": [
+          "error",
+          "afterAll",
+          "afterEach",
+          "assert",
+          "beforeAll",
+          "beforeEach",
+          "describe",
+          "expect",
+          "expectTypeOf",
+          "it",
+          "test",
+          "vi"
+        ],
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
+                "name": "node:assert"
+              },
+              {
+                "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
+                "name": "node:assert/strict"
+              },
+              {
+                "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
+                "name": "assert"
+              },
+              {
+                "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
+                "name": "assert/strict"
+              }
+            ],
+            "patterns": [
+              {
+                "importNames": ["default"],
+                "message": "Import a runtime built-in module's names by name, such as `import { readFile } from 'node:fs/promises'`; its default export is the whole module.",
+                "regex": "^node:"
+              }
+            ]
+          }
+        ],
+        "vitest/no-import-node-test": "error",
+        "vitest/prefer-importing-vitest-globals": "error"
+      }
+    }
+  ],
+  "plugins": ["typescript", "import"],
+  "rules": {
+    "import/first": "error",
+    "import/no-duplicates": [
+      "error",
+      {
+        "considerQueryString": true,
+        "prefer-inline": true
+      }
+    ],
+    "import/no-namespace": [
+      "error",
+      {
+        "ignore": ["@stylexjs/stylex", "valibot"]
+      }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "allowImportNames": ["strict"],
+            "allowTypeImports": true,
+            "message": "Import the strict assertion function as `import { strict as assert } from 'node:assert'`.",
+            "name": "node:assert"
+          },
+          {
+            "message": "Import the strict assertion function as `import { strict as assert } from 'node:assert'`.",
+            "name": "node:assert/strict"
+          },
+          {
+            "message": "Import the strict assertion function as `import { strict as assert } from 'node:assert'`.",
+            "name": "assert"
+          },
+          {
+            "message": "Import the strict assertion function as `import { strict as assert } from 'node:assert'`.",
+            "name": "assert/strict"
+          }
+        ],
+        "patterns": [
+          {
+            "importNames": ["default"],
+            "message": "Import a runtime built-in module's names by name, such as `import { readFile } from 'node:fs/promises'`; its default export is the whole module.",
+            "regex": "^node:"
+          }
+        ]
+      }
+    ],
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "disallowTypeAnnotations": false,
+        "fixStyle": "inline-type-imports",
+        "prefer": "type-imports"
+      }
+    ],
+    "typescript/no-import-type-side-effects": "error"
+  }
+}

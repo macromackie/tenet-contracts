@@ -1,0 +1,41 @@
+# code-typescript-effect-absent-values: never write `undefined` as a value.
+# TypeScript variant (.ts, .mts, .cts); undefined-values-tsx.yml is identical except for `id`, `language`, and this line.
+id: undefined-values-typescript
+language: TypeScript
+severity: error
+message: Write a bare `return;`, leave the default or initializer out, or use `Option.none()`, instead of writing `undefined` as a value.
+note: |
+  This reports an `= undefined` class field initializer, an `= undefined` `const` initializer anywhere, and `return undefined` and every `= undefined` default or initializer in a function that declares a return type.
+  The lint's `no-useless-undefined` rule skips those and reports every other `undefined` value, including a trailing `undefined` argument.
+rule:
+  kind: undefined
+  any:
+    - inside: { kind: public_field_definition, field: value, stopBy: neighbor }
+    - inside:
+        kind: variable_declarator
+        field: value
+        stopBy: neighbor
+        inside: { kind: lexical_declaration, regex: '^const\b', stopBy: neighbor }
+    - all:
+        - any:
+            - inside: { kind: return_statement, stopBy: neighbor }
+            - inside: { kind: variable_declarator, field: value, stopBy: neighbor }
+            - inside: { kind: object_assignment_pattern, field: right, stopBy: neighbor }
+            - inside: { kind: assignment_pattern, field: right, stopBy: neighbor }
+            - inside: { kind: required_parameter, field: value, stopBy: neighbor }
+            - inside: { kind: optional_parameter, field: value, stopBy: neighbor }
+        - inside:
+            stopBy:
+              any:
+                - kind: function_declaration
+                - kind: generator_function_declaration
+                - kind: function_expression
+                - kind: arrow_function
+                - kind: method_definition
+            any:
+              - kind: function_declaration
+              - kind: generator_function_declaration
+              - kind: function_expression
+              - kind: arrow_function
+              - kind: method_definition
+            has: { field: return_type, kind: type_annotation }

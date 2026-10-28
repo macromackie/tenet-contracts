@@ -1,0 +1,18 @@
+# code-comment-form: never write a copyright or license notice in a source file, because the repository's `LICENSE` file states it once.
+# Python variant; the TypeScript, Tsx, JavaScript, and Rust variants apply the same test to their comments.
+id: license-notices-python
+language: Python
+severity: error
+message: Remove this copyright or license notice, because the repository's `LICENSE` file states the license once for every file.
+note: |
+  The rule reports a comment that opens with `Copyright`, `©`, `(c)` and a year, `Licensed under`, or `SPDX-License-Identifier:` after its `#` marker.
+  It also reports a string statement, such as a module docstring, that opens with `Copyright`, `©`, or `SPDX-License-Identifier:`.
+  A comment that mentions copyright later in a sentence is not reported.
+rule:
+  any:
+    - kind: comment
+      regex: ^#\s*(?:SPDX-License-Identifier:|Copyright\b|©|\(c\)\s*\d|Licensed under\b)
+    - kind: string
+      inside:
+        kind: expression_statement
+      regex: ^[rbuRBU]*(?:"""|''')\s*(?:Copyright\b|SPDX-License-Identifier:|©)

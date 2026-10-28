@@ -1,0 +1,10 @@
+# The strictest cargo-machete settings that code-lint-strictness requires.
+# cargo-machete reads its settings from the manifest, so copy this table into the workspace's root manifest.
+# Run it from the workspace root, where its default scan reports every dependency that no source file names:
+#   cargo machete
+# Add a crate to `ignored` in that copy only beside a comment that starts with its reason letters.
+# A new cargo-machete version changes what it reports, so this file is tested against cargo-machete 0.9.1;
+# pin that exact version and raise it in a reviewed upgrade.
+
+[workspace.metadata.cargo-machete]
+ignored = []

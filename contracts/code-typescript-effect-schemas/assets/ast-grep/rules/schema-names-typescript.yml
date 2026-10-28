@@ -1,0 +1,22 @@
+# code-typescript-effect-schemas: name each schema constant in PascalCase, without a `Schema` suffix, so its derived type can share the name.
+# TypeScript variant (.ts, .mts, .cts); schema-names-tsx.yml is identical except for `id`, `language`, and this line.
+id: schema-names-typescript
+language: TypeScript
+severity: error
+message: Name this schema in PascalCase for the value it decodes, such as `Invoice`, without a `Schema` suffix, and give its derived type the same name.
+note: |
+  Declare the schema and its type under one name, such as `const Invoice = Schema.Struct({ ... })` followed by `type Invoice = typeof Invoice.Type`.
+  The rule reports a constant whose value starts with a PascalCase member of the `Schema` namespace, such as `Schema.Struct` or `Schema.String.check(...)`, when its name is not PascalCase or ends in `Schema`.
+  A decoder, guard, or check built by a lowercase `Schema` function, such as `Schema.decodeUnknownEffect(Invoice, options)` or `Schema.is(Invoice)`, is a function and keeps a camelCase name.
+  A schema built from another schema's value, such as `Invoice.mapFields(...)`, or from a lowercase function, such as `Schema.fromJsonString(Invoice)`, is left to review.
+  A repository that imports the namespace under another name edits the `Schema` in both regular expressions.
+rule:
+  kind: variable_declarator
+  all:
+    - has:
+        field: name
+        kind: identifier
+        regex: ^(?:[^A-Z].*|.*[^A-Za-z0-9].*|.*Schema)$
+    - has:
+        field: value
+        regex: ^Schema\.[A-Z]

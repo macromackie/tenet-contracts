@@ -1,0 +1,8 @@
+# code-boolean-names: the declared option prefixes, matched by the boolean prop rules in ../rules as `option-prefixed-name`.
+# A name passes when, after any leading `#`, `_`, or `$`, it starts with a listed prefix in lower, capitalized, or upper case, such as `includeArchived`, `skip_cache`, or `ALLOW_RETRY`; an upper-case prefix passes only before `_`, a digit, or the end.
+# A repository adds or removes each prefix in all three spellings in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
+# An option prefix names a setting that a caller passes, so no function rule reads this file.
+id: option-prefixed-name
+language: TypeScript
+rule:
+  regex: ^[#_$]*(?:(?:include|allow|skip|keep|use|Include|Allow|Skip|Keep|Use)(?:[^a-z]|$)|(?:INCLUDE|ALLOW|SKIP|KEEP|USE)(?:[_0-9]|$))

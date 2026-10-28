@@ -53,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 146 contracts.
+The library has 168 contracts.
 
 #### agent
 
@@ -66,12 +66,12 @@ The library has 146 contracts.
 #### api
 
 | Contract | Requirement |
-| `api-typescript-request-paths` | Build each request path and URL with one typed path function per operation, declared once in the module that owns its routes, and encode each part inside it. |
 | --- | --- |
 | `api-fastapi-resource-layout` | Give each resource one folder of router, schema, query and service modules, and keep URLs fixed when code moves. |
 | `api-fastapi-route-authorization` | Declare route admission as named shared dependencies and apply ownership in the statement, never after loading. |
 | `api-fastapi-wire-schemas-and-errors` | Declare explicit wire models, keep secrets on mint responses only, and map each failure to one status and detail. |
 | `api-openapi-generated-clients` | Generate the OpenAPI description from the live route registry, and publish pinned, framework-free clients from it. |
+| `api-typescript-request-paths` | Build each request path and URL with one typed path function per operation, declared once in the module that owns its routes, and encode each part inside it. |
 
 #### ci
 
@@ -90,19 +90,19 @@ The library has 146 contracts.
 #### code
 
 | Contract | Requirement |
-| `code-numeric-literals` | Give every number outside a declared few a named constant that holds one literal, and build each derived constant from other constants' names. |
-| `code-typescript-call-arguments` | Bind each nested call, `new`, `await`, and function written in an argument object or array to a name, and bind functions only as declarations or typed constants. |
 | --- | --- |
 | `code-blank-lines` | Separate a block's logical phases, control flow, returns, throws, calls, and multi-line declarations and expressions from neighboring code with one blank line. |
-| `code-boolean-names` | Start every owned boolean's name with a declared predicate or option prefix that lint enforces, and keep an external boolean name only in the mapping that decodes it. |
-| `code-closed-value-sets` | Declare each closed set of values once, HTTP methods and status codes included, and refer to its members by name, never by repeating their literal values. |
+| `code-boolean-names` | Start every owned boolean's name with a declared predicate or option prefix and every boolean function's with a predicate prefix, and decode each external boolean name at the boundary. |
+| `code-closed-value-sets` | Declare each closed set of values once, HTTP methods and status codes included, name its members instead of their literal values, and test membership with a module-level set. |
 | `code-comment-attribution` | Explain source behavior without attributing it to repository contracts or review tools. |
 | `code-comment-content` | Write comments that state what the code cannot show, never what it already says, what it used to do, or a shape that a declaration could carry. |
-| `code-comment-form` | Commit no task markers, commented-out code, or empty doc comments, and give doc comments and file summaries one lint-enforced layout. |
-| `code-conditional-expressions` | Choose values with statements, lookups, pattern matching, or named functions, not conditional operators or immediately invoked functions, and cap each expression's logical operators at a declared maximum. |
+| `code-comment-form` | Write comments as capitalized sentences without task markers, commented-out code, step labels, license notices, or empty doc comments, and declaration comments and file summaries as lint-enforced prose doc comments. |
+| `code-conditional-expressions` | Choose values with statements, lookups, pattern matching, or named functions, and markup with extracted components, not conditional operators, complementary pairs, or immediately invoked functions, within a declared logical-operator maximum. |
+| `code-constant-names` | Name each module-level constant whose value is a number or string written in source in SCREAMING_SNAKE_CASE, such as `STOP_TICK_MS`. |
 | `code-cross-repository-copies` | Keep each file that several repositories use in one source repository, and consume it from a release or as a locked copy whose hash checks verify. |
+| `code-declaration-order` | Declare each function and class above the code that uses it, so each file reads from its helpers down to its exported function. |
 | `code-dependency-boundaries` | Declare which packages each package may depend on once, in configuration that checks enforce, and keep that declaration acyclic and exact. |
-| `code-diagnostic-messages` | Write each diagnostic as one clause that names the failed operation and its input, without a trailing period. |
+| `code-diagnostic-messages` | Write each diagnostic as one clause that starts with a lowercase word, names the failed operation and its input, quotes every value it interpolates, and ends without a period. |
 | `code-domain-vocabulary` | Name each domain concept with its one glossary word in code, output, documentation, and interface text, and never with a word it replaced. |
 | `code-duplicated-blocks` | Fail checks on every copied block that the repository's copy detector reports, and remove the copy by calling one declaration. |
 | `code-environment-settings` | Read a program's environment only in its settings module, decode it once there, and pass decoded settings to the code that needs them. |
@@ -110,45 +110,65 @@ The library has 146 contracts.
 | `code-exhaustive-branches` | Write an `else if` chain of equality tests on one value as a `switch`, and name every member of a declared closed set instead of a default or wildcard. |
 | `code-export-consumers` | Give every export, source file, and dependency a production consumer, and let the repository's dead-code check prove it. |
 | `code-folder-size` | Keep every source folder within lint-enforced limits on its file count and depth, and name and justify each exempt folder in the lint configuration. |
-| `code-function-size` | Keep every function within lint-enforced length, nesting, callback, and complexity limits, and give each case of a branch on a closed set its own function. |
+| `code-function-size` | Keep every function within lint-enforced length, nesting, callback, markup depth, and complexity limits, and give each case of a branch on a closed set its own function. |
 | `code-guard-clauses` | Leave a block early with a guard instead of nesting its remaining work, and never write an `else` after a branch that leaves. |
+| `code-key-order` | Write the keys of every object, struct, and configuration map in code point order, and keep another order only where order is behavior. |
+| `code-lint-strictness` | Run every lint, type checker, compiler, and formatter at its strictest setting, and turn a rule off only for a listed reason named beside its entry. |
 | `code-lint-suppressions` | Suppress a lint or check finding only at the one site it reports, with the rule's name and a reason, and fail checks on every suppression that suppresses nothing. |
+| `code-map-and-set-names` | End every map's and set's name with a plural noun of what it holds, such as `orders` or `endedStates`, never a participle or adjective. |
 | `code-measured-value-names` | End the name of every numeric limit, duration, and bound with a declared unit, counted noun, or unitless measure that the repository's lint enforces. |
 | `code-mise-script-tasks` | Make every repository script a mise file task in the `mise-tasks/` folder of the root or package that owns it, and run repository work in CI only through `mise run`. |
-| `code-module-file-roles` | Give each source file one declared role and at most one exported function, keep types in a sibling types file, and make a module with several roles a folder. |
-| `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, with explicit inputs, results, and control flow. |
+| `code-module-file-roles` | Give each source file one declared role and at most one class, component, and exported function, export only components from markup files, and split multi-role modules into folders. |
+| `code-module-structure-and-control-flow` | Keep modules focused and named for their behavior, start every lowercase function name with a declared verb, and keep inputs, results, and control flow explicit. |
+| `code-numeric-literals` | Give every number except -1, 0, and 1 a named constant that holds one literal, and build each derived constant from other constants' names. |
 | `code-ownership-and-boundaries` | Give decisions and state one owner, with explicit dependency direction. |
 | `code-python-client-injection` | Construct stateful Python clients at composition roots and inject them into consumers as abstract types. |
+| `code-python-doc-comment-coverage` | Give every public Python module, class, function, method, and `__init__` a docstring, and fail checks when one is missing. |
 | `code-python-exception-propagation` | Let Python exceptions propagate; catch one only to re-raise it, translate it with its cause, retry it, or record a failed unit of work. |
+| `code-python-function-arguments` | Make every parameter of an owned Python function keyword-only, and keep the signatures that the language, runtime, and dependencies define. |
 | `code-python-none-guards` | Trust non-optional Python annotations, and check for None only where the checked value's type includes None. |
 | `code-python-uv-scripts` | Run each Python repository script with `uv run --script`, and declare its dependencies in its own PEP 723 inline metadata block. |
 | `code-rust-doc-comment-coverage` | Give every public item of a Rust library crate a doc comment, and fail checks when one is missing. |
 | `code-rust-module-boundaries` | Keep a Rust crate's top-level modules acyclic and its child modules private. |
 | `code-rust-module-files` | Declare each Rust module that has child modules in a file named for it beside its folder, never in a mod.rs file under src. |
 | `code-rust-numeric-conversions` | Convert Rust numbers with From and TryFrom instead of as, and declare each limit, count, or size in the type its consumers take. |
-| `code-rust-source-structure` | Keep Rust entry points thin, alternatives as enums, and errors typed and propagated with context, never unwrapped in production. |
+| `code-rust-source-structure` | Keep Rust entry points thin, alternatives as enums, and errors as derived types that callers match by variant, propagated with context and never unwrapped in production. |
 | `code-rust-type-ownership` | Give each Rust type at most one impl block per file, make its fields all private or all public, give each shared counter its own type, and declare no global mutable state. |
 | `code-rust-visibility` | Give every Rust item the narrowest visibility its users need, and fail checks on a public item that the crate root does not export. |
-| `code-rust-workspace-checks` | Enforce rustfmt and deny-warnings Clippy, share dependencies and lints through the workspace, and commit Cargo.lock. |
+| `code-rust-workspace-checks` | Enforce the rustfmt and Clippy settings that code-lint-strictness ships, share dependencies and lints through the workspace, and commit Cargo.lock. |
 | `code-script-entry-points` | Keep the top level of every file the repository executes directly to declarations and one statement that runs its main program. |
 | `code-shared-definitions` | Declare each pattern, bound, and derivation that several modules must agree on once, and import it everywhere else. |
 | `code-shared-utilities` | Keep domain-free helpers in the application's one shared utilities module, one per file, and use the declared utility library first. |
-| `code-spelled-out-names` | Spell out every word of every declared name, with a repository word list and a one-character ban that lint enforces in every language. |
+| `code-spelled-out-names` | Spell out every word of every declared name, case acronyms as words, map `get`, `fetch`, and `load` to `read`, and ban one-character names in every language's lint. |
+| `code-typescript-boolean-conditions` | Give every TypeScript condition a boolean or a nullable object, compare strings, numbers, and lengths explicitly, and supply defaults with `??`, never `||`. |
+| `code-typescript-call-arguments` | Bind to a name each nested call, `new`, `await`, and function written in an argument object or array, and each awaited or `yield*` value before reading a member. |
 | `code-typescript-class-declarations` | Declare a TypeScript class only where a runtime or library requires one, write every other unit that holds dependencies or state as a factory function, and give each class field a readonly private name. |
+| `code-typescript-collection-iteration` | Iterate over TypeScript collections with `for...of`, keep a running total in a `let` that the loop advances, and never call `forEach` or `reduce` or write `for...in`. |
 | `code-typescript-compiler-strictness` | Type-check every TypeScript package under strict compiler settings that no file relaxes. |
-| `code-typescript-const-bindings` | Declare TypeScript variables with `const`, give every `let` its first value where it is declared, and choose a value with a function rather than by assigning in each branch. |
+| `code-typescript-const-bindings` | Declare TypeScript variables with `const`, initialize each `let` and reassign it only in a loop or callback, step with `+= 1`, and bind functions as declarations or typed constants. |
+| `code-typescript-doc-comment-coverage` | Give every exported TypeScript function and class a doc comment, and fail checks when one is missing. |
+| `code-typescript-effect-absent-values` | Type each TypeScript result and record field that may hold no value as an Effect `Option`, writing `null` and `undefined` only where a foreign format or signature requires them. |
 | `code-typescript-effect-errors` | Carry each TypeScript failure that a caller can act on as a tagged error in an Effect's error type, and every other failure as a tagged defect. |
-| `code-typescript-effect-schemas` | Decode every value that crosses a TypeScript boundary with an Effect Schema, and derive its type from that schema. |
+| `code-typescript-effect-scheduling` | Sleep, bound, retry, poll, race, and fan out TypeScript work only with Effect's operators, never with hand-built promises, promise combinators, or timers. |
+| `code-typescript-effect-schemas` | Decode every value that crosses a TypeScript boundary with an Effect Schema, reject unknown fields on owned shapes, and give each schema and its type one PascalCase name. |
 | `code-typescript-entry-points` | Keep each TypeScript entry point a list of named re-exports from the files that declare them, re-export from no other file, and never add a file named after a sibling folder. |
+| `code-typescript-export-return-types` | Declare the return type of every exported TypeScript function and method, and let local functions and callbacks infer theirs. |
+| `code-typescript-expression-forms` | Destructure same-name TypeScript reads, use shorthand properties, expression-bodied arrows, template strings, `replaceAll`, `===`, and `for (;;)`, and convert or parse values with comparisons, `Boolean`, `Number`, or `String`. |
 | `code-typescript-file-names` | Use kebab-case source paths with dotted role suffixes; preserve tool-required names. |
-| `code-typescript-function-arguments` | Give every owned TypeScript function that takes input one destructured object argument; keep externally defined signatures. |
-| `code-typescript-input-immutability` | Never change a value that a TypeScript function received as a parameter or sort an array in place, and return a new value instead. |
+| `code-typescript-function-arguments` | Give each owned TypeScript function that takes input one destructured object argument whose type carries its name, default there, pass callbacks as inline arrows, and keep external signatures. |
+| `code-typescript-function-member-signatures` | Declare each function member of a TypeScript type as a property with a function type, never as a method signature, so the compiler checks its parameters strictly. |
+| `code-typescript-function-scoping` | Declare a named TypeScript function inside another function only when it captures that function's scope, and move every other one to the top level of its file. |
+| `code-typescript-import-extensions` | Name the imported file in each relative TypeScript import by its own name and extension, such as `./harness.ts`, never a bare path, a folder, or the emitted `.js` name. |
+| `code-typescript-import-statements` | Import modules at the top in sorted blocks without blank lines, once each and by name, test functions from the runner, listed libraries as namespaces, type-only names as `type`. |
+| `code-typescript-input-immutability` | Never change a TypeScript function's input, sort in place, or use `delete`, and type arrays and tuples `readonly` except a local or private field its owner fills. |
 | `code-typescript-module-boundaries` | Share code across source folders only through each folder's explicit named-export entry point, and keep imports between files acyclic, type-only and dynamic imports included. |
-| `code-typescript-module-state` | Keep no TypeScript state at module level or in a static class field that changes after the module loads, hold each cache in the object or closure that owns it, and give module constants read-only types. |
-| `code-typescript-named-types` | Give every TypeScript object type a name instead of writing an object type literal inline. |
+| `code-typescript-module-state` | Keep no TypeScript module state that changes after loading, hold each cache in its owner, end module-level literals with `as const`, and type module-level sets and maps read-only. |
+| `code-typescript-named-types` | Name every TypeScript object type with a `type` alias instead of writing it inline, and write `interface` only to augment a dependency's declaration. |
 | `code-typescript-node-scripts` | Write repository scripts as `.mts` files that the pinned Node runs directly without a loader or runner dependency, and type-check them for what Node's type stripping accepts. |
+| `code-typescript-object-literal-functions` | Declare each function a TypeScript object literal holds by name and list the name, such as `return { settleInvoice }`, instead of writing a method or function-valued property. |
 | `code-typescript-package-boundaries` | Consume TypeScript packages only through declared dependencies and explicitly exported entry points. |
-| `code-typescript-type-assertions` | Narrow TypeScript values with checks the compiler follows, never with type assertions, non-null assertions, return-only type parameters, or the any type. |
+| `code-typescript-runtime-keyed-maps` | Hold each TypeScript lookup that code fills at run time or builds from a collection in a `Map`, and create each record whole. |
+| `code-typescript-type-assertions` | Narrow values with checks the compiler follows, annotate declared types unless code reads inferred ones, and never write type or non-null assertions, type predicates, return-only type parameters, or `any`. |
 
 #### context
 
@@ -252,7 +272,7 @@ The library has 146 contracts.
 
 | Contract | Requirement |
 | --- | --- |
-| `telemetry-application-tracing` | Trace operations consistently without exposing secrets or letting diagnostics change results. |
+| `telemetry-application-tracing` | Trace operations and write each log line as one JSON object with a declared event, without exposing secrets or letting diagnostics change results. |
 
 #### test
 
@@ -278,8 +298,10 @@ The library has 146 contracts.
 | `ui-motion-lifecycle` | Keep animation interruptible, reduced-motion aware, pausable, paused when unseen, and released on removal. |
 | `ui-presentation-boundaries` | Render supplied data and report intent; leave requests, routing, identity, and domain decisions to applications. |
 | `ui-presentation-state` | Hold only ephemeral interaction state and unsaved drafts in presentation; receive application-owned state as inputs. |
+| `ui-react-hook-calls` | Name each state pair `[thing, setThing]`, and call state, ref, and context hooks before every other hook and effect hooks after them. |
 | `ui-react-interaction-ownership` | Keep each interaction's state, transitions, subscriptions, and cleanup under one component or hook. |
 | `ui-react-typescript-component-apis` | Encode supported component use in public prop types so unsupported combinations fail to compile. |
+| `ui-react-typescript-jsx-attributes` | Write inline JSX handlers as one expression, name declared ones `on` and their event, spread only declared style calls or story args, and name visible text and literal props. |
 | `ui-semantic-value-controls` | Give each value domain one control whose name states its value contract, and keep application policy outside it. |
 | `ui-storybook-component-checks` | Give every public component synthetic stories of its meaningful states and assert only consequential owned interactions. |
 | `ui-time-series-charts` | Render application-prepared series faithfully and give pointer, touch, and keyboard users the same inspected values. |

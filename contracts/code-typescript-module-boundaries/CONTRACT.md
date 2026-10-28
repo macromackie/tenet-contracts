@@ -21,6 +21,7 @@ Keep the import graph between source files acyclic, and count type-only imports,
 Break a cycle by moving the declarations both sides need into the module that owns them, as `code-module-file-roles` places types and constants; changing an import to a type-only import does not break a cycle.
 Import sibling folders directly from production modules, not through the package's own entry point; tests and examples may use the package entry point to exercise the consumer API.
 Keep server-only modules out of entry points that browser code imports.
+Declare a maximum number of distinct modules that one file imports, counting type-only imports and not re-exports; the shipped file sets 10, and a repository may override it.
 
 Enforce the cycle and entry-point rules with a dependency check that resolves each import to a file, never with a pattern over import text.
 Configure that check to fail on a cycle through any import, on an import that bypasses an entry point, and on a relative import it cannot resolve.

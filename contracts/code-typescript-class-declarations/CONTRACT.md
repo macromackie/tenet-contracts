@@ -8,7 +8,8 @@ message: Declare a TypeScript class only where a runtime or library requires one
 Declare a class only where a runtime or library requires one: a class the runtime instantiates, such as a stateful actor, a container, or a worker entry point; a tagged error class that `code-typescript-effect-errors` requires; or a service key class with an empty body that an effect or dependency-injection library requires to name a service.
 Write every other unit that holds dependencies or state, such as a store, a client, or a driver, as a factory function that returns named functions that close over them, such as `createInvoiceStore({ sql })` returning `{ settleInvoice }`.
 Keep a factory's storage handle and other dependencies in its closure, and never return them beside its functions.
-A plain record that holds values and no storage handle, such as `type InvoiceAccount = { apiUrl: string; token: string }` passed as `requestInvoices({ account, path })`, is data and needs no factory.
+A plain record that holds values and no storage handle is data and needs no factory.
+Such a record is `type InvoiceAccount = { readonly apiUrl: string; readonly token: string }`, passed as `listInvoices({ account })`.
 Extend only the base class that the runtime or library requires, and never extend an owned class or declare an `abstract` class.
 Declare each field of a class `readonly` with a private name, such as `readonly #storage: Storage`, and never use the `private`, `protected`, or `public` keywords or constructor parameter properties.
 A field that the runtime base class declares for subclasses to set, such as a container's `defaultPort`, keeps the name the base class gives it and carries the `override` modifier, such as `override readonly defaultPort = DEFAULT_PORT`.
@@ -18,7 +19,7 @@ Enable `erasableSyntaxOnly`, which rejects parameter properties, and `noImplicit
 Enforce the other rules with the repository's lint, and suppress a finding only as `code-lint-suppressions` allows, such as for an exported subclass that only passes a dependency to a runtime class.
 
 Violation: `class InvoiceApi { readonly #settings: Settings; constructor({ settings }: InvoiceApiInput) { this.#settings = settings; } }` holds a client's dependencies in an owned class.
-Allowed: `createInvoiceApi({ settings })` returns `{ requestInvoices }`, and `class InvoiceObject extends RuntimeObject` is a class the runtime instantiates.
+Allowed: `createInvoiceApi({ settings })` returns `{ listInvoices }`, and `class InvoiceObject extends RuntimeObject` is a class the runtime instantiates.
 
 ## Checks
 

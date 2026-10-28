@@ -1,0 +1,12 @@
+# code-comment-form: write every doc comment as prose, with no section or tag for parameters, results, yielded values, errors, or panics.
+# Rust variant; the TypeScript, Tsx, JavaScript, and Python variants apply the same test to their doc comments.
+id: prose-doc-comments-rust
+language: Rust
+severity: error
+message: State this in the doc comment's prose instead of a section heading, such as "Fails with `OrderError::Refunded` when a refund closed the order."
+note: |
+  The rule reports a `///` or `//!` line that is a section heading for errors, panics, parameters, results, or yielded values, such as `/// # Errors`.
+  It also reports an `# Examples` heading; only a `# Safety` heading, which states an unsafe function's contract, is not reported.
+rule:
+  kind: line_comment
+  regex: ^//[/!]\s*#+\s*(?:Errors|Panics|Arguments|Parameters|Returns|Yields|Examples?)\s*$

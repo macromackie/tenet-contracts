@@ -1,0 +1,201 @@
+# code-typescript-function-arguments: pass every function that a call takes as an inline arrow, never by name.
+# TypeScript variant (.ts, .mts, .cts); function-reference-arguments-tsx.yml differs only in `id`, `language`, and this line.
+id: function-reference-arguments-typescript
+language: TypeScript
+severity: error
+message: "Pass an inline arrow that names the arguments it reads, such as `emitter.on('message', (message) => recordMessage({ message }))`, instead of a function by name."
+note: |
+  A function passed by name receives every argument the callee passes, such as an array method's index and array, whether or not it expects them.
+  The rule reports a name passed to any call or `new` that the module or an enclosing block declares as a function, such as `retry(sendReminder)` or `useState(readStoredTheme)`, and a method or function-valued field of the enclosing class passed as `this.recordMessage`, never an accessor.
+  It also reports any name, property read, or element read passed to an array callback method on a receiver other than a capitalized namespace, such as `notes.filter(Boolean)`, a comparator passed to `toSorted` or `sort`, and a mapper passed to `Array.from`.
+  An imported function and a function that a parameter or a destructured binding holds are not seen, so review covers them.
+  A parameter that shares a declared function's name holds a value and is not reported, while another local value that shadows one is reported; rename it.
+  A function passed as an object field or a markup attribute, such as `{ run: sendReminder }` or `onSave={onSave}`, is not a call argument and is not reported.
+  Where a dependency removes a listener only by the function it registered and takes no abort signal, suppress both calls with a reason that names the dependency.
+utils:
+  # A function reference: a name or a property read, such as `compareOrders` or `sorting.byTotal`.
+  reference:
+    any:
+      - kind: identifier
+      - kind: member_expression
+  # A namespace is a capitalized name with a lowercase letter, or one capital letter, and a path of them.
+  # A constant in capital snake case, such as `DEFAULT_ORDERS`, is a value, not a namespace.
+  namespace:
+    any:
+      - kind: identifier
+        regex: ^[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?$
+      - kind: member_expression
+        regex: ^[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?(\.[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?)+$
+  # A name, property read, or element read, bare or wrapped in `as`, `!`, or type arguments.
+  any-reference:
+    any:
+      - matches: reference
+      - kind: subscript_expression
+      - kind: as_expression
+        has:
+          matches: reference
+      - kind: non_null_expression
+        has:
+          matches: reference
+      - kind: instantiation_expression
+        has:
+          matches: reference
+  # A function that a module or a block declares, such as `function sendReminder` or `const recordMessage = (...) => ...`.
+  module-function-declaration:
+    any:
+      - kind: function_declaration
+        has:
+          field: name
+          pattern: $NAME
+      - kind: generator_function_declaration
+        has:
+          field: name
+          pattern: $NAME
+      - kind: lexical_declaration
+        has:
+          kind: variable_declarator
+          all:
+            - has:
+                field: name
+                pattern: $NAME
+            - has:
+                field: value
+                any:
+                  - kind: arrow_function
+                  - kind: function_expression
+                  - kind: generator_function
+  # A name that the module or an enclosing block declares as a function, exported or not.
+  file-function:
+    kind: identifier
+    pattern: $NAME
+    inside:
+      stopBy: end
+      any:
+        - kind: program
+        - kind: statement_block
+      has:
+        any:
+          - matches: module-function-declaration
+          - kind: export_statement
+            has:
+              field: declaration
+              matches: module-function-declaration
+    # A parameter of an enclosing function that shares the name holds a value instead, such as `sha` in `setChecks(sha, checks)`.
+    not:
+      inside:
+        stopBy: end
+        all:
+          - any:
+              - kind: arrow_function
+              - kind: function_declaration
+              - kind: function_expression
+              - kind: generator_function
+              - kind: generator_function_declaration
+              - kind: method_definition
+          - any:
+              - has:
+                  field: parameters
+                  has:
+                    stopBy: end
+                    any:
+                      - kind: identifier
+                      - kind: shorthand_property_identifier_pattern
+                    pattern: $NAME
+              - has:
+                  field: parameter
+                  kind: identifier
+                  pattern: $NAME
+  # A method or function-valued field of the enclosing class read through `this`, such as `this.recordMessage` or `this.#stop`.
+  # An accessor, such as `get total()`, returns a value and is not a method here.
+  class-method:
+    kind: member_expression
+    all:
+      - has:
+          field: object
+          kind: this
+      - has:
+          field: property
+          pattern: $METHOD
+      - inside:
+          stopBy: end
+          kind: class_body
+          has:
+            any:
+              - kind: method_definition
+                not:
+                  regex: '^((static|override|public|protected|private)\s+)*(get|set)\s'
+                has:
+                  field: name
+                  pattern: $METHOD
+              - kind: public_field_definition
+                all:
+                  - has:
+                      field: name
+                      pattern: $METHOD
+                  - has:
+                      field: value
+                      any:
+                        - kind: arrow_function
+                        - kind: function_expression
+  # A receiver that is not a capitalized namespace.
+  callback-method:
+    kind: member_expression
+    all:
+      - has:
+          field: property
+          regex: ^(map|flatMap|filter|find|findIndex|findLast|findLastIndex|some|every|forEach|reduce|reduceRight)$
+      - not:
+          has:
+            field: object
+            matches: namespace
+  comparator-method:
+    kind: member_expression
+    all:
+      - has:
+          field: property
+          regex: ^(toSorted|sort)$
+      - not:
+          has:
+            field: object
+            matches: namespace
+rule:
+  inside:
+    kind: arguments
+    inside:
+      any:
+        - kind: call_expression
+        - kind: new_expression
+  any:
+    # A function by name passed to any call, such as `retry(sendReminder)` or `emitter.on('message', this.recordMessage)`.
+    - matches: file-function
+    - matches: class-method
+    # A callback by any name, such as `orders.map(parse)`, `notes.filter(Boolean)`, or `orders.reduce(add, 0)`.
+    - nthChild: 1
+      matches: any-reference
+      inside:
+        kind: arguments
+        inside:
+          kind: call_expression
+          has:
+            field: function
+            matches: callback-method
+    # A comparator by name, such as `orders.toSorted(compareOrders)`.
+    - nthChild: 1
+      matches: reference
+      inside:
+        kind: arguments
+        inside:
+          kind: call_expression
+          has:
+            field: function
+            matches: comparator-method
+    # A mapper by name, such as `Array.from(lines, parseLine)`.
+    - nthChild: 2
+      matches: reference
+      inside:
+        kind: arguments
+        inside:
+          kind: call_expression
+          has:
+            field: function
+            pattern: Array.from

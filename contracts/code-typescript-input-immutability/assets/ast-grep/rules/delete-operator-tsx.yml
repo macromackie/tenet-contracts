@@ -1,0 +1,19 @@
+# code-typescript-input-immutability: never use the `delete` operator; drop a key by rest destructuring into a new object.
+# Tsx variant (.tsx); delete-operator-typescript.yml differs only in `id`, `language`, and this line.
+id: delete-operator-tsx
+language: Tsx
+severity: error
+message: "Drop this key by rest destructuring into a new object, such as `const { secret, ...publicRecord } = record`, instead of `delete`."
+note: |
+  Every `delete` expression is reported in every file, whatever its operand, such as `delete copy.secret`, `delete copy[name]`, or `delete copy['x-trace']`.
+  Rest destructuring yields a new object whose type no longer holds the key, while `delete` changes the object and leaves the key in its type.
+  A key known only at run time takes a computed name, as in `const { [name]: dropped, ...kept } = headers`.
+  Keeping the entries that pass a test, such as unexpired permits, builds the lookup as `code-typescript-runtime-keyed-maps` requires.
+  `delete process.env.NAME` and `delete process.env[name]` are left to the delete-environment rule, which allows them in test files.
+  A collection's own `delete` method, such as `ids.delete(id)`, is a call, not this operator.
+rule:
+  pattern: delete $TARGET
+  not:
+    any:
+      - pattern: delete process.env.$NAME
+      - pattern: delete process.env[$NAME]

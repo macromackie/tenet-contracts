@@ -1,0 +1,51 @@
+# code-boolean-names: start the name of every function that returns a boolean with a declared predicate prefix.
+# Python variant; the TypeScript and Tsx variants check the same functions in their own syntax.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-boolean-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: predicate-function-names-python
+language: Python
+severity: error
+message: Start this boolean function's name with a declared predicate prefix, such as `is_overdue` rather than `overdue` or `check_overdue`.
+note: |
+  A function and a method, including an `async` one, are checked when their declared return type is `bool`, `Awaitable[bool]`, or a type predicate, `TypeGuard[...]` or `TypeIs[...]`.
+  A constant, variable, or class field annotated with a callable that returns a boolean, such as `Callable[[Job], bool]` or `Callable[[Job], Awaitable[bool]]`, is checked too.
+  The prefixes are the `predicate-prefixed-name` rule in ../utils; an option prefix such as `include` or `skip` never names a function.
+  Special methods such as `__eq__` and `__bool__` keep the names the language gives them, and a property or a test fixture is named as a field is.
+  A function whose return type is not declared is left to review.
+  Suppress a name that an interface or framework outside the repository fixes, with a reason that names that system.
+utils:
+  # A declared return type that is a boolean, an awaitable boolean, or a type predicate, such as `bool` or `TypeGuard[Invoice]`.
+  boolean-return:
+    kind: type
+    regex: ^(?:bool|(?:(?:typing|collections\.abc)\.)?Awaitable\s*\[\s*bool\s*\]|(?:(?:typing|typing_extensions)\.)?(?:TypeGuard|TypeIs)\s*\[[\s\S]*\])$
+rule:
+  any:
+    - kind: identifier
+      not:
+        any:
+          - matches: predicate-prefixed-name
+          # A special method keeps the name the language gives it.
+          - regex: ^__[a-z0-9_]+__$
+      inside:
+        field: name
+        kind: function_definition
+        has:
+          field: return_type
+          matches: boolean-return
+        not:
+          inside:
+            kind: decorated_definition
+            has:
+              kind: decorator
+              # A property or a fixture is read as a value and named as a field is.
+              regex: ^@((functools\.)?cached_property|property|[A-Za-z_][A-Za-z0-9_]*\.(setter|getter|deleter)|(pytest\.)?fixture)\b
+    # A constant, variable, or class field that holds a function returning a boolean, such as `is_due: Callable[[Job], bool]`.
+    - kind: identifier
+      not:
+        matches: predicate-prefixed-name
+      inside:
+        field: left
+        kind: assignment
+        has:
+          field: type
+          regex: ^(?:(?:typing|collections\.abc)\.)?Callable\s*\[[\s\S]*,\s*(?:bool|(?:(?:typing|collections\.abc)\.)?Awaitable\s*\[\s*bool\s*\])\s*\]$

@@ -1,0 +1,15 @@
+# code-typescript-type-assertions: list each `satisfies` expression, which a reviewer keeps only where later code reads the narrower inferred type.
+# Tsx variant (.tsx); satisfies-expressions-typescript.yml differs only in `id`, `language`, and this line.
+# Its severity, info, prints each expression without failing the scan; list only these with `--filter '^satisfies-expressions-'`.
+id: satisfies-expressions-tsx
+language: Tsx
+severity: info
+message: Keep this `satisfies` only where later code reads the narrower type that the compiler infers from the value; otherwise annotate the constant or field, or bind the value to an annotated constant.
+note: |
+  Every `satisfies` expression is listed, in every file, because no lint can tell whether later code reads the inferred type.
+  Keep one when a story type reads `typeof meta`, when code reads a table by the keys its literal declares, or when a runtime loads an anonymous default export.
+  A module-level literal's `as const satisfies T`, which `code-typescript-module-state` requires, is kept too.
+  Otherwise annotate the constant or field, such as `const reminders: ReminderSchedule = { ... }`, or bind any other value to an annotated constant, and drop the `satisfies`.
+  A `satisfies` on a value that a parameter or a declared return type already checks, such as `return { ... } satisfies Reminder`, adds nothing; drop it.
+rule:
+  kind: satisfies_expression

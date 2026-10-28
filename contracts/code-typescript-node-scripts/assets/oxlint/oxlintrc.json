@@ -1,0 +1,11 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.mts"],
+      "plugins": ["node"],
+      "rules": {
+        "node/no-sync": "error"
+      }
+    }
+  ]
+}

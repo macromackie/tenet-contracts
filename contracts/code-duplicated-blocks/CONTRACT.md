@@ -18,7 +18,7 @@ The reason in a start marker states why both copies must stay, such as two shipp
 Repeated code shorter than the declared minimum size, repeated configuration files, and copies between repositories, which `code-cross-repository-copies` covers, are outside this contract.
 
 Violation: a second smoke script adds a 9-line copy of the first script's worker startup instead of calling it.
-Allowed: both smoke scripts call `startWorker({ port, log })` from the module that declares it.
+Allowed: both smoke scripts call `startWorker({ log, port })` from the module that declares it.
 
 ## Checks
 
