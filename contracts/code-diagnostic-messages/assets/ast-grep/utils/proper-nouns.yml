@@ -1,0 +1,7 @@
+# code-diagnostic-messages: the proper nouns whose spelling a diagnostic's first word keeps, matched by every rule in ../rules as `proper-noun-text`.
+# A repository adds its own names, such as its products' names, in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
+# The regex reads only the literal's opening quote, with any Python prefix such as `f`, and its first word, so the TypeScript, Tsx, Rust, and Python rules share it.
+id: proper-noun-text
+language: TypeScript
+rule:
+  regex: "^[rRbBuUfF]{0,2}(?:\"\"\"|'''|[\"'`])(?:April|August|December|February|Friday|Git|January|July|June|Linux|March|Monday|November|October|Postgres|Python|Rust|Saturday|September|Sunday|Thursday|Tuesday|Wednesday)\\b"

@@ -1,0 +1,69 @@
+# The strictest cargo-deny settings that code-lint-strictness requires.
+# Every check runs, every lint level is deny, and every list that allows something starts empty.
+#
+# cargo-deny reads only its own file, so copy this file to `deny.toml` beside the workspace's root manifest.
+# Fill that copy's allow lists: each license expression the dependencies carry, each registry and git source,
+# each crate whose build script runs, and each crate allowed to keep its default features.
+# Give each entry a comment naming the dependency that needs it.
+# Run it from the workspace root, with every warning raised to an error:
+#   cargo deny --all-features --locked check --deny warnings
+# The advisories check fetches the advisory database, so the run needs network access to it.
+# A new cargo-deny version adds checks, so this file is tested against cargo-deny 0.19.0;
+# pin that exact version and raise it in a reviewed upgrade.
+
+[advisories]
+ignore = []
+unmaintained = "all"
+unsound = "all"
+yanked = "deny"
+
+[bans]
+allow = []
+allow-wildcard-paths = false
+deny = []
+external-default-features = "deny"
+highlight = "all"
+multiple-versions = "deny"
+multiple-versions-include-dev = true
+skip = []
+skip-tree = []
+wildcards = "deny"
+workspace-default-features = "deny"
+
+[bans.build]
+allow-build-scripts = []
+enable-builtin-globs = true
+executables = "deny"
+include-archives = true
+include-dependencies = true
+include-workspace = true
+interpreted = "deny"
+
+[bans.workspace-dependencies]
+duplicates = "deny"
+include-path-dependencies = true
+unused = "deny"
+
+[graph]
+all-features = true
+exclude-dev = false
+
+[licenses]
+allow = []
+confidence-threshold = 1.0
+exceptions = []
+include-build = true
+include-dev = true
+unused-allowed-license = "deny"
+unused-license-exception = "deny"
+
+[licenses.private]
+ignore = false
+
+[sources]
+allow-git = []
+allow-registry = []
+required-git-spec = "rev"
+unknown-git = "deny"
+unknown-registry = "deny"
+unused-allowed-source = "deny"

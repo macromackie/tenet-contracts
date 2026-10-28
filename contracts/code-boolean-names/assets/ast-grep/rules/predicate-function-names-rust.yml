@@ -1,0 +1,79 @@
+# code-boolean-names: start the name of every function that returns a boolean with a declared predicate prefix.
+# Rust variant; the TypeScript and Tsx variants check the same functions in their own syntax.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-boolean-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: predicate-function-names-rust
+language: Rust
+severity: error
+message: Start this boolean function's name with a declared predicate prefix, such as `is_overdue` rather than `overdue` or `check_overdue`.
+note: |
+  A free function, a method, and a trait's method declaration are checked when their declared return type is `bool`, `impl Future<Output = bool>`, or a `Result` whose success type is `bool`, such as `io::Result<bool>`.
+  A struct field, constant, static, or `let` binding whose type is a function pointer returning such a type, such as `fn(&Job) -> bool`, is checked too.
+  The prefixes are the `predicate-prefixed-name` rule in ../utils; an option prefix such as `include` or `skip` never names a function.
+  A method that implements a trait keeps the trait's name, such as `eq`, and a getter whose body only returns a field of `self` is named as a field is.
+  Suppress a name that an interface or framework outside the repository fixes, with a reason that names that system.
+utils:
+  # A declared return type that is a boolean, a future of one, or a result whose success type is a boolean.
+  boolean-return:
+    any:
+      - kind: primitive_type
+        regex: ^bool$
+      - kind: abstract_type
+        regex: ^impl\s+(?:[A-Za-z_][A-Za-z0-9_]*::)*Future\s*<\s*Output\s*=\s*bool\s*>$
+      - kind: generic_type
+        regex: ^(?:[A-Za-z_][A-Za-z0-9_]*::)*Result\s*<\s*bool\s*[,>]
+  # A function pointer type that returns a boolean result, such as `fn(&Job) -> bool`.
+  boolean-function-type:
+    kind: function_type
+    has:
+      field: return_type
+      matches: boolean-return
+rule:
+  any:
+    - kind: identifier
+      not:
+        matches: predicate-prefixed-name
+      inside:
+        field: name
+        any:
+          - kind: function_item
+          - kind: function_signature_item
+        has:
+          field: return_type
+          matches: boolean-return
+        not:
+          any:
+            # A getter, such as `fn include_archived(&self) -> bool { self.include_archived }`, is named as its field is.
+            - has:
+                field: body
+                regex: ^\{\s*&?(mut\s+)?self\.[a-z0-9_]+(\.clone\(\))?\s*\}$
+            # A method that implements a trait keeps the trait's name.
+            - inside:
+                kind: impl_item
+                has:
+                  field: trait
+                  regex: .
+                stopBy: end
+    # A struct field, constant, static, or `let` binding that holds a function returning a boolean.
+    - all:
+        - any:
+            - kind: field_identifier
+            - kind: identifier
+        - not:
+            matches: predicate-prefixed-name
+        - any:
+            - inside:
+                field: name
+                any:
+                  - kind: field_declaration
+                  - kind: const_item
+                  - kind: static_item
+                has:
+                  field: type
+                  matches: boolean-function-type
+            - inside:
+                field: pattern
+                kind: let_declaration
+                has:
+                  field: type
+                  matches: boolean-function-type

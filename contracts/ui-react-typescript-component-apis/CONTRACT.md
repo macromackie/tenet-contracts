@@ -12,7 +12,7 @@ Require the change callback in controlled mode.
 Type visual choices such as `size`, `tone`, and `density` as string-literal unions, not open `string`.
 Type catalogued choices such as icon names as a finite union of stable names, and keep the underlying library's component names private.
 Make a prop required when the component cannot render correctly without it, such as the accessible label of an icon-only button or an empty-state message.
-Allow `null` in a value type only where the component renders a gap or missing state for it.
+Allow an empty prop value only where the component renders a gap or missing state for it, and type it as `code-typescript-effect-absent-values` requires.
 Type content that the component renders verbatim, such as code or a label, as `string` rather than `ReactNode` or a pre-rendered element tree.
 Make collection components generic over the record type, so their callbacks receive the caller's record type.
 

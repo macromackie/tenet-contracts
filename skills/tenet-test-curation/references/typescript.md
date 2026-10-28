@@ -4,14 +4,14 @@ Prefer the observable result over intermediate call sequences.
 
 ```ts
 // Brittle: ties the test to private formatting and update steps.
-assert.equal(output, "⠸ reviewing 0.1s\n");
-assert.equal(renderCalls, 4);
+expect(output).toBe("⠸ reviewing 0.1s\n");
+expect(renderCalls).toBe(4);
 ```
 
 ```ts
 // Keep: redirected output includes the completed result without terminal controls.
-assert.match(output, /example\/plain\s+100%/);
-assert.doesNotMatch(output, /\x1b/);
+expect(output).toMatch(/example\/plain\s+100%/v);
+expect(output).not.toContain("\u001B");
 ```
 
 Inspect colors, wrapping, spacing, and animation in a real terminal during development. Do not retain a snapshot of

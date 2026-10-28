@@ -1,0 +1,38 @@
+{
+  "jsPlugins": [{ "name": "jsdoc-js", "specifier": "eslint-plugin-jsdoc" }],
+  "rules": {
+    "jsdoc-js/require-description": [
+      "error",
+      {
+        "contexts": [
+          "ExportNamedDeclaration > FunctionDeclaration",
+          "ExportDefaultDeclaration > FunctionDeclaration",
+          "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression",
+          "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > FunctionExpression",
+          "ExportDefaultDeclaration > ArrowFunctionExpression",
+          "ExportDefaultDeclaration > FunctionExpression",
+          "ExportNamedDeclaration > ClassDeclaration",
+          "ExportDefaultDeclaration > ClassDeclaration"
+        ],
+        "descriptionStyle": "body"
+      }
+    ],
+    "jsdoc-js/require-jsdoc": [
+      "error",
+      {
+        "contexts": [
+          "ExportNamedDeclaration > FunctionDeclaration",
+          "ExportDefaultDeclaration > FunctionDeclaration",
+          "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression",
+          "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > FunctionExpression",
+          "ExportDefaultDeclaration > ArrowFunctionExpression",
+          "ExportDefaultDeclaration > FunctionExpression",
+          "ExportNamedDeclaration > ClassDeclaration",
+          "ExportDefaultDeclaration > ClassDeclaration"
+        ],
+        "enableFixer": false,
+        "require": { "FunctionDeclaration": false }
+      }
+    ]
+  }
+}

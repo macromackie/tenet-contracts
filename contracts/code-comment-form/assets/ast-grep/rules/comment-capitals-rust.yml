@@ -1,0 +1,26 @@
+# code-comment-form: write every comment as sentences that start with a capital letter.
+# Rust variant; JavaScript, TypeScript, and Tsx files take the same test from this contract's oxlint configuration.
+id: comment-capitals-rust
+language: Rust
+severity: error
+message: Start this comment with a capital letter, or put the code identifier that opens it in backticks.
+note: |
+  The rule reports a plain or doc comment whose first letter is lowercase, such as `// retry_after is absent` or `/// returns the total.`.
+  A comment that opens with no letter is not reported, so a backticked identifier and a number pass.
+  A comment that opens with a link, such as `// https://...`, is not reported.
+  A comment directly after another comment continues its sentence, so it is not reported.
+  A tool's directive is not reported: `ast-grep-ignore` and a check's `-allow` directive.
+  A repository adds the directive words of its other tools to that list in its copy of this rule.
+rule:
+  any:
+    - kind: line_comment
+    - kind: block_comment
+  regex: ^(?://[/!]?|/\*[*!]?)[\s*]*\p{Ll}
+  not:
+    any:
+      - regex: ^(?://[/!]?|/\*[*!]?)[\s*]*(?:ast-grep-ignore|[a-z0-9]+(?:-[a-z0-9]+)*-allow\b|[a-z][a-z0-9+.-]*://)
+      - follows:
+          any:
+            - kind: line_comment
+            - kind: block_comment
+          immediate: true

@@ -1,0 +1,55 @@
+# code-closed-value-sets: test two or more members of a closed set with its declared module-level set, such as `endedStates.has(state)`.
+# TypeScript variant (.ts, .mts, .cts); member-chains-tsx.yml differs only in `id`, `language`, and this line.
+id: member-chains-typescript
+language: TypeScript
+severity: error
+message: "Declare these members once as a module-level read-only set, such as `endedStates`, and test it with `.has`, or, where the test must narrow a type, branch with a `switch` that names every member, instead of a chain of comparisons."
+note: |
+  Two or more `===` comparisons of one value with fixed values joined by `||` are reported, such as `state === SandboxState.Stopped || state === SandboxState.Failed`.
+  So are two or more `!==` comparisons joined by `&&`, the same test negated, such as `state !== SandboxState.Stopped && state !== SandboxState.Failed`.
+  A fixed value is what membership-lists counts: a string or a template without substitutions, a number, a member of a capitalized name such as `HttpStatus.BadGateway`, or a SCREAMING_SNAKE_CASE constant.
+  A chain of literals, such as `kind === 'draft' || kind === 'sent'`, is reported too, and its members are named under the rules above before they move into the set.
+  A chain is reported once, at its first comparison, even when it holds more members or follows another operand, such as `isReady || state === A || state === B`.
+  Comparisons with run-time values, such as `user.id`, a call, `null`, or `undefined`, and comparisons of different values are not reported.
+  A comparison written with the value on the right, such as `SandboxState.Stopped === state`, or with a comment between its comparisons, is left to review.
+  A `switch` whose cases name every member branches on the set and is not reported; write one where the test must narrow a type.
+utils:
+  # One fixed value, as membership-lists counts it: a literal, a member of a capitalized name, or a SCREAMING_SNAKE_CASE constant.
+  fixed-value:
+    any:
+      - kind: string
+      - kind: number
+      - kind: template_string
+        not:
+          has:
+            kind: template_substitution
+      - kind: member_expression
+        has:
+          field: object
+          kind: identifier
+          regex: ^[A-Z]
+      - kind: identifier
+        regex: ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$
+rule:
+  any:
+    - all:
+        - any:
+            - pattern: $VALUE === $FIRST || $VALUE === $SECOND
+            - pattern: $REST || $VALUE === $FIRST || $VALUE === $SECOND
+        - not:
+            inside:
+              field: left
+              pattern: $OUTER || $VALUE === $NEXT
+    - all:
+        - any:
+            - pattern: $VALUE !== $FIRST && $VALUE !== $SECOND
+            - pattern: $REST && $VALUE !== $FIRST && $VALUE !== $SECOND
+        - not:
+            inside:
+              field: left
+              pattern: $OUTER && $VALUE !== $NEXT
+constraints:
+  FIRST:
+    matches: fixed-value
+  SECOND:
+    matches: fixed-value

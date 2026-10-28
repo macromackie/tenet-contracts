@@ -1,0 +1,162 @@
+# The strictest ruff lint and format settings that code-lint-strictness requires.
+# Every rule runs at error, including preview rules, and each rule left off names its reason on the line above it.
+# Reasons: C contradicts a contract, R contradicts another enabled rule, F conflicts with the formatter,
+# and Q reports code the contracts require.
+#
+# Extend this file from the repository's own ruff.toml:
+#   extend = ".contracts/<number>-code-lint-strictness/assets/ruff/ruff.toml"
+# Set `target-version`, `src`, and `include` in the repository's file.
+# Turn one more rule off only with `lint.ignore` there, which adds to this file's list, with a comment on the line directly above it that starts with its reason letters.
+# Write each rule by its name, not its code, because the preview rule RUF201 reports a code in a selector.
+# Set a value a contract lets the repository declare, such as a limit below, in the repository's file too.
+#
+# Put every path scope in the repository's own ruff.toml, never in this file.
+# Ruff anchors an extended file's globs to that file's folder, so `per-file-ignores` and `namespace-packages`
+# globs written here would match nothing in the repository.
+# Replace each placeholder below with the repository's declared path pattern:
+#   [lint.per-file-ignores]
+#   # C, Q: code-numeric-literals lets test files write numbers bare, and pytest tests check with a bare `assert`.
+#   "<test files>" = ["assert", "magic-value-comparison"]
+#   # Q: cli-output-channels has the output module write the standard streams and end the process.
+#   "<output module>" = ["banned-api", "print"]
+#   # Q: code-environment-settings has the settings module read the environment.
+#   "<settings module>" = ["banned-api"]
+#   # C: code-script-entry-points forbids the top-level `if TYPE_CHECKING:` branch these rules ask for.
+#   "<executable files>" = ["typing-only-first-party-import", "typing-only-standard-library-import", "typing-only-third-party-import"]
+
+line-length = 100
+# A new ruff version adds rules, so this file is tested against one exact version; raise it in a reviewed upgrade.
+required-version = "==0.17.1"
+
+[format]
+docstring-code-format = true
+preview = true
+quote-style = "double"
+
+[lint]
+# Only `_` marks a value the code never reads, as code-spelled-out-names allows.
+dummy-variable-rgx = "^_$"
+# Names the docstring form code-comment-form chooses; `ALL` also selects it once multi-line-summary-first-line is off.
+extend-select = ["multi-line-summary-second-line"]
+ignore = [
+  # F: ruff names it a formatter conflict; on formatted code it reports the calls the formatter wraps without a trailing comma.
+  "missing-trailing-comma",
+  # C: code-comment-form keeps the license in the LICENSE file only, so no source file carries a notice.
+  "missing-copyright-notice",
+  # R: contradicts blank-line-before-class, which stays on.
+  "incorrect-blank-line-before-class",
+  # C: code-comment-form puts the opening quotes of a longer docstring on their own line; multi-line-summary-second-line stays on.
+  "multi-line-summary-first-line",
+  # Q: reports code-comment-form's allowed docstring `Opens a connection that no workflow sleep may hold.`
+  "non-imperative-mood",
+  # C: code-comment-form writes doc comments as prose, with no `Returns:` section.
+  "docstring-missing-returns",
+  # C: code-comment-form writes doc comments as prose, with no `Yields:` section.
+  "docstring-missing-yields",
+  # C: code-comment-form writes doc comments as prose, with no `Raises:` section.
+  "docstring-missing-exception",
+  # Q: reports `class ManifestRejected(Exception)`, the error code-python-exception-propagation's allowed example raises.
+  "error-suffix-on-exception-name",
+  # R: its fix `not stdout` changes behavior for `str | None`, which ty's truthiness-test-of-none-union reports.
+  "compare-to-empty-string",
+  # Q: reports `urllib.request.Request(endpoint)` for an endpoint that code-environment-settings passes in from the settings.
+  "suspicious-url-open-usage",
+  # Q: reports `import subprocess`, which the argument-list call of security-interpreter-injection needs.
+  "suspicious-subprocess-import",
+  # Q: reports `subprocess.run([GIT_PATH, "init"], check=True)`, the only form security-interpreter-injection allows.
+  "subprocess-without-shell-equals-true",
+  # Q: reports `os.execvpe(path, argv, env)`, an argument list with no shell, which security-interpreter-injection allows.
+  "start-process-with-no-shell",
+  # C: its fix `contextlib.suppress` violates code-python-exception-propagation; try-except-pass reports the same sites.
+  "suppressible-exception",
+  # C: its fix writes `total if ready else 0`, which code-conditional-expressions bans.
+  "if-else-block-instead-of-if-exp",
+]
+preview = true
+select = ["ALL"]
+# Each of these fixes writes a form a contract bans, so the finding is fixed by hand.
+unfixable = [
+  # The fix binds the message to `msg`, a name code-spelled-out-names spells out.
+  "raw-string-in-exception",
+  "f-string-in-exception",
+  # The fix writes a collection at the test, which code-closed-value-sets bans.
+  "repeated-equality-comparison",
+  "literal-membership",
+]
+
+[lint.flake8-bandit]
+# Reports a handler that passes or continues for any exception type, as code-python-exception-propagation forbids.
+check-typed-exception = true
+
+[lint.flake8-builtins]
+# Q: reports the `types` role file that code-module-file-roles declares; a repository adds its other role names here.
+allowed-modules = ["types"]
+strict-checking = true
+
+[lint.flake8-implicit-str-concat]
+# F: ruff names `false` a conflict with the formatter, which may join or split implicitly concatenated strings.
+allow-multiline = true
+
+[lint.flake8-import-conventions]
+# C: the default aliases require abbreviations, such as `np`, which code-spelled-out-names bans.
+aliases = {}
+
+[lint.flake8-pytest-style]
+raises-require-match-for = ["*"]
+warns-require-match-for = ["*"]
+
+[lint.flake8-quotes]
+avoid-escape = true
+docstring-quotes = "double"
+inline-quotes = "double"
+multiline-quotes = "double"
+
+[lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[lint.flake8-tidy-imports.banned-api]
+"contextlib.suppress".msg = "It hides exceptions; let them propagate or handle them as code-python-exception-propagation allows."
+"os._exit".msg = "End the process only through the output module's exit function, as cli-output-channels requires."
+"os.environ".msg = "Read the environment only in the settings module, as code-environment-settings requires."
+"os.environb".msg = "Read the environment only in the settings module, as code-environment-settings requires."
+"os.getenv".msg = "Read the environment only in the settings module, as code-environment-settings requires."
+"os.getenvb".msg = "Read the environment only in the settings module, as code-environment-settings requires."
+"sys.__stderr__".msg = "Write the standard streams only through the output module, as cli-output-channels requires."
+"sys.__stdout__".msg = "Write the standard streams only through the output module, as cli-output-channels requires."
+"sys.argv".msg = "Read process arguments only in the settings module, as code-environment-settings requires."
+"sys.exit".msg = "End the process only through the output module's exit function, as cli-output-channels requires."
+"sys.orig_argv".msg = "Read process arguments only in the settings module, as code-environment-settings requires."
+"sys.stderr".msg = "Write the standard streams only through the output module, as cli-output-channels requires."
+"sys.stdout".msg = "Write the standard streams only through the output module, as cli-output-channels requires."
+"unittest.mock.patch".msg = "Inject an implementation of the abstract type instead, as code-python-client-injection requires."
+
+[lint.flake8-type-checking]
+strict = true
+
+[lint.mccabe]
+# The cyclomatic complexity of 10 per function that code-function-size's shipped file allows; a repository may override it.
+max-complexity = 10
+
+[lint.pep8-naming]
+ignore-names = []
+
+[lint.pycodestyle]
+ignore-overlong-task-comments = false
+
+[lint.pydocstyle]
+# code-python-doc-comment-coverage lists the declarations that need no docstring, so no further decorator exempts one.
+ignore-decorators = []
+
+[lint.pylint]
+# Strictest: every compared string or bytes literal needs a name, besides the "" and __main__ that ruff exempts.
+allow-magic-value-types = []
+# code-conditional-expressions' declared limit of 2 logical operators, so 3 operands; a repository may override it.
+max-bool-expr = 3
+# code-function-size's declared nesting depth; a repository may override it.
+max-nested-blocks = 3
+# code-python-function-arguments makes every parameter of an owned function keyword-only.
+# A signature the language or a dependency defines, such as `__getitem__`'s key, a property setter's value, or a signal handler,
+# keeps its positional parameters: mark the method @override where a base class defines it, and otherwise suppress the site as code-lint-suppressions allows.
+max-positional-args = 0
+# The 10 statements per function that code-function-size's shipped file allows; ruff counts no lines and no callback nesting, so Python declares no length or callback limit.
+max-statements = 10

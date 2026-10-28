@@ -7,6 +7,7 @@ message: Leave a block early with a guard instead of nesting its remaining work,
 
 When a condition means that the rest of a function or loop body does not apply, test it as soon as its value is known and leave with `return`, `throw`, `continue`, or `break`.
 A guard may follow other statements once the value it tests is known, such as after an awaited read.
+In a language whose blocks take braces, write every `if`, `else`, and loop body in braces, even one statement, except an `else` followed by `if`, as in `else if`.
 Declare a maximum number of statements for an `if` statement that has no `else` and ends a function.
 Never end a function with an `if` statement that has no `else` and holds more statements than that maximum, counting every statement nested inside the `if` at any depth; invert its condition into a guard.
 
@@ -18,9 +19,10 @@ In a language with a statement that binds a pattern or leaves, such as `let Some
 An `if` and `else` whose branches both continue the function, such as two different writes, are allowed and are not guards.
 
 Configure the lint to reject an `else` after a branch that leaves, an `if` alone in an `else`, a negated condition with an `else`, a needless `continue`, a `match` that a pattern-binding statement replaces, and a trailing `if` over the declared maximum, wherever the lint supports each rule.
+Configure the lint as well to reject an `if`, `else`, or loop body without braces, wherever the lint supports that rule.
 
 Violation: `if (order.isPaid) { return ship({ order }); } else { return hold({ order }); }` writes an `else` after a branch that returns.
-Allowed: `if (order.lines.length === 0) return;`, a blank line, and the remaining work without nesting.
+Allowed: `if (order.lines.length === 0) { return; }`, a blank line, and the remaining work without nesting.
 
 ## Checks
 

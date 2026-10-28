@@ -1,0 +1,30 @@
+# code-module-structure-and-control-flow: every owned function name that starts in lowercase starts with a verb from the declared list.
+# Python variant.
+# The alternation below holds every word of verbs.txt beside this folder; keep the two identical when either changes.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-module-structure-and-control-flow/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: function-verbs-python
+language: Python
+severity: error
+message: Start this function's name with a verb from the declared list, such as `read_invoice` rather than `invoice`.
+note: |
+  A function and a method are checked; the first word is the name's leading lowercase run, after any leading underscores, so `read_invoice` and `readInvoice` start with `read`.
+  Special methods such as `__init__`, `main`, properties and their setters, and test fixtures are not checked.
+  Suppress a name that an interface or framework outside the repository fixes, with a reason that names that system.
+rule:
+  kind: identifier
+  regex: ^_*[a-z]
+  inside:
+    field: name
+    kind: function_definition
+    not:
+      inside:
+        kind: decorated_definition
+        has:
+          kind: decorator
+          # A property or a fixture is named for the value it returns.
+          regex: ^@((functools\.)?cached_property|property|[A-Za-z_][A-Za-z0-9_]*\.(setter|getter|deleter)|(pytest\.)?fixture)\b
+  not:
+    any:
+      - regex: ^_*(abort|accept|acquire|add|admit|advance|aggregate|allocate|allow|answer|append|apply|approve|archive|arm|assert|assess|assign|attach|audit|authenticate|authorize|await|backfill|begin|bind|block|build|bump|calculate|call|can|cancel|capture|change|check|choose|claim|classify|clean|clear|clip|close|collect|combine|commit|compare|compile|complete|compose|compress|compute|configure|confirm|connect|consume|continue|convert|copy|count|create|decide|declare|decode|decrypt|deduplicate|define|delete|deliver|deny|deploy|derive|describe|detach|detect|diagnose|diff|disable|discard|discover|dismiss|dispatch|dispose|download|drain|draw|drop|edit|emit|enable|encode|encrypt|end|enforce|enqueue|enroll|ensure|enter|escape|estimate|evaluate|exchange|exclude|execute|exit|expand|expect|expire|explain|export|expose|extend|extract|fail|feed|fill|filter|find|finish|flush|focus|fold|follow|force|format|forward|freeze|generate|grade|grant|group|guard|handle|has|hash|hide|hold|identify|ignore|import|include|increment|index|infer|ingest|initialize|insert|inspect|install|invoke|is|issue|join|judge|keep|kill|label|launch|lease|leave|limit|link|list|listen|lock|log|look|make|map|mark|mask|match|measure|merge|migrate|mint|mock|mount|move|name|navigate|needs|normalize|notify|observe|obtain|on|open|order|pack|page|paginate|parse|patch|pause|pick|pin|place|plan|poll|post|prepare|present|preserve|print|probe|process|produce|promote|prompt|protect|provide|provision|prune|publish|pull|push|put|qualify|query|queue|quote|raise|rank|read|reap|rebuild|receive|recheck|reconcile|record|recover|redact|redeem|redirect|reduce|refresh|refund|refuse|register|reject|release|reload|remember|remove|rename|render|renew|reopen|repair|repeat|replace|replay|reply|report|request|require|reserve|reset|resolve|respond|restart|restore|resume|retain|retry|return|reveal|review|revoke|rotate|route|run|sample|save|scale|scan|schedule|score|seal|search|seed|select|send|serialize|serve|set|settle|share|ship|should|show|sign|signal|simulate|skip|sleep|slice|sort|spawn|split|start|stop|store|stream|strip|submit|subscribe|sum|summarize|supply|suspend|sync|tag|take|terminate|test|throw|toggle|touch|trace|track|transform|translate|trigger|trim|truncate|try|unlabel|unlock|unpack|unregister|unset|unsubscribe|unwrap|update|upgrade|upload|upsert|use|validate|vend|verify|view|visit|wait|wake|walk|warn|was|watch|wrap|write|yield)([^a-z]|$)
+      - regex: ^(main|__[a-z0-9_]+__)$

@@ -1,0 +1,47 @@
+# code-typescript-expression-forms: write a long text as one literal, never as literals joined with `+` across lines.
+# TypeScript variant (.ts, .mts, .cts); literal-concatenation-tsx.yml is the Tsx variant.
+# Keep the two otherwise identical; they differ only in `id` and `language`.
+# The oxlint file in this contract reports `+` beside a value, and string literals joined on one line.
+# This rule reports what both miss: string and template literals joined with `+` across lines.
+# The oxlint fix for a multi-line `+` chain leaves such a join between the templates it writes.
+id: literal-concatenation-typescript
+language: TypeScript
+severity: error
+message: Write this text as one literal instead of joining literals with `+` across lines.
+note: |
+  Write the text as one literal whose source lines break exactly where the text itself does.
+utils:
+  # A string or template literal, or literals joined with `+`, seen through parentheses.
+  literal-text:
+    any:
+      - kind: string
+      - kind: template_string
+      - kind: parenthesized_expression
+        has:
+          matches: literal-text
+      - kind: binary_expression
+        has:
+          field: operator
+          regex: ^\+$
+        all:
+          - has:
+              field: left
+              matches: literal-text
+          - has:
+              field: right
+              matches: literal-text
+rule:
+  kind: binary_expression
+  matches: literal-text
+  # Only joins that span lines; `no-useless-concat` reports literals joined on one line.
+  regex: \n
+  # Report the outermost join once, even when parentheses wrap an inner one.
+  not:
+    inside:
+      kind: binary_expression
+      has:
+        field: operator
+        regex: ^\+$
+      stopBy:
+        not:
+          kind: parenthesized_expression

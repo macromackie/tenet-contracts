@@ -1,0 +1,17 @@
+# code-rust-source-structure: derive each error type's `Display` and `std::error::Error` implementations with a derive macro, never by hand.
+# Rust only; error-displays-rust.yml reports a hand-written `Display` for a type that derives its `Error` implementation.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-rust-source-structure/assets/ast-grep/sgconfig.yml --globs '!target/**'`.
+id: error-implementations-rust
+language: Rust
+severity: error
+message: 'Derive this error type''s `Display` and `Error` implementations, such as with `#[derive(Debug, thiserror::Error)]` and an `#[error("...")]` message on the type or on each variant, instead of writing them by hand.'
+note: |
+  An `impl` of `Error`, `error::Error`, `std::error::Error`, or `core::error::Error` is reported, with or without a body, generic or not.
+  A bare `Error` is read as the standard trait; another crate's trait of that name written with its module path, such as `de::Error`, is not reported.
+  Test code is checked like production code.
+rule:
+  kind: impl_item
+  has:
+    field: trait
+    regex: ^(?:(?:::)?(?:std|core)::error::|error::)?Error$

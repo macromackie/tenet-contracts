@@ -1,0 +1,8 @@
+# code-boolean-names: the declared boolean attribute names of markup elements, matched by the boolean prop rules in ../rules as `boolean-attribute-name`.
+# A component's prop for one of these attributes takes its bare name, such as `disabled`, when the component forwards it to an element or a dependency's component.
+# The default list holds the HTML boolean attributes and `hidden`, in any letter case, so both `readOnly` and `readonly` pass.
+# A repository adds or removes names in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
+id: boolean-attribute-name
+language: TypeScript
+rule:
+  regex: ^(?i:allowfullscreen|alpha|async|autofocus|autoplay|checked|controls|default|defer|disabled|formnovalidate|headingreset|hidden|inert|ismap|itemscope|loop|multiple|muted|nomodule|novalidate|open|playsinline|readonly|required|reversed|selected|shadowrootclonable|shadowrootcustomelementregistry|shadowrootdelegatesfocus|shadowrootserializable)$

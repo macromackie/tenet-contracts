@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "no-use-before-define": [
+      "error",
+      {
+        "allowNamedExports": false,
+        "classes": true,
+        "enums": false,
+        "functions": true,
+        "ignoreTypeReferences": true,
+        "typedefs": false,
+        "variables": false
+      }
+    ]
+  }
+}

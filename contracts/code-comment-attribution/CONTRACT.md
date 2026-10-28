@@ -9,7 +9,7 @@ Apply these rules to maintained production code, tests, and examples, including 
 Keep requirements in guidance documents; source comments explain behavior and why it matters to callers.
 Do not name a repository contract's number, name, or path as the reason for source behavior.
 Do not name a review tool, automated reviewer, or review finding as the reason for source behavior.
-Do not add attribution comments such as `// Contract 011: keep the session cookie host-only`, `# orders-retention-lifecycle: purge closed orders`, or `// See the route-paths contract`.
+Do not add attribution comments such as `// Contract 011: keep the session cookie host-only`, ``# `orders-retention-lifecycle`: purge closed orders``, or `// See the route-paths contract`.
 A comment that names a contract this way is an attribution even when it never uses the word contract and even when it also states a reason.
 
 Explain the external constraint, failure consequence, or caller dependency that makes a behavior matter, for example `// A failed revocation returns focus to its invoker so the user can retry`.

@@ -1,0 +1,14 @@
+# code-comment-form: never write a copyright or license notice in a source file, because the repository's `LICENSE` file states it once.
+# Rust variant; the TypeScript, Tsx, JavaScript, and Python variants apply the same test to their comments.
+id: license-notices-rust
+language: Rust
+severity: error
+message: Remove this copyright or license notice, because the repository's `LICENSE` file states the license once for every file.
+note: |
+  The rule reports a plain or doc comment that opens with `Copyright`, `©`, `(c)` and a year, `Licensed under`, or `SPDX-License-Identifier:`, after any comment markers and asterisks.
+  A comment that mentions copyright later in a sentence is not reported.
+rule:
+  any:
+    - kind: line_comment
+    - kind: block_comment
+  regex: ^(?://[/!]?|/\*[*!]?)[\s*]*(?:SPDX-License-Identifier:|Copyright\b|©|\(c\)\s*\d|Licensed under\b)

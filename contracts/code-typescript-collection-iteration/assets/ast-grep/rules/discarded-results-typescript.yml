@@ -1,0 +1,38 @@
+# code-typescript-collection-iteration: call `map`, `filter`, `flatMap`, `some`, `every`, and `find` only for the value they return.
+# TypeScript variant (.ts, .mts, .cts); discarded-results-tsx.yml is identical except for `id`, `language`, and this line.
+id: discarded-results-typescript
+language: TypeScript
+severity: error
+message: Use the value that `map`, `filter`, `flatMap`, `some`, `every`, or `find` returns, and run work for each member in a `for...of` loop instead of discarding that value.
+note: |
+  Write `for (const order of orders) { ship({ order }); }` instead of `orders.map((order) => ship({ order }));`.
+  The rule reports a call to one of these methods as a whole statement, with or without `void`, on any value except a capitalized namespace.
+rule:
+  kind: expression_statement
+  has:
+    any:
+      - kind: call_expression
+        pattern: $CALL
+      - kind: unary_expression
+        regex: ^void\s
+        has:
+          kind: call_expression
+          pattern: $CALL
+constraints:
+  CALL:
+    kind: call_expression
+    has:
+      field: function
+      kind: member_expression
+      all:
+        - has:
+            field: property
+            regex: ^(map|filter|flatMap|some|every|find|findLast|findIndex|findLastIndex)$
+        - not:
+            has:
+              field: object
+              any:
+                - kind: identifier
+                  regex: ^[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?$
+                - kind: member_expression
+                  regex: ^[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?(\.[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?)+$

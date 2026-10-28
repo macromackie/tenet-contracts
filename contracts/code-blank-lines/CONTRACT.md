@@ -17,7 +17,7 @@ Consecutive call statements need no blank line between them, even when one spans
 A function's overload signatures and its implementation need no blank lines between them.
 A `break` or `continue` statement or a one-line assignment, such as `used += length;`, needs a blank line only where a neighboring statement requires one.
 An import, a re-export, or a list of exported names needs a blank line only where a neighboring statement requires one, even when it spans several lines.
-Apply these rules to a one-line statement, such as `if (!found) return [];`, as well as to a braced one.
+Apply these rules to a statement whose braced body holds one statement, such as `if (orders.length === 0) { return []; }`, as well as to a longer one.
 Treat `else`, `catch`, and `finally` clauses and the cases of a `switch` or `match` as parts of their statement, which take no blank lines between them.
 
 Put a comment that describes a statement directly above it, and put the blank line above the comment.

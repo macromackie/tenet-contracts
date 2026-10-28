@@ -1,7 +1,35 @@
 {
+  "options": { "typeAware": true },
   "rules": {
     "no-throw-literal": "error",
-    "preserve-caught-error": "error",
+    "preserve-caught-error": ["error", { "requireCatchParameter": true }],
+    // C, R: code-typescript-effect-errors declares every promise-returning function `async`, even without `await`; `typescript/promise-function-async` stays on.
+    "require-await": "off",
+    "typescript/no-floating-promises": [
+      "error",
+      {
+        "allowForKnownSafeCalls": [],
+        "allowForKnownSafePromises": [],
+        "checkThenables": true,
+        "ignoreIIFE": false,
+        "ignoreVoid": true
+      }
+    ],
+    "typescript/promise-function-async": [
+      "error",
+      {
+        "allowAny": false,
+        "allowedPromiseNames": [],
+        "checkArrowFunctions": true,
+        "checkFunctionDeclarations": true,
+        "checkFunctionExpressions": true,
+        "checkMethodDeclarations": true
+      }
+    ],
+    // C, R: same as `require-await`.
+    "typescript/require-await": "off",
+    "typescript/return-await": ["error", "always"],
+    // C: code-typescript-effect-errors keeps off rules that report a tagged error class declaration.
     "unicorn/throw-new-error": "off"
   }
 }

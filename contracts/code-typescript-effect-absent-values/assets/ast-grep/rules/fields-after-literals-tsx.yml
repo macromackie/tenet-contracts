@@ -1,0 +1,43 @@
+# code-typescript-effect-absent-values: set every field of a record in the literal that creates it.
+# Tsx variant (.tsx); fields-after-literals-typescript.yml is identical except for `id`, `language`, and this line.
+id: fields-after-literals-tsx
+language: Tsx
+severity: error
+message: "Set this field in the object literal that creates the record, such as `{ id, replaces: previous }` with `previous` an `Option`, instead of assigning it afterward."
+note: |
+  This reports an assignment, including `+=` and `??=`, to a named property of a variable that a declaration directly in an enclosing block or the module initialized with an object literal, including one under `as` or `satisfies`.
+  A computed key, such as `counts[id] = 1`, a record that a call or `new` created, a parameter or loop variable, and a collection method such as `push` are not reported.
+rule:
+  any:
+    - kind: assignment_expression
+    - kind: augmented_assignment_expression
+  has:
+    field: left
+    kind: member_expression
+    has:
+      field: object
+      kind: identifier
+      pattern: $RECORD
+  inside:
+    stopBy: end
+    any:
+      - kind: statement_block
+      - kind: program
+    has:
+      any:
+        - kind: lexical_declaration
+        - kind: variable_declaration
+        - kind: export_statement
+      has:
+        stopBy:
+          any:
+            - kind: variable_declarator
+        kind: variable_declarator
+        all:
+          - has: { field: name, pattern: $RECORD }
+          - has:
+              field: value
+              any:
+                - kind: object
+                - { kind: as_expression, has: { kind: object } }
+                - { kind: satisfies_expression, has: { kind: object } }

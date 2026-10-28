@@ -1,0 +1,52 @@
+# code-rust-source-structure: give each derived error type its message in the derive's attribute, on a `struct` or each `enum` variant, never in a hand-written `Display`.
+# Rust only; error-implementations-rust.yml reports a hand-written `Error` implementation.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-rust-source-structure/assets/ast-grep/sgconfig.yml --globs '!target/**'`.
+id: error-displays-rust
+language: Rust
+severity: error
+message: 'Give this error type its message in an `#[error("...")]` attribute on the type or on each variant, such as `#[error("settle invoice {id:?}: the invoice is closed")]`, instead of writing `Display` by hand.'
+note: |
+  An `impl` of `Display`, `fmt::Display`, `std::fmt::Display`, or `core::fmt::Display` is reported for a struct or enum whose `#[derive(...)]` attribute lists `Error`, such as `thiserror::Error`.
+  The type must be declared in the same file, inline module, or function body as the `impl`; review a type declared elsewhere.
+  Test code is checked like production code.
+utils:
+  # A struct or enum below a `#[derive(...)]` that lists `Error`, through other attributes and comments.
+  derived-error-type:
+    any:
+      - kind: struct_item
+      - kind: enum_item
+    follows:
+      kind: attribute_item
+      regex: ^#\[derive\([^\]]*\bError\b
+      stopBy:
+        not:
+          any:
+            - kind: attribute_item
+            - kind: line_comment
+            - kind: block_comment
+rule:
+  kind: impl_item
+  has:
+    field: trait
+    regex: ^(?:(?:::)?(?:std|core)::fmt::|fmt::)?Display$
+  all:
+    - has:
+        field: type
+        any:
+          - kind: type_identifier
+            pattern: $TYPE
+          - kind: generic_type
+            has:
+              field: type
+              pattern: $TYPE
+    - inside:
+        any:
+          - kind: source_file
+          - kind: declaration_list
+          - kind: block
+        has:
+          matches: derived-error-type
+          has:
+            field: name
+            pattern: $TYPE

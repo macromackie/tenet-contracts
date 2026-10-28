@@ -7,7 +7,7 @@ requires-tenet: 0.11.0
 ## Rules
 
 A request path is the path and query of a URL that code requests, serves, links to, or compares, on the repository's own routes or another system's.
-Build each request path with its operation's path function, such as `PackPaths.chunk({ key, index })` for one chunk of a pack, and never write it by hand elsewhere.
+Build each request path with its operation's path function, such as `PackPaths.formatChunk({ index, key })` for one chunk of a pack, and never write it by hand elsewhere.
 A fixed path, such as `/health`, also comes from its operation's path function.
 Give each path function one named, typed field for each variable part of its path and query, and return the whole path and query that the operation requests.
 A path function takes all of its fields in one call and holds no state, so a chained builder that accumulates segments is not a path function.
@@ -19,7 +19,7 @@ The module that owns the client for another system's API owns the path functions
 Import each path function wherever its path is needed, including in tests and in fakes of the server.
 When the repository serves an operation's route, derive the route pattern that the server matches and the operation's path function from one declaration.
 A client or router may derive each operation's typed call from one declaration of its route pattern and parameters, and that call is the operation's path function.
-A generic request function that takes a path template at each call site, such as `request('GET /accounts/{account}/invoices', { account })`, writes the path by hand.
+A generic request function that takes a path template at each call site, such as `request({ account, method: HttpMethod.Get, path: '/accounts/{account}/invoices' })`, writes the path by hand.
 
 Percent-encode each text part inside its path function, as RFC 3986 defines percent-encoding, so callers pass raw values and never encode them.
 Encode each segment of a part that spans several segments, such as a file path inside a repository, separately, so its separators stay separators.
@@ -36,7 +36,7 @@ The shipped files mark paths files by a stem that ends in `-paths`, and a reposi
 Exempt generated files by a declared path pattern, and suppress a finding only as `code-lint-suppressions` allows, such as for display text or a file-system path.
 
 Violation: four call sites write `/packs/${key}` by hand without encoding `key`, and the server that stores packs slices the same layout from the path again.
-Allowed: `packs/pack-paths.ts` exports `pack` and `chunk`, `packs/index.ts` re-exports it as `PackPaths`, callers request `PackPaths.chunk({ key, index })`, and the server matches the pattern that `chunk` derives from.
+Allowed: `packs/pack-paths.ts` exports `formatPack` and `formatChunk`, `packs/index.ts` re-exports it as `PackPaths`, callers request `PackPaths.formatChunk({ index, key })`, and the server matches the pattern that `formatChunk` derives from.
 
 ## Checks
 

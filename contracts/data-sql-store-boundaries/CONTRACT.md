@@ -17,8 +17,9 @@ A store function may run several statements that one change needs together, such
 Write each statement whole as one literal whose values the client binds as parameters, whether marked as `$1`, as `?`, or by a template placeholder, and never build its text by interpolating text, concatenating, joining, or nesting a fragment, even from trusted text such as a table name chosen in a loop.
 
 Never expose the database client outside the store module, such as in a public field, a return value, or an exported binding.
-Never write a function that runs SQL text its caller supplies, such as `first({ query, values })`.
-Export a store function, such as `atomic`, that runs the caller's store calls in one transaction, so that the code owning an operation decides where its transaction starts and ends; it is the one exported store function that `data-store-ownership` lets carry a storage operation's name.
+Never write a function that runs SQL text its caller supplies, such as `readFirstRow({ query, values })`.
+Export a store function, such as `runInTransaction`, that runs the caller's store calls in one transaction, so the code owning an operation decides where its transaction starts and ends.
+It is the one exported store function that `data-store-ownership` lets carry a storage operation's name.
 The composition root that owns the client's lifecycle may construct the client and close it at shutdown, and it or the class that holds the database may pass the client to the store's constructor or factory, such as `createOrderStore({ sql })`.
 
 Configure the repository's lint to fail on SQL text or a client call outside the declared store paths, other than the composition root's construction and shutdown of the client, and on an exposed client, a function that takes SQL text, or an assembled statement anywhere.

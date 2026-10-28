@@ -1,0 +1,23 @@
+# code-typescript-type-assertions: write no type predicate or assertion signature by hand, in any file.
+# Tsx variant (.tsx); type-predicates-typescript.yml differs only in `id`, `language`, and this line.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-typescript-type-assertions/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: type-predicates-tsx
+language: Tsx
+severity: error
+message: Narrow inline with a check the compiler follows, or test an unknown value with a guard built from its schema, instead of writing a type predicate or assertion signature.
+note: |
+  A type predicate, such as `order is PaidOrder` or `this is Draft`, and an assertion signature, such as `asserts value is Invoice` or `asserts value`, are reported as the return type of any function, method, or signature.
+  The compiler never checks that the body proves the claim, so a wrong predicate narrows a value to a type it does not have.
+  Write `orders.filter((order) => order.status === OrderStatus.Paid)`, from which TypeScript 5.5 or later infers the predicate.
+  A function type's predicate, such as `(value: unknown) => value is Invoice`, is reported too; take the schema and build its guard instead.
+rule:
+  any:
+    - kind: type_predicate_annotation
+    - kind: asserts_annotation
+    - kind: type_predicate
+      inside:
+        kind: function_type
+    - kind: asserts
+      inside:
+        kind: function_type

@@ -1,0 +1,148 @@
+# code-spelled-out-names: the word list maps `get`, `fetch`, and `load` to `read`, so no declared name starts with one of those words.
+# Python variant.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-spelled-out-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: lookup-names-python
+language: Python
+severity: error
+message: Start this name with `read` rather than `get`, `fetch`, or `load`, such as `read_invoice` for `get_invoice`, `fetch_invoice`, or `load_invoice`.
+note: |
+  A function, a method, a class, a type alias, a type parameter, a type variable, a function's or lambda's parameter, a variable that an assignment declares, a field assigned on `self`, a loop, `with`, comprehension, or walrus target, and an import alias are checked.
+  The first word is the name's leading run after any underscores, in any case style, so `get_invoice`, `_get_invoice`, `GetInvoice`, and `GET_LIMIT` start with `get`, as `fetch_invoice` and `LoadInvoice` start with `fetch` and `load`, while `getter` does not.
+  Special methods such as `__get__` and `__getitem__` are named by the language, and a call such as `rows.get(key)` declares nothing, so neither is checked.
+  Suppress a name that an interface or framework outside the repository fixes, such as a view's `get` method, with a reason that names that system.
+utils:
+  # A name that a declaration introduces.
+  declared-name:
+    kind: identifier
+    any:
+      - inside:
+          field: name
+          any:
+            - kind: function_definition
+            - kind: class_definition
+      - inside:
+          kind: parameters
+      - inside:
+          field: name
+          any:
+            - kind: default_parameter
+            - kind: typed_default_parameter
+      - nthChild: 1
+        inside:
+          kind: typed_parameter
+      - inside:
+          kind: assignment
+          field: left
+      - inside:
+          any:
+            - kind: pattern_list
+            - kind: tuple_pattern
+          inside:
+            field: left
+            any:
+              - kind: assignment
+              - kind: for_statement
+              - kind: for_in_clause
+      - inside:
+          kind: lambda_parameters
+      - inside:
+          any:
+            - kind: list_splat_pattern
+            - kind: dictionary_splat_pattern
+          inside:
+            any:
+              - kind: parameters
+              - kind: lambda_parameters
+              - kind: typed_parameter
+      - inside:
+          field: left
+          any:
+            - kind: for_statement
+            - kind: for_in_clause
+      - inside:
+          kind: as_pattern_target
+      - inside:
+          kind: named_expression
+          field: name
+      - inside:
+          kind: aliased_import
+          field: alias
+      - inside:
+          kind: attribute
+          field: attribute
+          has:
+            field: object
+            regex: ^self$
+          inside:
+            kind: assignment
+            field: left
+      - matches: type-name
+  # A list that declares type parameters, as in `def read_first[Row]` or `type Pairs[Key] = ...`.
+  declared-type-parameters:
+    kind: type_parameter
+    any:
+      - inside:
+          field: type_parameters
+          any:
+            - kind: function_definition
+            - kind: class_definition
+      - inside:
+          kind: generic_type
+          inside:
+            kind: type
+            inside:
+              kind: type_alias_statement
+              field: left
+  # A name that only a class, a type alias, a type parameter, or a type variable takes.
+  type-name:
+    kind: identifier
+    any:
+      - inside:
+          field: name
+          kind: class_definition
+      - inside:
+          kind: type
+          inside:
+            kind: type_alias_statement
+            field: left
+      - inside:
+          kind: generic_type
+          inside:
+            kind: type
+            inside:
+              kind: type_alias_statement
+              field: left
+      - inside:
+          kind: type
+          inside:
+            matches: declared-type-parameters
+      - inside:
+          kind: splat_type
+          inside:
+            kind: type
+            inside:
+              matches: declared-type-parameters
+      - inside:
+          kind: type
+          nthChild: 1
+          inside:
+            kind: constrained_type
+            inside:
+              kind: type
+              inside:
+                matches: declared-type-parameters
+      - inside:
+          kind: assignment
+          field: left
+          has:
+            field: right
+            kind: call
+            has:
+              field: function
+              regex: ^((typing|typing_extensions)\.)?(TypeVar|ParamSpec|TypeVarTuple)$
+rule:
+  matches: declared-name
+  regex: ^_*((get|Get|fetch|Fetch|load|Load)([^a-z]|$)|(GET|FETCH|LOAD)([_0-9]|$))
+  not:
+    regex: ^__[a-z0-9_]+__$

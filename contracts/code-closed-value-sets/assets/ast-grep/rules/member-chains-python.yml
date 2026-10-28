@@ -1,0 +1,70 @@
+# code-closed-value-sets: test two or more members of a closed set with its declared module-level set, such as `state in ENDED_STATES`.
+# Python variant; the TypeScript and Tsx variants apply the same test to `===` and `!==` chains.
+id: member-chains-python
+language: Python
+severity: error
+message: "Declare these members once as a module-level `frozenset`, such as `ENDED_STATES`, and test it with `in`, or, where the test must narrow a type, branch with a `match` that names every member, instead of a chain of comparisons."
+note: |
+  Two or more `==` or `is` comparisons of one value with fixed values joined by `or` are reported, such as `state == SandboxState.STOPPED or state == SandboxState.FAILED`.
+  So are two or more `!=` or `is not` comparisons joined by `and`, the same test negated.
+  A fixed value is a string without interpolation, a number, an attribute of a capitalized name such as `SandboxState.STOPPED`, or a SCREAMING_SNAKE_CASE constant.
+  A chain is reported once, at its first comparison, even when it holds more members or follows another operand, such as `is_ready or state == A or state == B`.
+  Comparisons with run-time values, such as `user.id`, a call, or `None`, and comparisons of different values are not reported.
+  A comparison written with the value on the right, or with a comment between its comparisons, is left to review.
+  A `match` statement whose cases name every member branches on the set and is not reported.
+utils:
+  # One fixed value: a string without interpolation, a number, an attribute of a capitalized name, or a SCREAMING_SNAKE_CASE constant.
+  fixed-value:
+    any:
+      - kind: string
+        not:
+          has:
+            kind: interpolation
+      - kind: integer
+      - kind: float
+      - kind: attribute
+        has:
+          field: object
+          kind: identifier
+          regex: ^[A-Z]
+      - kind: identifier
+        regex: ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$
+rule:
+  any:
+    - all:
+        - any:
+            - pattern: $VALUE == $FIRST or $VALUE == $SECOND
+            - pattern: $REST or $VALUE == $FIRST or $VALUE == $SECOND
+        - not:
+            inside:
+              field: left
+              pattern: $OUTER or $VALUE == $NEXT
+    - all:
+        - any:
+            - pattern: $VALUE is $FIRST or $VALUE is $SECOND
+            - pattern: $REST or $VALUE is $FIRST or $VALUE is $SECOND
+        - not:
+            inside:
+              field: left
+              pattern: $OUTER or $VALUE is $NEXT
+    - all:
+        - any:
+            - pattern: $VALUE != $FIRST and $VALUE != $SECOND
+            - pattern: $REST and $VALUE != $FIRST and $VALUE != $SECOND
+        - not:
+            inside:
+              field: left
+              pattern: $OUTER and $VALUE != $NEXT
+    - all:
+        - any:
+            - pattern: $VALUE is not $FIRST and $VALUE is not $SECOND
+            - pattern: $REST and $VALUE is not $FIRST and $VALUE is not $SECOND
+        - not:
+            inside:
+              field: left
+              pattern: $OUTER and $VALUE is not $NEXT
+constraints:
+  FIRST:
+    matches: fixed-value
+  SECOND:
+    matches: fixed-value

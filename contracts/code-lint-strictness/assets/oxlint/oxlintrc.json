@@ -1,0 +1,776 @@
+{
+  "categories": {
+    "correctness": "error",
+    "nursery": "error",
+    "pedantic": "error",
+    "perf": "error",
+    "restriction": "error",
+    "style": "error",
+    "suspicious": "error"
+  },
+  "options": {
+    "denyWarnings": true,
+    "reportUnusedDisableDirectives": "error",
+    "typeAware": true
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/test/**",
+        "**/tests/**",
+        "**/testing/**",
+        "**/__tests__/**"
+      ],
+      "rules": {
+        // C: code-typescript-input-immutability lets a test file delete an environment variable it changes.
+        "typescript/no-dynamic-delete": "off"
+      }
+    },
+    {
+      "files": [
+        "**/schemas.ts",
+        "**/schemas/**"
+      ],
+      "rules": {
+        // C: code-typescript-call-arguments lets a schema file nest constructor calls.
+        "unicorn/max-nested-calls": "off"
+      }
+    },
+    {
+      "files": [
+        "**/settings.ts",
+        "**/settings/**"
+      ],
+      "rules": {
+        // C: code-environment-settings reads the environment only in the settings module.
+        "node/no-process-env": "off"
+      }
+    },
+    {
+      "files": [
+        "**/src/worker.ts",
+        "**/app/**/layout.tsx",
+        "**/app/**/not-found.tsx",
+        "**/app/**/page.tsx",
+        "**/app/**/route.ts",
+        "**/*.config.mts",
+        "**/*.config.ts",
+        "**/*.stories.tsx"
+      ],
+      "rules": {
+        // C: code-typescript-module-boundaries keeps the default export that a tool loads from these files.
+        "import/no-default-export": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.mts",
+        "**/*.cts"
+      ],
+      "rules": {
+        // C: code-comment-content bans restating a declared type; JavaScript files keep the rule.
+        "jsdoc/require-param-type": "off",
+        // C: same as `jsdoc/require-param-type`.
+        "jsdoc/require-returns-type": "off",
+        // C: same as `jsdoc/require-param-type`.
+        "jsdoc/require-yields-type": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/test/**",
+        "**/tests/**",
+        "**/__tests__/**"
+      ],
+      "plugins": [
+        "vitest"
+      ],
+      "rules": {
+        "vitest/consistent-test-it": [
+          "error",
+          {
+            "fn": "test",
+            "withinDescribe": "test"
+          }
+        ],
+        // R: contradicts `vitest/prefer-importing-vitest-globals`, which stays on, so each test imports `{ test }` from the runner.
+        "vitest/no-importing-vitest-globals": "off",
+        // R: contradicts `vitest/prefer-called-times`, which stays on.
+        "vitest/prefer-called-once": "off",
+        // C, R: same as `vitest/prefer-to-be-truthy`.
+        "vitest/prefer-to-be-falsy": "off",
+        // C, R: contradicts `vitest/prefer-strict-boolean-matchers`; code-typescript-boolean-conditions bans truthiness tests.
+        "vitest/prefer-to-be-truthy": "off"
+      }
+    }
+  ],
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "jsdoc",
+    "promise",
+    "node",
+    "react",
+    "react-perf",
+    "jsx-a11y"
+  ],
+  "rules": {
+    "array-callback-return": [
+      "error",
+      {
+        "allowImplicit": false,
+        "allowVoid": false,
+        "checkForEach": true
+      }
+    ],
+    "class-methods-use-this": [
+      "error",
+      {
+        "enforceForClassFields": true,
+        "exceptMethods": [],
+        "ignoreOverrideMethods": true
+      }
+    ],
+    "curly": [
+      "error",
+      "all"
+    ],
+    // C: code-exhaustive-branches turns off every rule that requires a default case over a closed set.
+    "default-case": "off",
+    "func-name-matching": [
+      "error",
+      "always",
+      {
+        "considerPropertyDescriptor": true,
+        "includeCommonJSModuleExports": true
+      }
+    ],
+    "func-names": [
+      "error",
+      "always",
+      {
+        "generators": "always"
+      }
+    ],
+    "id-length": [
+      "error",
+      {
+        "checkGeneric": true,
+        "exceptions": [
+          "_"
+        ],
+        "min": 2,
+        "properties": "always"
+      }
+    ],
+    // C: code-typescript-import-statements uses the inline and the statement type marker, each in its own case.
+    "import/consistent-type-specifier-style": "off",
+    // C, R: exports sit at their declarations; it also contradicts `no-use-before-define`.
+    "import/exports-last": "off",
+    // C: exports sit at their declarations, which the doc comment and one-export-per-file rules read.
+    "import/group-exports": "off",
+    "import/newline-after-import": [
+      "error",
+      {
+        "considerComments": true,
+        "count": 1,
+        "exactCount": true
+      }
+    ],
+    "import/no-anonymous-default-export": [
+      "error",
+      {
+        "allowAnonymousClass": false,
+        "allowAnonymousFunction": false,
+        "allowArray": false,
+        "allowArrowFunction": false,
+        "allowCallExpression": false,
+        "allowLiteral": false,
+        "allowNew": false,
+        "allowObject": true
+      }
+    ],
+    // C, R: code-typescript-module-boundaries and code-typescript-entry-points require named exports; `import/no-default-export` stays on.
+    "import/no-named-export": "off",
+    // Q: server code, scripts, and tests import runtime built-in modules that code-typescript-node-scripts requires; turn it on in an override for browser-only source globs.
+    "import/no-nodejs-modules": "off",
+    // Q: code-typescript-module-boundaries lets `orders/lines/sum.ts` import `../format.ts`.
+    "import/no-relative-parent-imports": "off",
+    "import/no-unassigned-import": [
+      "error",
+      {
+        "allow": [
+          "**/*.css"
+        ]
+      }
+    ],
+    // C, R: code-typescript-module-boundaries bans default exports outside tool-defined formats; `import/no-default-export` stays on.
+    "import/prefer-default-export": "off",
+    "jsdoc/require-param": [
+      "error",
+      {
+        "checkConstructors": true,
+        "checkDestructured": false,
+        "checkDestructuredRoots": true,
+        "checkGetters": true,
+        "checkRestProperty": false,
+        "checkSetters": true,
+        "exemptedBy": [],
+        "ignoreWhenAllParamsMissing": true,
+        "interfaceExemptsParamsCheck": false,
+        "useDefaultObjectProperties": false
+      }
+    ],
+    // C: code-comment-form writes prose-only doc comments with no return tag.
+    "jsdoc/require-returns": "off",
+    // C: code-comment-form writes prose-only doc comments with no yield tag.
+    "jsdoc/require-yields": "off",
+    // Q: reports a domain prop named `accessKey`, which code-domain-vocabulary builds from a glossary word.
+    "jsx-a11y/no-access-key": "off",
+    "jsx-a11y/no-autofocus": [
+      "error",
+      {
+        "ignoreNonDOM": false
+      }
+    ],
+    "jsx-a11y/no-noninteractive-tabindex": [
+      "error",
+      {
+        "allowExpressionValues": false,
+        "roles": [
+          "tabpanel"
+        ],
+        "tags": [
+          "main",
+          "section"
+        ]
+      }
+    ],
+    "max-lines": [
+      "error",
+      {
+        "max": 300,
+        "skipBlankLines": false,
+        "skipComments": false
+      }
+    ],
+    "max-params": [
+      "error",
+      {
+        "countThis": "except-void",
+        "max": 1
+      }
+    ],
+    "new-cap": [
+      "error",
+      {
+        "capIsNew": true,
+        "capIsNewExceptionPattern": "^(Schema|Data|Context)\\.",
+        "newIsCap": true,
+        "newIsCapExceptions": [],
+        "properties": true
+      }
+    ],
+    // Q: code-guard-clauses leaves a loop iteration with `continue`, as in `if (!match) { continue; }`.
+    "no-continue": "off",
+    "no-duplicate-imports": [
+      "error",
+      {
+        "allowSeparateTypeImports": false,
+        "includeExports": true
+      }
+    ],
+    "no-inner-declarations": [
+      "error",
+      "both"
+    ],
+    "no-param-reassign": [
+      "error",
+      {
+        "ignorePropertyModificationsFor": [],
+        "props": true
+      }
+    ],
+    // Q: code-typescript-effect-schemas names a schema's type alias after the schema constant.
+    "no-redeclare": "off",
+    "no-shadow": [
+      "error",
+      {
+        "allow": [],
+        "builtinGlobals": false,
+        "hoist": "all",
+        "ignoreFunctionTypeParameterNameValueShadow": true,
+        "ignoreOnInitialization": false,
+        "ignoreTypeValueShadow": false
+      }
+    ],
+    // Q: code-typescript-boolean-conditions compares an optional value with `undefined`.
+    "no-undefined": "off",
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": [
+          "_tag"
+        ],
+        "allowAfterSuper": false,
+        "allowAfterThis": false,
+        "allowAfterThisConstructor": false,
+        "allowFunctionParams": true,
+        "allowInArrayDestructuring": true,
+        "allowInObjectDestructuring": true,
+        "allowInUsingDeclarations": false,
+        "enforceInClassFields": true,
+        "enforceInMethodNames": true
+      }
+    ],
+    // F: the formatter starts a computed member access on its own line in a broken chain.
+    "no-unexpected-multiline": "off",
+    // Q: code-typescript-effect-errors discards a promise only with `void`, as in the handler `() => void save()`.
+    "no-void": "off",
+    "node/callback-return": [
+      "error",
+      [
+        "callback",
+        "cb"
+      ]
+    ],
+    "node/no-process-env": [
+      "error",
+      {
+        "allowedVariables": []
+      }
+    ],
+    "node/no-top-level-await": [
+      "error",
+      {
+        "ignoreBin": true
+      }
+    ],
+    "one-var": [
+      "error",
+      "never"
+    ],
+    // C: code-typescript-effect-errors writes `async` functions that `await` each promise.
+    "oxc/no-async-await": "off",
+    // C, R: code-typescript-effect-errors declares promise-returning handlers `async`; `typescript/promise-function-async` stays on.
+    "oxc/no-async-endpoint-handlers": "off",
+    // C: code-typescript-module-boundaries and code-typescript-entry-points require an `index.ts` that re-exports a folder's shared names.
+    "oxc/no-barrel-file": "off",
+    // C: code-typescript-input-immutability bans the element mutation this rule suggests.
+    "oxc/no-map-spread": "off",
+    // Q: code-typescript-boolean-conditions writes `init?.keepalive === true`; `typescript/prefer-optional-chain` stays on.
+    "oxc/no-optional-chaining": "off",
+    // Q: code-typescript-input-immutability drops a key by rest destructuring and adds one by spread.
+    "oxc/no-rest-spread-properties": "off",
+    "promise/always-return": [
+      "error",
+      {
+        "ignoreAssignmentVariable": [],
+        "ignoreLastCallback": false
+      }
+    ],
+    "promise/no-callback-in-promise": [
+      "error",
+      {
+        "exceptions": [],
+        "timeoutsErr": true
+      }
+    ],
+    // Q: reports `Effect.catchTag('Refused', (error) => ...)`, which code-typescript-effect-errors directs.
+    "promise/prefer-await-to-callbacks": "off",
+    // Q: reports `Effect.catch`, which code-typescript-effect-errors allows.
+    "promise/prefer-await-to-then": "off",
+    // Q: ui-presentation-boundaries passes ready regions into a component through named slots.
+    "react-perf/jsx-no-jsx-as-prop": "off",
+    // Q: ui-react-typescript-jsx-attributes writes inline handlers such as `onClick={() => saveDraft({ draft })}`.
+    "react-perf/jsx-no-new-function-as-prop": "off",
+    "react/forbid-component-props": [
+      "error",
+      {
+        "forbid": [
+          "className",
+          "style"
+        ]
+      }
+    ],
+    "react/forbid-dom-props": [
+      "error",
+      {
+        "forbid": [
+          "accessKey"
+        ]
+      }
+    ],
+    // Q: ui-react-hook-calls binds a state value alone when it never changes.
+    "react/hook-use-state": "off",
+    "react/jsx-curly-brace-presence": [
+      "error",
+      {
+        "children": "never",
+        "propElementValues": "always",
+        "props": "never"
+      }
+    ],
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "allow": "as-needed",
+        "extensions": [
+          ".tsx"
+        ],
+        "ignoreFilesWithoutCode": false
+      }
+    ],
+    // C: ui-react-typescript-jsx-attributes keeps a received function's own name, such as `onChange={setTitle}`.
+    "react/jsx-handler-names": "off",
+    "react/jsx-no-useless-fragment": [
+      "error",
+      {
+        "allowExpressions": false
+      }
+    ],
+    // Q: ui-react-typescript-jsx-attributes writes a declared style call inside a spread attribute.
+    "react/jsx-props-no-spreading": "off",
+    "react/no-unstable-nested-components": [
+      "error",
+      {
+        "allowAsProps": true
+      }
+    ],
+    // R: the compiler's automatic JSX runtime with unused-local checks reports the import this rule demands.
+    "react/react-in-jsx-scope": "off",
+    // C, R: code-typescript-effect-errors declares every promise-returning function `async`, even without `await`; `typescript/promise-function-async` stays on.
+    "require-await": "off",
+    // C, F: code-typescript-import-statements sorts each group by specifier, and the formatter's import sorting writes that order.
+    "sort-imports": "off",
+    // code-key-order compares keys by code point, the one order that every shipped key sorter writes.
+    "sort-keys": [
+      "error",
+      "asc",
+      {
+        "allowLineSeparatedGroups": false,
+        "caseSensitive": true,
+        "minKeys": 2,
+        "natural": false
+      }
+    ],
+    // Q: code-exhaustive-branches writes a switch that names every member and has no default case.
+    "typescript/consistent-return": "off",
+    "typescript/consistent-type-assertions": [
+      "error",
+      {
+        "assertionStyle": "never"
+      }
+    ],
+    "typescript/dot-notation": [
+      "error",
+      {
+        "allowIndexSignaturePropertyAccess": true,
+        "allowKeywords": true,
+        "allowPattern": "",
+        "allowPrivateClassPropertyAccess": false,
+        "allowProtectedClassPropertyAccess": false
+      }
+    ],
+    // C: code-typescript-export-return-types lets local functions and callbacks infer their return types.
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-member-accessibility": [
+      "error",
+      {
+        "accessibility": "no-public"
+      }
+    ],
+    "typescript/no-base-to-string": [
+      "error",
+      {
+        "checkUnknown": true,
+        "ignoredTypeNames": [
+          "Error",
+          "RegExp",
+          "URL",
+          "URLSearchParams"
+        ]
+      }
+    ],
+    "typescript/no-confusing-void-expression": [
+      "error",
+      {
+        "ignoreArrowShorthand": true,
+        "ignoreVoidOperator": false,
+        "ignoreVoidReturningFunctions": false
+      }
+    ],
+    "typescript/no-deprecated": [
+      "error",
+      {
+        "allow": []
+      }
+    ],
+    "typescript/no-inferrable-types": [
+      "error",
+      {
+        "ignoreParameters": false,
+        "ignoreProperties": false
+      }
+    ],
+    "typescript/no-invalid-void-type": [
+      "error",
+      {
+        "allowAsThisParameter": false,
+        "allowInGenericTypeArguments": true
+      }
+    ],
+    "typescript/no-misused-promises": [
+      "error",
+      {
+        "checksConditionals": true,
+        "checksSpreads": true,
+        "checksVoidReturn": true
+      }
+    ],
+    "typescript/no-misused-spread": [
+      "error",
+      {
+        "allow": []
+      }
+    ],
+    "typescript/no-this-alias": [
+      "error",
+      {
+        "allowDestructuring": true,
+        "allowedNames": []
+      }
+    ],
+    "typescript/no-unnecessary-boolean-literal-compare": [
+      "error",
+      {
+        "allowComparingNullableBooleansToFalse": true,
+        "allowComparingNullableBooleansToTrue": true
+      }
+    ],
+    "typescript/no-unnecessary-condition": [
+      "error",
+      {
+        "allowConstantLoopConditions": "never",
+        "checkTypePredicates": true
+      }
+    ],
+    "typescript/no-unnecessary-type-assertion": [
+      "error",
+      {
+        "checkLiteralConstAssertions": true,
+        "typesToIgnore": []
+      }
+    ],
+    "typescript/no-unsafe-member-access": [
+      "error",
+      {
+        "allowOptionalChaining": false
+      }
+    ],
+    // C, R: its fix writes `value!`, which code-typescript-type-assertions and `typescript/no-non-null-assertion` ban.
+    "typescript/non-nullable-type-assertion-style": "off",
+    "typescript/only-throw-error": [
+      "error",
+      {
+        "allow": [],
+        "allowRethrowing": false,
+        "allowThrowingAny": false,
+        "allowThrowingUnknown": false
+      }
+    ],
+    "typescript/parameter-properties": [
+      "error",
+      {
+        "allow": [],
+        "prefer": "class-property"
+      }
+    ],
+    "typescript/prefer-optional-chain": [
+      "error",
+      {
+        "allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": false,
+        "checkAny": true,
+        "checkBigInt": true,
+        "checkBoolean": true,
+        "checkNumber": true,
+        "checkString": true,
+        "checkUnknown": true,
+        "requireNullish": false
+      }
+    ],
+    "typescript/prefer-readonly": [
+      "error",
+      {
+        "onlyInlineLambdas": false
+      }
+    ],
+    // C, R: same as `require-await`.
+    "typescript/require-await": "off",
+    "typescript/restrict-plus-operands": [
+      "error",
+      {
+        "allowAny": false,
+        "allowBoolean": false,
+        "allowNullish": false,
+        "allowNumberAndString": false,
+        "allowRegExp": false,
+        "skipCompoundAssignments": false
+      }
+    ],
+    "typescript/restrict-template-expressions": [
+      "error",
+      {
+        "allow": [],
+        "allowAny": false,
+        "allowArray": false,
+        "allowBoolean": false,
+        "allowNever": false,
+        "allowNullish": false,
+        "allowNumber": false,
+        "allowRegExp": false
+      }
+    ],
+    "typescript/strict-void-return": [
+      "error",
+      {
+        "allowReturnAny": false
+      }
+    ],
+    "typescript/unbound-method": [
+      "error",
+      {
+        "ignoreStatic": false
+      }
+    ],
+    "unicorn/catch-error-name": [
+      "error",
+      {
+        "name": "error"
+      }
+    ],
+    "unicorn/import-style": [
+      "error",
+      {
+        "checkDynamicImport": true,
+        "checkExportFrom": true,
+        "checkImport": true,
+        "checkRequire": true,
+        "extendDefaultStyles": false,
+        "styles": {
+          "node:path": {
+            "named": true
+          },
+          "node:util": {
+            "named": true
+          },
+          "path": {
+            "named": true
+          },
+          "util": {
+            "named": true
+          }
+        }
+      }
+    ],
+    "unicorn/max-nested-calls": [
+      "error",
+      {
+        "max": 2
+      }
+    ],
+    // Q: reports `Option.map(dueAt, (date) => formatDate({ date }))`, which code-typescript-effect-absent-values requires.
+    "unicorn/no-array-method-this-argument": "off",
+    "unicorn/no-array-reduce": [
+      "error",
+      {
+        "allowSimpleOperations": false
+      }
+    ],
+    "unicorn/no-array-reverse": [
+      "error",
+      {
+        "allowExpressionStatement": false
+      }
+    ],
+    "unicorn/no-array-sort": [
+      "error",
+      {
+        "allowAfterSpread": false,
+        "allowExpressionStatement": false
+      }
+    ],
+    // Q: reports the `return null` of a component that renders nothing, which code-typescript-effect-absent-values requires.
+    "unicorn/no-null": "off",
+    // F: the formatter lowercases hexadecimal digits, and this rule has no lowercase option.
+    "unicorn/number-literal-case": "off",
+    "unicorn/numeric-separators-style": [
+      "error",
+      {
+        "binary": {
+          "groupLength": 4,
+          "minimumDigits": 0
+        },
+        "hexadecimal": {
+          "groupLength": 2,
+          "minimumDigits": 0
+        },
+        "number": {
+          "groupLength": 3,
+          "minimumDigits": 0
+        },
+        "octal": {
+          "groupLength": 4,
+          "minimumDigits": 0
+        },
+        "onlyIfContainsSeparator": false
+      }
+    ],
+    "unicorn/prefer-export-from": [
+      "error",
+      {
+        "checkUsedVariables": true
+      }
+    ],
+    "unicorn/prefer-number-properties": [
+      "error",
+      {
+        "checkInfinity": true,
+        "checkNaN": true
+      }
+    ],
+    "unicorn/prefer-single-call": [
+      "error",
+      {
+        "ignore": []
+      }
+    ],
+    // C, R: code-conditional-expressions bans the conditional operator; `no-ternary` stays on.
+    "unicorn/prefer-ternary": "off",
+    "unicorn/relative-url-style": [
+      "error",
+      "never"
+    ],
+    "unicorn/switch-case-braces": [
+      "error",
+      "always"
+    ],
+    "unicorn/text-encoding-identifier-case": [
+      "error",
+      {
+        "withDash": true
+      }
+    ],
+    // C: code-typescript-effect-errors keeps off rules that report a tagged error class declaration.
+    "unicorn/throw-new-error": "off"
+  }
+}

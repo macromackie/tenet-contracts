@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "arrow-body-style": ["error", "as-needed", { "requireReturnForObjectLiteral": false }],
+    "eqeqeq": ["error", "always", { "null": "always" }],
+    "no-bitwise": ["error", { "allow": [], "int32Hint": false }],
+    "no-constant-condition": ["error", { "checkLoops": "all" }],
+    "no-implicit-coercion": [
+      "error",
+      {
+        "allow": [],
+        "boolean": true,
+        "disallowTemplateShorthand": true,
+        "number": true,
+        "string": true
+      }
+    ],
+    "no-useless-concat": "error",
+    "no-useless-rename": ["error", { "ignoreExport": true, "ignoreImport": true }],
+    "object-shorthand": ["error", "properties", { "avoidQuotes": false }],
+    "prefer-destructuring": [
+      "error",
+      {
+        "AssignmentExpression": { "array": false, "object": true },
+        "VariableDeclarator": { "array": false, "object": true }
+      },
+      { "enforceForDeclarationWithTypeAnnotation": false, "enforceForRenamedProperties": false }
+    ],
+    "prefer-template": "error",
+    "radix": ["error", "always"],
+    "require-unicode-regexp": ["error", { "requireFlag": "v" }],
+    "unicorn/prefer-string-replace-all": "error"
+  }
+}

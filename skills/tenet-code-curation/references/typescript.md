@@ -8,7 +8,7 @@ Make lifecycle decisions visible. Write a decision as ordinary branches in a fun
 a closed set, and build the new state from its result rather than changing the input:
 
 ```ts
-function nextStage({ job }: NextStageInput): JobStage {
+function chooseNextStage({ job }: ChooseNextStageInput): JobStage {
   if (job.isReviewed) {
     return JobStage.Judging;
   }
@@ -20,7 +20,9 @@ function nextStage({ job }: NextStageInput): JobStage {
   return JobStage.Preparing;
 }
 
-const progress = { stage: nextStage({ job }), lastEventAtMs: Date.now() };
+function advanceJob({ job }: AdvanceJobInput): JobProgress {
+  return { lastEventAtMs: Date.now(), stage: chooseNextStage({ job }) };
+}
 ```
 
 Keep transport and environment lookup at composition boundaries. Pass the dependencies a function actually needs as

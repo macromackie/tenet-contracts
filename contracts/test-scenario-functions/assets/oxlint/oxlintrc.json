@@ -1,0 +1,16 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+      "plugins": ["vitest"],
+      "rules": {
+        "vitest/require-top-level-describe": [
+          "error",
+          {
+            "maxNumberOfTopLevelDescribes": 1
+          }
+        ]
+      }
+    }
+  ]
+}

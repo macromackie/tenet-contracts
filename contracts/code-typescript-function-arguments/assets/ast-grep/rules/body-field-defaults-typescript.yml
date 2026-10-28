@@ -1,0 +1,279 @@
+# code-typescript-function-arguments: default an optional field of a function's argument object in the destructured signature.
+# TypeScript variant (.ts, .mts, .cts); body-field-defaults-tsx.yml parses the same rule as JSX.
+# Keep the two identical except for `id`, `language`, and this comment.
+id: body-field-defaults-typescript
+language: TypeScript
+severity: error
+message: Default this field in the destructured signature, such as `{ pollMs = POLL_MS }`, instead of with `??` or `||` in the body.
+note: |
+  Destructure the field in the signature with its default, then read the bare name in the body.
+  A domain value passed positionally becomes a named field first, such as `retry({ job })`, and `job.retries ?? 0` then reads that value's data.
+  A callback written directly as a call's argument receives the callee's values, so its parameters are not reported.
+  A field of a field, such as `options.retry.attempts ?? MAX_ATTEMPTS`, is not reported unless the signature destructures it.
+  `?? undefined` and `|| undefined` turn `null` or `false` into an absent value and supply no default, so they are not reported.
+  `||` is reported only when its right side is a literal or a SCREAMING_SNAKE_CASE constant, and never inside a condition.
+  The type-aware `||` rule of code-typescript-boolean-conditions reports the other `||` defaults, and its `??` fix brings them here.
+utils:
+  # A function whose signature the repository writes: any function except one written directly as a call's argument.
+  owned-function:
+    any:
+      - kind: function_declaration
+      - kind: generator_function_declaration
+      - kind: function_expression
+      - kind: generator_function
+      - kind: arrow_function
+      - kind: method_definition
+    not:
+      inside:
+        kind: arguments
+  # A callback written directly as a call's argument that binds `$PARAM` again, such as `(input) => input.label ?? 'untitled'`.
+  rebound-param-by-callback:
+    inside:
+      stopBy: end
+      all:
+        - any:
+            - kind: arrow_function
+            - kind: function_expression
+        - inside:
+            kind: arguments
+        - any:
+            - has:
+                field: parameter
+                kind: identifier
+                pattern: $PARAM
+            - has:
+                field: parameters
+                has:
+                  stopBy: end
+                  any:
+                    - kind: shorthand_property_identifier_pattern
+                      pattern: $PARAM
+                    - kind: identifier
+                      pattern: $PARAM
+  # A callback written directly as a call's argument that binds `$FIELD` again, such as `({ note }) => note ?? ''`.
+  rebound-by-callback:
+    inside:
+      stopBy: end
+      all:
+        - any:
+            - kind: arrow_function
+            - kind: function_expression
+        - inside:
+            kind: arguments
+        - any:
+            - has:
+                field: parameter
+                kind: identifier
+                pattern: $FIELD
+            - has:
+                field: parameters
+                has:
+                  stopBy: end
+                  any:
+                    - kind: shorthand_property_identifier_pattern
+                      pattern: $FIELD
+                    - kind: identifier
+                      pattern: $FIELD
+  # A parameter that binds a whole object to one name, such as `input: PollInput`.
+  named-parameter:
+    any:
+      - kind: required_parameter
+      - kind: optional_parameter
+    has:
+      field: pattern
+      kind: identifier
+      pattern: $PARAM
+  # A name that a parameter's destructuring binds at any depth, such as `pollMs` in `{ pollMs }` or `intervalMs` in `{ pollMs: intervalMs }`.
+  destructured-name:
+    any:
+      - kind: shorthand_property_identifier_pattern
+        pattern: $FIELD
+      - kind: identifier
+        pattern: $FIELD
+        any:
+          - inside:
+              kind: pair_pattern
+              field: value
+          - inside:
+              kind: assignment_pattern
+              field: left
+          - inside:
+              kind: array_pattern
+  destructured-parameter:
+    any:
+      - kind: required_parameter
+      - kind: optional_parameter
+    has:
+      field: pattern
+      any:
+        - kind: object_pattern
+        - kind: array_pattern
+      has:
+        stopBy: end
+        matches: destructured-name
+  # The right side of a reported `||`: a value that only a default supplies.
+  default-value:
+    any:
+      - kind: string
+      - kind: number
+      - kind: template_string
+      - kind: array
+      - kind: object
+      - kind: 'null'
+      - kind: 'true'
+      - kind: 'false'
+      - kind: identifier
+        regex: ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$
+  # The right side of a `??` that turns `null` into an absent value instead of supplying a default.
+  absent-value:
+    any:
+      - kind: undefined
+      - kind: unary_expression
+        regex: ^void\s
+  # The first ancestor above a `||` chain that is not part of it decides whether the chain is a test.
+  or-chain:
+    any:
+      - kind: parenthesized_expression
+      - kind: binary_expression
+        has:
+          field: operator
+          regex: ^\|\|$
+  test-position:
+    any:
+      - kind: if_statement
+      - kind: while_statement
+      - kind: do_statement
+      - kind: for_statement
+      - kind: unary_expression
+      - kind: binary_expression
+        has:
+          field: operator
+          regex: ^&&$
+  a-test:
+    inside:
+      stopBy:
+        not:
+          matches: or-chain
+      matches: test-position
+  nullish-default:
+    not:
+      has:
+        field: right
+        matches: absent-value
+  # A `||` whose right side, or the right side of the `||` chain it starts, is a default value.
+  or-default:
+    any:
+      - has:
+          field: right
+          matches: default-value
+      - inside:
+          kind: binary_expression
+          field: left
+          all:
+            - has:
+                field: operator
+                regex: ^\|\|$
+            - has:
+                field: right
+                matches: default-value
+    not:
+      matches: a-test
+rule:
+  any:
+    # A field read from a parameter that holds the whole object, such as `input.pollMs ?? POLL_MS`.
+    - all:
+        - any:
+            - all:
+                - any:
+                    - pattern: $PARAM.$FIELD ?? $DEFAULT
+                    - pattern: $PARAM?.$FIELD ?? $DEFAULT
+                    - pattern: $PARAM.$FIELD ??= $DEFAULT
+                    - pattern: $PARAM?.$FIELD ??= $DEFAULT
+                - matches: nullish-default
+            - all:
+                - any:
+                    - pattern: $PARAM.$FIELD || $DEFAULT
+                    - pattern: $PARAM?.$FIELD || $DEFAULT
+                - matches: or-default
+        - not:
+            matches: rebound-param-by-callback
+        - inside:
+            stopBy: end
+            matches: owned-function
+            has:
+              field: parameters
+              has:
+                matches: named-parameter
+    # A name the signature destructured without its default, such as `pollMs ?? POLL_MS`.
+    - all:
+        - any:
+            - all:
+                - any:
+                    - pattern: $FIELD ?? $DEFAULT
+                    - pattern: $FIELD ??= $DEFAULT
+                - matches: nullish-default
+            - all:
+                - pattern: $FIELD || $DEFAULT
+                - matches: or-default
+        - has:
+            field: left
+            kind: identifier
+        - not:
+            matches: rebound-by-callback
+        - inside:
+            stopBy: end
+            matches: owned-function
+            has:
+              field: parameters
+              has:
+                matches: destructured-parameter
+    # A name the body copied out of a parameter without its default, such as `const { label } = input` before `label ?? 'untitled'`.
+    - all:
+        - any:
+            - all:
+                - any:
+                    - pattern: $FIELD ?? $DEFAULT
+                    - pattern: $FIELD ??= $DEFAULT
+                - matches: nullish-default
+            - all:
+                - pattern: $FIELD || $DEFAULT
+                - matches: or-default
+        - has:
+            field: left
+            kind: identifier
+        - not:
+            matches: rebound-by-callback
+        - inside:
+            stopBy: end
+            matches: owned-function
+            all:
+              - has:
+                  field: parameters
+                  has:
+                    matches: named-parameter
+              - has:
+                  field: body
+                  has:
+                    stopBy: end
+                    kind: variable_declarator
+                    any:
+                      - all:
+                          - has:
+                              field: value
+                              pattern: $PARAM
+                          - has:
+                              field: name
+                              kind: object_pattern
+                              has:
+                                stopBy: end
+                                matches: destructured-name
+                      - all:
+                          - has:
+                              field: name
+                              pattern: $FIELD
+                          - has:
+                              field: value
+                              kind: member_expression
+                              has:
+                                field: object
+                                pattern: $PARAM

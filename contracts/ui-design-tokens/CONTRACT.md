@@ -1,6 +1,7 @@
 ---
 name: ui-design-tokens
 message: Name shared visual decisions as semantic tokens and expose named variants, not unrestricted style overrides.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -16,6 +17,10 @@ Do not extend a feature-specific accent to unrelated controls.
 Keep structural literals local when they describe content geometry or rendering mechanics, such as grid tracks, percentages, border widths, focus offsets, and glyph or chart geometry.
 
 Expose supported visual choices as named variants, such as size, tone, density, and padding.
+Where styles are defined as an object keyed by name, select a variant's style by indexing one definition keyed by the variant's members, such as `toneStyles[tone]`.
+Never pick such a style by comparing the variant with a member, such as `tone === Tone.Positive && styles.positive`.
+Give every member a key in that definition, with an empty style for a member that adds nothing.
+Give that definition a type argument keyed by the variant's set, such as `Record<Tone, Style>`, so the type checker rejects a missing member and a key outside the set.
 Do not accept unrestricted style overrides, such as arbitrary style classes or style values, on public components.
 Accept placement of a component's root only through a constrained layout input.
 Style application composition through the application's own wrappers rather than by overriding shared components.
@@ -24,6 +29,12 @@ Keep one styling system per component, and never define the same element's prope
 
 Keep global styles in application shells, and do not make components depend on a shell's global styles for their appearance.
 
+Where the repository's lint can load the configuration in this contract's `assets/` folder, load it from the repository's own lint configuration.
+Suppress a finding only as `code-lint-suppressions` allows.
+
+Violation: a badge passes `tone === Tone.Positive && styles.positive` and `tone === Tone.Warning && styles.warning` to its style call.
+Allowed: a badge passes `toneStyles[tone]` from one style definition whose type argument is `Record<Tone, Style>`, keyed `neutral`, `positive`, and `warning`, where `neutral` holds an empty style.
+
 ## Checks
 
 Review each new literal in changed styles: is it structural geometry, or a reusable color, spacing, typography, elevation, layer, or motion decision?
@@ -31,3 +42,4 @@ Search changed public component inputs for unrestricted class, style, or style-o
 Render changed components in an isolated catalog without application styles, and compare them with the visual reference.
 Check the contrast of changed color tokens against the surfaces that use them in every supported theme.
 Run the repository's existing style lint for literals and repeated conditions where it exists, and review the rest by hand.
+Run the repository's lint from the repository root and confirm that it reports a variant compared with a member inside a style call.

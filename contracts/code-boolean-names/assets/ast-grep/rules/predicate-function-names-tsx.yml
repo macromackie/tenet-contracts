@@ -1,0 +1,101 @@
+# code-boolean-names: start the name of every function that returns a boolean with a declared predicate prefix.
+# Tsx variant (.tsx); it differs from the TypeScript variant only in `id`, `language`, and this line.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-boolean-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: predicate-function-names-tsx
+language: Tsx
+severity: error
+message: Start this boolean function's name with a declared predicate prefix, such as `isOverdue` rather than `overdue` or `checkOverdue`.
+note: |
+  A function declaration, a method, a method or abstract method signature, and a constant, class field, or property signature that holds a function are checked.
+  Each is checked when its declared return type is `boolean`, `Promise<boolean>`, `Effect.Effect<boolean, ...>`, or `Result.Result<boolean, ...>`.
+  A hand-written type predicate, including one in a function type such as `(value: unknown) => value is Invoice`, is not checked here, because code-typescript-type-assertions rejects every one.
+  The prefixes are the `predicate-prefixed-name` rule in ../utils; an option prefix such as `include` or `skip` never names a function.
+  An accessor or accessor signature, such as `get isPaid()`, or a method whose body only returns a field of `this`, is named as a field is.
+  An event handler named `on` and a capital letter, such as `onSubmit`, keeps the name that ui-react-typescript-jsx-attributes gives it.
+  A function whose return type is inferred or a named function type is left to review.
+  Suppress a name that an interface or framework outside the repository fixes, with a reason that names that system.
+utils:
+  # A boolean result type, such as `boolean`, `Promise<boolean>`, `Effect.Effect<boolean, ReadError>`, or `Result.Result<boolean, ReadError>`.
+  boolean-type:
+    any:
+      - kind: predefined_type
+        regex: ^boolean$
+      - kind: generic_type
+        regex: ^(?:Promise|Effect(?:\.Effect)?|Result(?:\.Result)?)\s*<\s*boolean\s*[,>]
+  # A declared return type that is a boolean result.
+  boolean-return:
+    kind: type_annotation
+    has:
+      matches: boolean-type
+  # A function written as a value whose declared return type is a boolean result.
+  boolean-function-value:
+    any:
+      - kind: arrow_function
+      - kind: function_expression
+    has:
+      field: return_type
+      matches: boolean-return
+  # An annotation whose type is a function type that returns a boolean result, such as `(order: Order) => boolean`.
+  boolean-function-annotation:
+    kind: type_annotation
+    has:
+      kind: function_type
+      has:
+        field: return_type
+        matches: boolean-type
+  # The name of a function declaration, method, method signature, or function-holding constant, field, or property signature that returns a boolean result.
+  boolean-function-name:
+    any:
+      - kind: identifier
+        inside:
+          field: name
+          kind: function_declaration
+          has:
+            field: return_type
+            matches: boolean-return
+      - any:
+          - kind: property_identifier
+          - kind: private_property_identifier
+        inside:
+          field: name
+          any:
+            - kind: method_signature
+            - kind: abstract_method_signature
+            - kind: method_definition
+          not:
+            any:
+              # An accessor or accessor signature, such as `get isPaid()`, is read as a field and named as one.
+              - regex: '^((static|public|private|protected|override|abstract|async|readonly|declare)\s+)*(get|set)\s+[\w#$\[]'
+              # A method that only returns a field, such as `includeArchived() { return this.#includeArchived; }`, is named as its field is.
+              - has:
+                  field: body
+                  regex: '^\{\s*return\s+this\.[#\w$]+;?\s*\}'
+          has:
+            field: return_type
+            matches: boolean-return
+      - any:
+          - kind: identifier
+          - kind: property_identifier
+          - kind: private_property_identifier
+        inside:
+          field: name
+          all:
+            - any:
+                - kind: variable_declarator
+                - kind: public_field_definition
+                - kind: property_signature
+            - any:
+                - has:
+                    field: type
+                    matches: boolean-function-annotation
+                - has:
+                    field: value
+                    matches: boolean-function-value
+rule:
+  matches: boolean-function-name
+  not:
+    any:
+      - matches: predicate-prefixed-name
+      # An event handler keeps the `on` name of the prop it serves.
+      - regex: ^on[A-Z]

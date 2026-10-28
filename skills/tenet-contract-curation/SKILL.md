@@ -9,7 +9,8 @@ license: MIT
 Use a numbered `.contracts/001-name/CONTRACT.md` with `name` and `message` metadata. Names must be unique in the project.
 Give each contract one reviewable concern and an identifiable violation. Inherit shared rules and name local exceptions.
 Tenet asks one question about a whole contract per file, so a clause buried in a long contract can be missed. Enforce a
-mechanical requirement, such as a required metadata field or an import rule, with a project script named under `Checks`.
+mechanical requirement, such as a required metadata field or an import rule, with a tool the project already runs, such
+as its formatter or lint. Name the command under `Checks`, and write a project script only when no tool can check it.
 A contract can govern code, configuration, tests, or documentation; state its scope in the body.
 When it applies to only some files in its folder, such as one language's source or every `SKILL.md`, add a `paths`
 frontmatter list of globs relative to that folder, such as `paths: ["**/*.py"]`; a glob that starts with `!`, such as
@@ -33,6 +34,31 @@ expected labels outside the inputs sent to the reviewer. Avoid adding a second e
 Run `tenet validate` when Tenet is available and the repository's contract checks after edits. This checks document format, not compliance.
 Use the existing eval runner for model behavior and review the code against every applicable contract.
 A model assessment guides the review; it does not replace it.
+
+## What makes a good contract
+
+A good contract leaves one right way to write the code it covers, and a tool finds most of its violations. The
+`contract-maintenance` contract requires one form per case, chosen on its merits, examples that obey other contracts,
+and a tool check where one can decide; these steps meet it.
+
+- Look for a tool before writing the rule. Search the project's formatter, lint and its plugins, and structural search
+  for a rule that decides the requirement, then run it on a few violations and allowed forms. Ship its configuration
+  with the contract, under `assets/<tool>/` for a shared contract, which needs Tenet 0.11.0 or later to install, and
+  name the command that runs it under `Checks`.
+- Leave to review only what two reviewers would decide alike. "Name the operation that failed and its input" is
+  decidable; "keep functions short" is not.
+- Remove choices. When the code shows two equivalent forms, such as `count++` and `count += 1`, allow one. When two
+  forms both stay, write the observable condition that picks one, such as the file's extension or whether a value can
+  be absent.
+- Choose a form on its merits. Write the rule's examples in each candidate form and compare them. Pick the form that
+  is clean, readable, consistent with the project's other rules, easily enforced by a lint or an agent reading code,
+  and needs the fewest exceptions. Count how much code each form would change only to plan the rollout, never to pick
+  the form.
+- Keep chosen numbers in configuration. Write "declare a maximum function length" and set the value in the tool's
+  configuration. A kind of code with a different shape, such as a component that returns markup, may carry its own
+  maximum with the reason beside it.
+- Check every example against every other adopted contract. A violation example breaks only the rule it illustrates,
+  and an allowed example breaks none.
 
 ## Word rules for a model reviewer
 

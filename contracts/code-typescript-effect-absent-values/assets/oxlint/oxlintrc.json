@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "unicorn/no-useless-undefined": [
+      "error",
+      { "checkArguments": true, "checkArrowFunctionBody": true }
+    ]
+  }
+}

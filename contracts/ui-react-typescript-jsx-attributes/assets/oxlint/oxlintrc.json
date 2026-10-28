@@ -1,0 +1,15 @@
+{
+  "plugins": ["react", "react-perf"],
+  "rules": {
+    "react-perf/jsx-no-new-array-as-prop": "error",
+    "react-perf/jsx-no-new-object-as-prop": "error",
+    "react/jsx-no-literals": [
+      "error",
+      {
+        "allowedStrings": [" "],
+        "ignoreProps": true,
+        "noStrings": true
+      }
+    ]
+  }
+}

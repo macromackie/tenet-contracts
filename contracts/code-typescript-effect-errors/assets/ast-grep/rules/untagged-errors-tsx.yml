@@ -5,7 +5,7 @@ language: Tsx
 severity: error
 message: Fail or die with an instance of a tagged error class that carries its fields, never with a bare error.
 note: |
-  Declare a tagged error class with the fields its handler needs, such as `class InvoiceMissing extends Schema.TaggedError<InvoiceMissing>()('InvoiceMissing', { invoice: Schema.String }) {}`.
+  Declare a tagged error class with the fields its handler needs, such as `class InvoiceMissing extends Schema.TaggedErrorClass<InvoiceMissing>()('InvoiceMissing', { invoice: Schema.String }) {}`.
   Fail with it for an expected failure, such as `return yield* new InvoiceNotFound({ invoice })`, and raise it for a defect, such as `throw new InvoiceMissing({ invoice })`.
   The rule reports a built-in error built with or without `new`, a class that extends one, `Effect.dieMessage`, and a failure or defect written as a literal.
   A test fake that reproduces a dependency's own error suppresses the finding with a reason that names the dependency.

@@ -1,0 +1,46 @@
+id: complementary-markup-children-tsx
+language: Tsx
+severity: error
+message: Choose between the two branches in a component whose if statements each return one branch, not in sibling children on a condition and its negation.
+utils:
+  negated-child:
+    kind: jsx_expression
+    has:
+      kind: binary_expression
+      any:
+        - pattern: '!$CONDITION && $OTHER'
+        - pattern: '!$CONDITION && $GUARD && $OTHER'
+  unequal-child:
+    kind: jsx_expression
+    has:
+      kind: binary_expression
+      any:
+        - pattern: '$LEFT !== $RIGHT && $OTHER'
+        - pattern: '$LEFT !== $RIGHT && $GUARD && $OTHER'
+rule:
+  kind: jsx_expression
+  any:
+    - has:
+        kind: binary_expression
+        any:
+          - pattern: $CONDITION && $BRANCH
+          - pattern: $CONDITION && $GUARD && $BRANCH
+      any:
+        - follows:
+            stopBy: end
+            matches: negated-child
+        - precedes:
+            stopBy: end
+            matches: negated-child
+    - has:
+        kind: binary_expression
+        any:
+          - pattern: $LEFT === $RIGHT && $BRANCH
+          - pattern: $LEFT === $RIGHT && $GUARD && $BRANCH
+      any:
+        - follows:
+            stopBy: end
+            matches: unequal-child
+        - precedes:
+            stopBy: end
+            matches: unequal-child

@@ -34,7 +34,7 @@ Violation: a repository declares two examples per package, so each new package a
 Violation: an example loops over three currencies and asserts each invoice total.
 Violation: a change that fixes refund rounding adds a second assertion to the isolated example and cites it as the fix's protection.
 Allowed: a repository declares one isolated and one local-dependency example for each test runner command that CI invokes, under `tests/examples/`, and ignores `tests/scratch/` beside it.
-Allowed: the isolated example's header names its kind, says to copy it to start a test of order logic, and gives the command that runs a copy, and its one case asserts that `orderTotal({ prices: [300, 200] })` returns `500`.
+Allowed: the isolated example's header gives its kind, when to copy it, and its run command, and its one case asserts `computeOrderTotal({ prices: [300, 200] })` returns `500`.
 
 ## Checks
 

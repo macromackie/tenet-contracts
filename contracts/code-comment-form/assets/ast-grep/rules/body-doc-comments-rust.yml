@@ -1,0 +1,17 @@
+# code-comment-form: write a comment inside a function body as a plain line comment, never as a doc comment.
+# Rust variant; the TypeScript and Tsx variants apply the same test with `/** */`.
+id: body-doc-comments-rust
+language: Rust
+severity: error
+message: Write this comment as a plain `//` line comment, because a comment inside a function body is never a doc comment.
+note: |
+  The rule reports a `///`, `//!`, `/** */`, or `/*! */` doc comment inside a function body, including one above a local item.
+  A comment that starts with four slashes, such as `////`, is a plain comment and is not reported.
+rule:
+  any:
+    - kind: line_comment
+    - kind: block_comment
+  regex: ^(?:///(?:[^/]|$)|//!|/\*\*(?:[^*/]|$)|/\*!)
+  inside:
+    kind: block
+    stopBy: end

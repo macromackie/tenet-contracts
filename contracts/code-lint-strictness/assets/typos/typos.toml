@@ -1,0 +1,23 @@
+# The strictest typos settings that code-lint-strictness requires.
+# Every check runs with typos' own dictionary, and no word is allowed beyond it.
+#
+# typos reads only its own file, so copy this file to `typos.toml` at the repository root.
+# Run it from the repository root, where it checks every file that no ignore file excludes:
+#   typos
+# Rename a misspelled identifier rather than listing it as a word.
+# Add a word to `[default.extend-words]` in that copy only beside a comment that starts with its reason letters,
+# such as Q for a protocol's or dependency's own spelling that the code must reproduce.
+# A new typos version adds corrections, so this file is tested against typos-cli 1.51.1;
+# pin that exact version and raise it in a reviewed upgrade.
+
+[default]
+check-file = true
+check-filename = true
+# One spelling for each word, in the locale that platform names such as `color` and `serialize` use.
+locale = "en-us"
+
+[files]
+# The version control folder holds no source.
+extend-exclude = [".git/"]
+# Check hidden files and folders too, such as workflow files.
+ignore-hidden = false

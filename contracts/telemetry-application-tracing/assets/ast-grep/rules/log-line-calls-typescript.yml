@@ -1,0 +1,30 @@
+# telemetry-application-tracing: pass the logger function one object literal whose `event` field names the line's event, so each call site states its event.
+# TypeScript variant (.ts, .mts, .cts); log-line-calls-tsx.yml is identical except for `id`, `language`, and this line.
+id: log-line-calls-typescript
+language: TypeScript
+severity: error
+message: "Pass the logger one object literal with an `event` field, such as `log({ event: LogEvent.InvoiceSettled, invoiceId })`."
+note: |
+  The logger function is the identifier that the shared `logger-function` rule names, `log` unless a repository's own copy names another.
+  A call is allowed when its first argument is an object literal with an `event` pair or an `event` shorthand property.
+  An argument built elsewhere, such as `log(line)` or `log({ ...line })`, is reported, because the call must state its event.
+rule:
+  kind: call_expression
+  has:
+    field: function
+    kind: identifier
+    matches: logger-function
+  not:
+    has:
+      field: arguments
+      has:
+        nthChild: 1
+        kind: object
+        has:
+          any:
+            - kind: pair
+              has:
+                field: key
+                regex: ^(?:event|'event'|"event")$
+            - kind: shorthand_property_identifier
+              regex: ^event$

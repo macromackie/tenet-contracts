@@ -1,0 +1,116 @@
+# code-map-and-set-names: end the name of every map and set with a plural noun of what it holds.
+# Python variant; the TypeScript and Tsx variants check the same holders of their own map and set types.
+# Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
+# `ast-grep scan -c .contracts/NNN-code-map-and-set-names/assets/ast-grep/sgconfig.yml --globs '!src/generated/**'`.
+id: map-and-set-names-python
+language: Python
+severity: error
+message: End this map's or set's name with a plural noun of what it holds, such as `pending_jobs` or `seen_order_ids` rather than `pending` or `seen`.
+note: |
+  A variable, an attribute such as `self.jobs`, a class field, a parameter, and a property are checked when the annotation or return type starts with a dict, set, or mapping type, such as `dict`, `frozenset`, `Mapping`, `defaultdict`, or `Counter`, alone or inside `Optional`.
+  They are also checked when the assigned value is a set literal, a set or dict comprehension, a call of `set`, `frozenset`, `defaultdict`, `Counter`, `OrderedDict`, or `ChainMap`, or `dict` with a positional argument, such as `dict(pairs)`.
+  The name passes when its last word ends in `s` but not in `ss` or `ous` and is not a listed singular noun, such as `status`, or when it is a listed irregular plural, such as `children`.
+  A bare `dict` or `Mapping` annotation, one whose values are `Any` or `object`, a dict literal, even an empty `{}`, `dict()`, `dict` with keyword arguments, and a dict comprehension over written string keys may hold a record, and are not checked.
+  A map or set that a call returns without an annotation is left to review.
+  Suppress a name that a system outside the repository fixes, with a reason that names that system.
+utils:
+  # A dict, set, or mapping type, alone, first in a union, or inside `Optional`, such as `dict[str, Job] | None`.
+  collection-type:
+    kind: type
+    regex: ^(?:(?:typing\.)?Optional\[)?(?:(?:typing|collections|collections\.abc)\.)?(?:dict|Dict|set|Set|frozenset|FrozenSet|Mapping|MutableMapping|AbstractSet|MutableSet|defaultdict|DefaultDict|Counter|OrderedDict|ChainMap)\b
+    not:
+      # A bare mapping, or one whose values are `Any` or `object`, holds a decoded record, such as `request: dict`.
+      regex: ^(?:(?:typing\.)?Optional\[)?(?:(?:typing|collections\.abc)\.)?(?:dict|Dict|Mapping|MutableMapping)(?:\s*(?:\||\]|$)|\[\s*str\s*,\s*(?:typing\.)?(?:Any|object)\s*\])
+  # A value that builds a dict or set.
+  collection-value:
+    any:
+      - kind: set
+      - kind: set_comprehension
+      - kind: dictionary_comprehension
+        not:
+          has:
+            kind: for_in_clause
+            has:
+              field: right
+              any:
+                - kind: tuple
+                - kind: list
+              # A record's written keys, such as `("secret_env", "files")`.
+              has:
+                kind: string
+              not:
+                has:
+                  not:
+                    any:
+                      - kind: string
+                      - regex: ^[()\[\],]$
+      - kind: call
+        has:
+          field: function
+          regex: ^(?:collections\.)?(?:set|frozenset|defaultdict|Counter|OrderedDict|ChainMap)$
+      # `dict(pairs)` builds a map; `dict()` and `dict(name=...)` build a record, as a dict literal does.
+      - kind: call
+        all:
+          - has:
+              field: function
+              regex: ^dict$
+          - not:
+              has:
+                field: arguments
+                any:
+                  - regex: ^\(\s*\)$
+                  - has:
+                      any:
+                        - kind: keyword_argument
+                        - kind: dictionary_splat
+  # An assignment or parameter that holds a dict or set.
+  collection-holder:
+    any:
+      - has:
+          field: type
+          matches: collection-type
+      - has:
+          field: right
+          matches: collection-value
+      - has:
+          field: value
+          matches: collection-value
+rule:
+  all:
+    - kind: identifier
+    - not:
+        matches: plural-name
+    - any:
+        - inside:
+            field: left
+            kind: assignment
+            matches: collection-holder
+        - inside:
+            field: attribute
+            kind: attribute
+            inside:
+              field: left
+              kind: assignment
+              matches: collection-holder
+        - inside:
+            kind: typed_parameter
+            matches: collection-holder
+        - inside:
+            field: name
+            any:
+              - kind: typed_default_parameter
+              - kind: default_parameter
+            matches: collection-holder
+        # A property that callers read as an attribute.
+        - inside:
+            field: name
+            kind: function_definition
+            all:
+              - has:
+                  field: return_type
+                  matches: collection-type
+              - inside:
+                  kind: decorated_definition
+                  has:
+                    kind: decorator
+                    regex: ^@(?:functools\.)?(?:property|cached_property)$

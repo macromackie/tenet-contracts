@@ -1,5 +1,5 @@
 {
   "rules": {
-    "func-style": ["error", "declaration", { "allowTypeAnnotation": true }]
+    "unicorn/no-await-expression-member": "error"
   }
 }

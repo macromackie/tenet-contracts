@@ -1,0 +1,14 @@
+# code-typescript-collection-iteration: iterate over an object's own entries with `for...of`, never with `for...in`.
+# Tsx variant (.tsx); key-loops-typescript.yml is identical except for `id`, `language`, and this line.
+id: key-loops-tsx
+language: Tsx
+severity: error
+message: Iterate over an object's own keys or entries with `for...of` over `Object.keys` or `Object.entries`, instead of `for...in`, which also visits inherited keys.
+note: |
+  Write `for (const [currency, rate] of Object.entries(rates))`.
+  The rule reports every `for...in` loop.
+rule:
+  kind: for_in_statement
+  has:
+    field: operator
+    regex: ^in$

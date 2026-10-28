@@ -16,7 +16,7 @@ A function that reads its module's own domain types, constants, or rules is doma
 A type declared only for a function's own input or result does not make that function domain code.
 A callback written inside the call that uses it, such as `orders.filter((order) => order.isPaid)`, is part of that call, not a utility.
 
-Violation: an invoice export module declares `clip(text)`, which cuts any string to a fixed length and reads nothing about invoices.
+Violation: an invoice export module declares `clip({ text })`, which cuts any string to a fixed length and reads nothing about invoices.
 Allowed: the utilities module's `clip-text` file exports a function that takes the text and a maximum length, and the export module passes its own line limit.
 
 ## Checks

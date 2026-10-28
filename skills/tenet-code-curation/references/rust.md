@@ -20,7 +20,7 @@ mod labels;
 mod stream;
 
 pub(crate) use labels::grade_labels;
-pub(crate) use stream::interpret;
+pub(crate) use stream::parse_events;
 ```
 
 Use the repository's module naming convention. A split should separate responsibilities, not create a forwarding

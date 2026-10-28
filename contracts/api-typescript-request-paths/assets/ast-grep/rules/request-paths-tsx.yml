@@ -3,7 +3,7 @@
 id: request-paths-tsx
 language: Tsx
 severity: error
-message: Build this request path with its operation's path function, such as `PackPaths.chunk({ key, index })`, declared once in the module that owns the route.
+message: Build this request path with its operation's path function, such as `PackPaths.formatChunk({ index, key })`, declared once in the module that owns the route.
 note: |
   A template literal that starts with `/` is reported, and so is a `+` concatenation whose left operand is a string that starts with `/`.
   A path that starts with a value, such as `${origin}/packs/${key}`, and a path written as one plain string are left to review.

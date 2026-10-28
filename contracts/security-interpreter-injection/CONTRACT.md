@@ -23,7 +23,7 @@ Load code-bearing artifacts, such as plugins, serialized objects, and executable
 
 A feature whose purpose is to run code that a user or model wrote may run it inside an isolated sandbox that holds no credentials or network access its author does not already have.
 
-Violation: query text built as `"SELECT total FROM orders WHERE id = '" + orderId + "'"` from a request parameter.
+Violation: query text built as `` `SELECT total FROM orders WHERE id = '${orderId}'` `` from a request parameter.
 Allowed: query text `SELECT total FROM orders WHERE id = ?` with the order identifier bound as a parameter.
 Violation: a shell command string that interpolates an uploaded file's name.
 

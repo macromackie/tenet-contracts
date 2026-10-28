@@ -15,18 +15,19 @@ Declare one store module for each owner of persisted data, and mark it by its pa
 Name each table, stored file, state directory, and storage key only inside its store module.
 Declare each stored file, state directory, and storage key name once in the store module, as a named constant such as `RESULTS_FILE`.
 Outside the store module, never write a stored name as a literal, open a stored file, query a table, or read or write a key; call the store module's functions instead.
-A report, an audit, or a comparison that reads finished data is outside the store module, and calls the store's read functions, such as `finishedResults({ run })`.
+A report, an audit, or a comparison that reads finished data is outside the store module, and calls the store's read functions, such as `readFinishedResults({ run })`.
 Parse each kind of stored record in one function of the store module, and never parse that record anywhere else.
 
-Name each store function that code outside the store module calls for the record it reads or the change it writes, such as `pendingInvoices()` or `markInvoicePaid({ invoice })`.
-Never name such a function only for a storage operation, such as `get`, `put`, `exec`, `read`, or `write`.
-A function that only the store module calls, such as an append-only line writer, may be named for its storage operation, and so may the one exported store function that runs its caller's store calls in one transaction, such as `atomic`.
+Name each store function that code outside the store module calls for the record it reads or the change it writes, such as `listPendingInvoices()` or `markInvoicePaid({ invoice })`.
+Never name such a function only for a storage operation, such as `read`, `write`, `put`, or `execute`.
+A function that only the store module calls, such as an append-only line writer, may be named for its storage operation.
+So may the one exported store function that runs its caller's store calls in one transaction, such as `runInTransaction`.
 
 Configure the repository's lint or a project script to fail on a declared stored name written as a literal outside its store module, and on a key-value storage call outside it.
 Suppress a finding only in the form that `code-lint-suppressions` requires.
 
 Violation: an audit command joins `results.jsonl` onto a run directory and parses each line itself, while the run store writes that file.
-Allowed: the run store declares `RESULTS_FILE` once and parses the file in `finishedResults({ run })`, which the audit calls.
+Allowed: the run store declares `RESULTS_FILE` once and parses the file in `readFinishedResults({ run })`, which the audit calls.
 
 ## Checks
 

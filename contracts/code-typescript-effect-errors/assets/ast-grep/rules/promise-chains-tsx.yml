@@ -1,0 +1,19 @@
+# code-typescript-effect-errors: await a promise and bind its value, never chain it with its then or finally method.
+# Tsx variant (.tsx); promise-chains-typescript.yml is identical except for `id`, `language`, and this line.
+id: promise-chains-tsx
+language: Tsx
+severity: error
+message: Await the promise and bind its value, instead of calling its `then` or `finally` method.
+note: |
+  Where a promise remains, such as at an entry point or in a function that `Effect.tryPromise` calls, await it, such as `const response = await fetch(INVOICE_URL, { signal })`.
+  Release a resource after an awaited call with a `try` statement that has only a `finally` clause, never with the promise's `finally` method.
+  The rule reports each call of a method named `then` or `finally`; catch-handlers reports a promise's `catch` method.
+rule:
+  # `readInvoice({ id }).then((invoice) => sumTotal({ invoice }))` and `readInvoice({ id }).finally(() => release())`, including after `?.`.
+  kind: call_expression
+  has:
+    field: function
+    kind: member_expression
+    has:
+      field: property
+      regex: ^(then|finally)$

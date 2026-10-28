@@ -24,6 +24,7 @@ When a tool honors no suppression at a site it reports, the site follows the rul
 Spell the directive of every check that the repository owns one way: the check's name followed by `-allow`, the rule's name, ` -- `, and the reason, on the line above the reported line.
 
 A suppression that covers a whole file, module, or package, a rule turned off, a lowered severity, and an option or limit changed so that one site passes are violations.
+A rule turned off with one of the reasons that `code-lint-strictness` lists, named in the comment above its entry, is not a violation.
 A path pattern that a contract declares in the lint configuration, such as a settings module, generated files, or test fixtures, scopes a rule and is not a suppression, and widening it to admit one site is a violation.
 Configure every tool to fail on a suppression that no longer suppresses a finding, wherever the tool supports it.
 Make every check that the repository owns fail on its own directive once that directive suppresses nothing.
@@ -38,4 +39,4 @@ From the repository root, run each lint and check with its unused-suppression se
 For each suppression a change adds, does it sit at the reported site, name each rule it silences, and give a reason that names the system or source that keeps the site from following the rule?
 For a tool that cannot report a stale suppression, does each suppression that a change keeps still cover a finding?
 For each configuration entry or path pattern a change adds or widens, does it name one path with a reason, or scope a rule as a contract declares?
-Does a change turn a rule off, lower its severity, or change an option or limit so that one site passes?
+Does a change turn a rule off without a reason that `code-lint-strictness` lists, lower its severity, or change an option or limit so that one site passes?

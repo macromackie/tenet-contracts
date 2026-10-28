@@ -1,0 +1,18 @@
+---
+# The strictest actionlint settings that code-lint-strictness requires.
+# actionlint runs every rule by default, and no rule can be turned off, so this file only closes the two open lists.
+#
+# actionlint reads only its own file, so copy this file to `.github/actionlint.yaml`.
+# Name each self-hosted runner label and each configuration variable the workflows use in that copy's lists.
+# Run it from the repository root, with shellcheck at every optional check and pyflakes checking `run:` scripts:
+#   SHELLCHECK_OPTS="--enable=all --severity=style" actionlint -shellcheck=shellcheck -pyflakes=pyflakes
+# actionlint silently skips a script check whose program it cannot find,
+# so pin actionlint, shellcheck, and pyflakes to exact versions in the repository's tool manager.
+# This file was tested with actionlint 1.7.12, shellcheck 0.11.0, and pyflakes 3.4.0.
+
+# An empty list reports every `vars.` reference, so each configuration variable is declared here before a workflow reads it.
+"config-variables": []
+"self-hosted-runner":
+  # An empty list reports every label that no hosted runner carries.
+  "labels": []
+...

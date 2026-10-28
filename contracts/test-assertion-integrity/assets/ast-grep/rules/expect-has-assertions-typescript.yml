@@ -1,0 +1,14 @@
+# test-assertion-integrity: open each test by declaring how many assertions it must run, never with `expect.hasAssertions()`.
+# TypeScript variant (.ts, .mts, .cts); the TypeScript and Tsx variants differ only in `id`, `language`, and this line.
+id: expect-has-assertions-typescript
+language: TypeScript
+severity: error
+message: Declare the test's assertion count, such as `expect.assertions(1)`, never `expect.hasAssertions()`.
+files:
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/__tests__/**"
+rule:
+  pattern: expect.hasAssertions()

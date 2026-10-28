@@ -1,0 +1,7 @@
+{
+  "jsPlugins": [{ "name": "unicorn-js", "specifier": "eslint-plugin-unicorn" }],
+  "rules": {
+    "unicorn-js/consistent-function-scoping": ["error", { "checkArrowFunctions": true }],
+    "unicorn/consistent-function-scoping": ["error", { "checkArrowFunctions": true }]
+  }
+}

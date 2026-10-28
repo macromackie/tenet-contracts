@@ -1,0 +1,108 @@
+# ui-react-hook-calls: call state, ref, and context hooks before every other hook, and effect hooks after every other hook.
+# TypeScript variant (.ts, .mts, .cts), for hooks in files without markup; it differs from the Tsx and JavaScript variants only in `id`, `language`, and this line.
+# Scan with this folder's sgconfig.yml, such as `ast-grep scan -c .contracts/NNN-ui-react-hook-calls/assets/ast-grep/sgconfig.yml`.
+id: hook-order-typescript
+language: TypeScript
+severity: error
+message: Call state, ref, and context hooks before every other hook, and effect hooks after every other hook, in the same body.
+note: |
+  A hook is a function whose name is `use` followed by a capital letter or digit, called directly or as a member such as `React.useState`.
+  State, ref, and context hooks are `useState`, `useReducer`, `useRef`, and `useContext`.
+  Effect hooks are `useEffect`, `useLayoutEffect`, and `useInsertionEffect`.
+  A statement that calls a state, ref, or context hook after a statement that calls any other hook is reported.
+  A statement that calls a hook of neither kind after a statement that calls an effect hook is reported.
+  Statements that call no hook may stand anywhere, and calls inside nested functions are not counted.
+utils:
+  nested-function:
+    any:
+      - kind: arrow_function
+      - kind: function_expression
+      - kind: function_declaration
+      - kind: generator_function
+      - kind: generator_function_declaration
+      - kind: method_definition
+      - kind: class_declaration
+      - kind: class
+  hook-call:
+    kind: call_expression
+    has:
+      field: function
+      any:
+        - kind: identifier
+          regex: ^use[A-Z0-9]
+        - kind: member_expression
+          has:
+            field: property
+            regex: ^use[A-Z0-9]
+  first-hook-call:
+    kind: call_expression
+    has:
+      field: function
+      any:
+        - kind: identifier
+          regex: ^(useState|useReducer|useRef|useContext)$
+        - kind: member_expression
+          has:
+            field: property
+            regex: ^(useState|useReducer|useRef|useContext)$
+  effect-hook-call:
+    kind: call_expression
+    has:
+      field: function
+      any:
+        - kind: identifier
+          regex: ^(useEffect|useLayoutEffect|useInsertionEffect)$
+        - kind: member_expression
+          has:
+            field: property
+            regex: ^(useEffect|useLayoutEffect|useInsertionEffect)$
+  hook-statement:
+    any:
+      - kind: lexical_declaration
+      - kind: variable_declaration
+      - kind: expression_statement
+      - kind: return_statement
+  calls-first-hook:
+    matches: hook-statement
+    has:
+      stopBy:
+        matches: nested-function
+      matches: first-hook-call
+  calls-later-hook:
+    matches: hook-statement
+    has:
+      stopBy:
+        matches: nested-function
+      all:
+        - matches: hook-call
+        - not:
+            matches: first-hook-call
+  calls-middle-hook:
+    matches: hook-statement
+    has:
+      stopBy:
+        matches: nested-function
+      all:
+        - matches: hook-call
+        - not:
+            matches: first-hook-call
+        - not:
+            matches: effect-hook-call
+  calls-effect-hook:
+    matches: hook-statement
+    has:
+      stopBy:
+        matches: nested-function
+      matches: effect-hook-call
+rule:
+  any:
+    - all:
+        - matches: calls-first-hook
+        - follows:
+            stopBy: end
+            matches: calls-later-hook
+    - all:
+        - matches: calls-middle-hook
+        - follows:
+            stopBy: end
+            matches: calls-effect-hook

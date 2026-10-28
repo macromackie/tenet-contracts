@@ -1,0 +1,19 @@
+# The strictest taplo settings that code-lint-strictness requires.
+# taplo formats every TOML file, and the check fails on any file that formatting would change.
+#
+# taplo reads only its own file, so copy this file to `taplo.toml` at the repository root.
+# Run it from the repository root:
+#   taplo fmt --check
+# Where a table's key order is behavior, keep it with a `[[rule]]` entry in that copy whose `include` names the one file and whose `keys` names the one table.
+# Set `reorder_keys = false` under that entry's `[rule.formatting]`, with a comment above the entry naming the behavior the order decides, as code-lint-suppressions allows.
+# A new taplo version changes its output, so this file is tested against taplo 0.10.0;
+# pin that exact version and raise it in a reviewed upgrade.
+
+[formatting]
+# F: wrap arrays at the formatter's print width of 100 columns, so taplo and the formatter write the same layout.
+column_width = 100
+# Q: reorders a task's list of commands, and a list such as `extends` whose order decides which entry wins.
+reorder_arrays = false
+# Sort the keys of every table and inline table alphabetically, so each table has one order.
+reorder_inline_tables = true
+reorder_keys = true

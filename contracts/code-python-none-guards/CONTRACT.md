@@ -12,11 +12,12 @@ Do not guard such a value with `is None`, `is not None`, `== None`, `assert valu
 A fallback that changes nothing except a `None` value, such as `count or 0` on an `int` or `items or []` on a `list`, is a guard too.
 When a value can be `None`, annotate it `X | None` and handle `None` as a meaningful case, or fix the caller so it never passes `None`.
 
-A `None` check is allowed when the checked value's declared type includes `None`, such as a parameter annotated `X | None` or `Optional[X]`, a value typed `Any` or `object`, or the result of an API that returns `None` for absence, such as `re.match`, `next(iterator, None)`, or `dict.get`.
+A `None` check is allowed when the checked value's declared type includes `None`, such as a parameter annotated `X | None`, or a value typed `Any` or `object`.
+A `None` check is also allowed on the result of an API that returns `None` for absence, such as `re.match`, `next(iterator, None)`, or `dict.get`.
 A function that callers outside the type-checked code reach, such as a published library's entry point, may reject `None` by raising an error.
 
-Allowed, because `timeout` is annotated `float | None`: `def connect(host: str, timeout: float | None = None)` followed by `if timeout is None: timeout = DEFAULT_TIMEOUT`.
-Violation, because `request` is annotated `Request`: `def handle(request: Request)` followed by `if request is None: return Response.empty()`.
+Allowed, because `timeout_seconds` is annotated `float | None`: `def connect(*, host: str, timeout_seconds: float | None = None)` with an `if timeout_seconds is None:` block setting `timeout_seconds = DEFAULT_TIMEOUT_SECONDS`.
+Violation, because `request` is annotated `Request`: `def handle(*, request: Request)` with an `if request is None:` block returning `Response.empty()`.
 
 ## Checks
 

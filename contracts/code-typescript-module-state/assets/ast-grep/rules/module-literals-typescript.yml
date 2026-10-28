@@ -1,0 +1,114 @@
+# code-typescript-module-state: end each module-level object or array literal with `as const`, plus `satisfies T` when it must match a declared type.
+# TypeScript variant (.ts, .mts, .cts); module-literals-tsx.yml differs only in `id`, `language`, and this line.
+id: module-literals-typescript
+language: TypeScript
+severity: error
+message: "End this module-level literal with `as const`, followed by `satisfies T` when it must match a declared type, and leave the constant unannotated."
+note: |
+  A top-level `const`, exported or not, or an anonymous default export, whose value is an object or array literal is reported unless the literal ends with `as const`.
+  The literal may sit inside parentheses or a `satisfies` clause, such as `[...] as const satisfies readonly Role[]`.
+  A literal wrapped in `Object.freeze` is reported, because the freeze reaches only the top level; write `as const` instead.
+  A constant annotated with a type, such as `const labels: Record<Status, string> = { ... } as const`, is reported, because the annotation replaces the read-only literal type.
+  A primitive value, a function, a `new` expression, and a value that another call returns are not reported.
+  Scripts and test files are exempt by the path patterns under `ignores`; replace them with the repository's declared paths.
+ignores:
+  # Scripts, whose top level code-script-entry-points governs.
+  - "**/scripts/**"
+  # Test files.
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/testing/**"
+  - "**/__tests__/**"
+utils:
+  # A `const` declarator at the top level of the module, exported or not.
+  module-const:
+    kind: variable_declarator
+    inside:
+      kind: lexical_declaration
+      regex: ^const\s
+      inside:
+        any:
+          - kind: program
+          - kind: export_statement
+            inside:
+              kind: program
+  # An object or array literal.
+  literal:
+    any:
+      - kind: object
+      - kind: array
+  # A node that wraps a value without changing it, such as `(value)` or `value satisfies Labels`.
+  value-wrapper:
+    any:
+      - kind: parenthesized_expression
+      - kind: as_expression
+      - kind: satisfies_expression
+  # A literal, bare or inside wrappers, such as `{ ... } satisfies Labels`.
+  literal-value:
+    any:
+      - matches: literal
+      - matches: value-wrapper
+        has:
+          matches: literal
+          stopBy:
+            not:
+              matches: value-wrapper
+  # A literal under a constant assertion, such as `[...] as const`.
+  const-assertion:
+    kind: as_expression
+    regex: \bas\s+const$
+  # A value whose literal ends with `as const`, inside wrappers or not, such as `{ ... } as const satisfies Labels`.
+  asserted-value:
+    any:
+      - matches: const-assertion
+      - matches: value-wrapper
+        has:
+          matches: const-assertion
+          stopBy:
+            not:
+              matches: value-wrapper
+  # `Object.freeze({ ... })`.
+  frozen-literal:
+    kind: call_expression
+    all:
+      - has:
+          field: function
+          regex: ^Object\.freeze$
+      - has:
+          field: arguments
+          has:
+            matches: literal-value
+rule:
+  any:
+    - matches: module-const
+      any:
+        - has:
+            field: value
+            all:
+              - matches: literal-value
+              - not:
+                  matches: asserted-value
+        - has:
+            field: value
+            matches: frozen-literal
+        - all:
+            - has:
+                field: type
+                kind: type_annotation
+            - has:
+                field: value
+                matches: literal-value
+    # An anonymous default export, such as `export default { fetch: handleRequest }`.
+    - kind: export_statement
+      inside:
+        kind: program
+      has:
+        field: value
+        any:
+          - all:
+              - matches: literal-value
+              - not:
+                  matches: asserted-value
+          - matches: frozen-literal

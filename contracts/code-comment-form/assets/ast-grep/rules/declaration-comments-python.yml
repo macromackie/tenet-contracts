@@ -1,0 +1,62 @@
+# code-comment-form: write a comment above or beside a declaration, a member, or a module constant outside a function body as a doc comment.
+# Python variant: a function's or class's doc comment is its docstring, and a module constant's or class field's is the string directly below its assignment.
+id: declaration-comments-python
+language: Python
+severity: error
+message: Move this comment into the docstring of the function or class below it, or into a string directly below the assignment it describes.
+note: |
+  The rule reads each `#` comment at module level or in a class body, outside every function body.
+  It reports one that sits directly above, or beside on the same line, a function, a class, a decorated definition, or an assignment.
+  A comment after an assignment that sits above another statement, such as a `for` loop, is not reported.
+  A shebang, a coding line, inline script metadata, and a directive that a tool reads, such as `# noqa`, `# type: ignore`, or `# ast-grep-ignore`, keep their own form and are not reported.
+  The reason line directly above a `# ast-grep-ignore` directive, which `code-lint-suppressions` requires, is not reported either.
+utils:
+  declaration:
+    any:
+      - kind: function_definition
+      - kind: class_definition
+      - kind: decorated_definition
+      - kind: expression_statement
+        has:
+          any:
+            - kind: assignment
+            - kind: augmented_assignment
+rule:
+  kind: comment
+  not:
+    any:
+      - regex: ^#(?:!|\s*-\*-|\s*///|\s*(?:noqa|type:|pragma|ruff:|fmt:|pyright:|mypy:|pylint:|isort:|ast-grep-ignore\b))
+      - precedes:
+          regex: ^#\s*ast-grep-ignore\b
+      - inside:
+          kind: function_definition
+          stopBy: end
+  any:
+    - inside:
+        any:
+          - kind: module
+          - kind: block
+            inside:
+              kind: class_definition
+      any:
+        - precedes:
+            matches: declaration
+        - follows:
+            matches: declaration
+          not:
+            precedes:
+              stopBy:
+                not:
+                  kind: comment
+              all:
+                - not:
+                    kind: comment
+                - not:
+                    matches: declaration
+    - inside:
+        kind: class_definition
+      precedes:
+        kind: block
+        has:
+          nthChild: 1
+          matches: declaration

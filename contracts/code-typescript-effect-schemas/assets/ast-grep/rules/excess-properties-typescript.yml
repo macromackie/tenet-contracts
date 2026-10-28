@@ -1,0 +1,41 @@
+# code-typescript-effect-schemas: reject unknown fields on every decode, and mark a foreign payload read in part loose in its schema.
+# TypeScript variant (.ts, .mts, .cts); excess-properties-tsx.yml is identical except for `id`, `language`, and this line.
+id: excess-properties-typescript
+language: TypeScript
+severity: error
+message: "Pass `{ onExcessProperty: 'error' }` beside the schema, such as `Schema.decodeUnknownEffect(Invoice, { onExcessProperty: 'error' })`, so an unknown or misspelled field fails the decode."
+note: |
+  The default strips each field the schema does not declare, so a misspelled optional field silently disappears.
+  A foreign payload read in part keeps the option and declares its other fields in its schema, such as `Schema.StructWithRest(Schema.Struct({ type: Schema.String }), [Schema.Record(Schema.String, Schema.Unknown)])`.
+  The rule reports a decode call of the `Schema` namespace, and `Schema.toStandardSchemaV1`, unless an object literal among its arguments sets `onExcessProperty` to `'error'`, nested inside `parseOptions` for `toStandardSchemaV1`.
+  Options passed by name, options passed to the returned function instead of beside the schema, and `onExcessProperty: 'ignore'` are reported.
+  A decode that a framework runs through its own parse options, such as an HTTP API's parse options annotation, is left to review.
+rule:
+  kind: call_expression
+  all:
+    - has:
+        field: function
+        kind: member_expression
+        all:
+          - has:
+              field: object
+              kind: identifier
+              regex: ^Schema$
+          - has:
+              field: property
+              regex: ^(?:decode(?:Unknown)?(?:Effect|Either|Exit|Option|Promise|Result|Sync)|decodeUnknown|toStandardSchemaV1)$
+    - not:
+        has:
+          field: arguments
+          has:
+            kind: object
+            has:
+              stopBy: end
+              kind: pair
+              all:
+                - has:
+                    field: key
+                    regex: ^['"]?onExcessProperty['"]?$
+                - has:
+                    field: value
+                    regex: ^['"]error['"]$

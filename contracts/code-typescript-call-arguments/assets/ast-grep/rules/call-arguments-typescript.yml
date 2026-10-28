@@ -6,12 +6,12 @@ language: TypeScript
 severity: error
 message: Bind this call, `new`, or `await` to a name before passing it as an argument.
 note: |
-  Write `const value = await load(id)` and pass `value`.
+  Write `const invoice = await readInvoice({ id })` and pass `invoice`.
   A fluent chain such as `a().b()` counts once, as the outermost call.
   A function, class, or JSX element written in the arguments starts a fresh count.
   Each argument of `pipe(...)` or `.pipe(...)` may be one call; that call's own arguments follow this rule.
   A tagged template such as String.raw`...` is a template, not a call.
-# Declared schema files nest builders by design, such as `z.object({ name: z.string() })`.
+# Declared schema files nest builders by design, such as `Schema.Struct({ tags: Schema.Array(Schema.String) })`.
 ignores:
   - "**/schemas.{ts,mts,cts,tsx}"
 utils:

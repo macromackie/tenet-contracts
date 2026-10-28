@@ -1,0 +1,11 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+      "plugins": ["vitest"],
+      "rules": {
+        "vitest/require-test-timeout": "error"
+      }
+    }
+  ]
+}

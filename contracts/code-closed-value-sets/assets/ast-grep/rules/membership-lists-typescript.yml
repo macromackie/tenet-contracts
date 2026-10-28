@@ -1,0 +1,129 @@
+# code-closed-value-sets: test membership in a fixed group of values through its named module-level set, such as `endedStates.has(state)`.
+# TypeScript variant (.ts, .mts, .cts); membership-lists-tsx.yml differs only in `id`, `language`, and this line.
+id: membership-lists-typescript
+language: TypeScript
+severity: error
+message: "Declare this fixed group of values once as a module-level read-only set, such as `const endedStates: ReadonlySet<SandboxState> = new Set([...])`, and test it with `.has`."
+note: |
+  An array literal whose items are all fixed values, followed by `.includes(...)`, is reported, and so is a `new Set([...])` of such items, with or without `as const`, followed by `.has(...)`.
+  So is `.includes(...)` on a module-level `const` that holds such an array, such as `ENDED.includes(state)` after `const ENDED = [...] as const`, which `prefer-set-has` skips.
+  A fixed value is a string or a template without substitutions, a number, a member of a capitalized name such as `SandboxState.Stopped`, or a SCREAMING_SNAKE_CASE constant.
+  The array may sit inside parentheses or an `as` or `satisfies` clause, such as `(['draft', 'sent'] as const).includes(kind)`.
+  An array that holds a local variable, a property of a lowercase name such as `user.id`, a call, a spread, or a template with substitutions is left to review.
+  A named array used only with `.includes` in a function is reported by the lint configuration in `assets/oxlint/`.
+utils:
+  # One fixed value: a literal, a member of a capitalized name, or a SCREAMING_SNAKE_CASE constant.
+  fixed-value:
+    any:
+      - kind: string
+      - kind: number
+      - kind: template_string
+        not:
+          has:
+            kind: template_substitution
+      - kind: member_expression
+        has:
+          field: object
+          kind: identifier
+          regex: ^[A-Z]
+      - kind: identifier
+        regex: ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$
+  # An array literal of one or more fixed values, with only brackets, commas, and comments besides.
+  fixed-array:
+    kind: array
+    has:
+      matches: fixed-value
+    not:
+      has:
+        not:
+          any:
+            - matches: fixed-value
+            - kind: comment
+            - regex: '^[\[\],]$'
+  # The array, bare or inside parentheses, `as`, or `satisfies`.
+  fixed-list:
+    any:
+      - matches: fixed-array
+      - kind: parenthesized_expression
+        has:
+          any:
+            - matches: fixed-array
+            - kind: as_expression
+              has:
+                matches: fixed-array
+            - kind: satisfies_expression
+              has:
+                matches: fixed-array
+  # The array inside `as` or `satisfies`, as a module-level literal ends, such as `[...] as const satisfies readonly Kind[]`.
+  asserted-array:
+    any:
+      - matches: fixed-array
+      - kind: as_expression
+        has:
+          matches: asserted-array
+      - kind: satisfies_expression
+        has:
+          matches: asserted-array
+  # A `const` declarator at the top level of the module, exported or not, that holds a fixed array.
+  module-fixed-array:
+    kind: variable_declarator
+    has:
+      field: value
+      matches: asserted-array
+    inside:
+      kind: lexical_declaration
+      regex: ^const\s
+      inside:
+        any:
+          - kind: program
+          - kind: export_statement
+            inside:
+              kind: program
+  # `new Set([...])` of fixed values, bare or inside `as` or `satisfies`, written where it is tested.
+  fixed-set:
+    kind: new_expression
+    all:
+      - has:
+          field: constructor
+          regex: ^Set$
+      - has:
+          field: arguments
+          has:
+            matches: asserted-array
+rule:
+  kind: call_expression
+  has:
+    field: function
+    kind: member_expression
+    any:
+      - all:
+          - has:
+              field: object
+              matches: fixed-list
+          - has:
+              field: property
+              regex: ^includes$
+      - all:
+          - has:
+              field: object
+              kind: identifier
+              pattern: $LIST
+          - has:
+              field: property
+              regex: ^includes$
+          - inside:
+              kind: program
+              stopBy: end
+              has:
+                matches: module-fixed-array
+                stopBy: end
+                has:
+                  field: name
+                  pattern: $LIST
+      - all:
+          - has:
+              field: object
+              matches: fixed-set
+          - has:
+              field: property
+              regex: ^has$

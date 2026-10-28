@@ -1,21 +1,4 @@
 {
-  "rules": {
-    "no-magic-numbers": [
-      "error",
-      {
-        "ignore": [-1, 0, 1, 2],
-        "enforceConst": true,
-        "detectObjects": false,
-        "ignoreArrayIndexes": true,
-        "ignoreEnums": true,
-        "ignoreNumericLiteralTypes": true,
-        "ignoreTypeIndexes": true,
-        "ignoreReadonlyClassProperties": true,
-        "ignoreClassFieldInitialValues": false,
-        "ignoreDefaultValues": false
-      }
-    ]
-  },
   "overrides": [
     {
       "files": [
@@ -26,7 +9,27 @@
         "**/testing/**",
         "**/__tests__/**"
       ],
-      "rules": { "no-magic-numbers": "off" }
+      "rules": {
+        // C: code-numeric-literals lets a test file write numbers bare.
+        "no-magic-numbers": "off"
+      }
     }
-  ]
+  ],
+  "rules": {
+    "no-magic-numbers": [
+      "error",
+      {
+        "detectObjects": false,
+        "enforceConst": true,
+        "ignore": [-1, 0, 1],
+        "ignoreArrayIndexes": true,
+        "ignoreClassFieldInitialValues": false,
+        "ignoreDefaultValues": false,
+        "ignoreEnums": true,
+        "ignoreNumericLiteralTypes": true,
+        "ignoreReadonlyClassProperties": true,
+        "ignoreTypeIndexes": true
+      }
+    ]
+  }
 }

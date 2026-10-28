@@ -1,0 +1,76 @@
+# code-closed-value-sets: test two or more members of a closed set with its declared module-level set, never with a pattern written at the test.
+# Rust only; member-chains-rust.yml reports the same test written as a chain of comparisons.
+id: member-patterns-rust
+language: Rust
+severity: error
+message: "Declare these members once as a module-level `const` slice and test it with `contains`, or, where no constant can hold the members, branch with a `match` that names every member, instead of a pattern written at the test."
+note: |
+  A `matches!` whose pattern joins two or more alternatives with `|`, one of them a member or a literal, is reported, such as `matches!(state, SandboxState::Stopped | SandboxState::Failed)` or `matches!(c, ' ' | '\t')`.
+  So is such a pattern in `if let`, `while let`, or `let ... else`, such as `if let SandboxState::Stopped | SandboxState::Failed = state`.
+  A member is a path whose type is capitalized, such as `SandboxState::Stopped` or `Event::Opened { .. }`, and a literal is a character, string, or integer literal.
+  In `matches!`, a `|` inside parentheses or braces or after an `if` guard does not count, and a pattern of one alternative or with a range, such as `matches!(c, 'a'..='z')`, is not reported.
+  A `matches!` inside another macro's arguments, such as `assert!(matches!(...))`, is left to review.
+  A `match` whose arms name every member, grouping members that share a result, such as `SandboxState::Stopped | SandboxState::Failed => ...`, branches on the set and is not reported.
+  Where no constant can hold the members, such as variants that carry data, write that `match`.
+utils:
+  # A token of a `matches!` pattern: after the first top-level comma and before any guard.
+  in-pattern:
+    follows:
+      regex: '^,$'
+      stopBy: end
+    not:
+      follows:
+        regex: '^if$'
+        stopBy: end
+rule:
+  any:
+    - kind: macro_invocation
+      all:
+        - has:
+            field: macro
+            regex: ^matches$
+        - has:
+            kind: token_tree
+            all:
+              - has:
+                  regex: '^\|$'
+                  matches: in-pattern
+              - has:
+                  matches: in-pattern
+                  any:
+                    - kind: char_literal
+                    - kind: string_literal
+                    - kind: integer_literal
+                    - kind: identifier
+                      regex: ^[A-Z]
+                      precedes:
+                        regex: '^::$'
+              - not:
+                  has:
+                    regex: '^\.\.=?$'
+    - kind: or_pattern
+      not:
+        any:
+          - inside:
+              kind: or_pattern
+          - inside:
+              stopBy: end
+              kind: match_pattern
+          - has:
+              stopBy: end
+              kind: range_pattern
+      has:
+        stopBy: end
+        any:
+          - kind: char_literal
+          - kind: string_literal
+          - kind: integer_literal
+          - kind: scoped_identifier
+            has:
+              field: path
+              regex: '(^|::)[A-Z][A-Za-z0-9_]*$'
+      inside:
+        stopBy: end
+        any:
+          - kind: let_condition
+          - kind: let_declaration

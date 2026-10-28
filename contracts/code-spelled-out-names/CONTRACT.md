@@ -1,35 +1,52 @@
 ---
 name: code-spelled-out-names
-message: Spell out every word of every declared name, with a repository word list and a one-character ban that lint enforces in every language.
+message: Spell out every word of every declared name, case acronyms as words, map `get`, `fetch`, and `load` to `read`, and ban one-character names in every language's lint.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
 
-Apply these rules to every name a change declares: variables, parameters, callback parameters, fields, functions, methods, types, constants, enum members, and schema keys.
+Apply these rules to every name a change declares: variables, parameters, callback parameters, fields, functions, methods, types, type parameters, constants, enum members, and schema keys.
 Exempt generated files and copied third-party source from these rules by a path pattern declared in the lint configuration, and apply the rules to the source that the repository writes as a generator's input.
 Declare one list of word replacements for the repository, each mapping an abbreviation or a spelling variant to the one word that replaces it, such as `dir` to `directory`, `ctx` to `context`, `err` to `error`, and `colour` to `color`.
 Keep that list in one place, and configure every language's lint from it, so that no language's lint misses a listed word.
 Configure the repository's lint to reject a declared name that holds a listed word as any of its words, in any case style, such as `dir`, `orderDir`, `order_dir`, or `ORDER_DIR`.
 When a language's lint cannot match a word inside a name, check that language's compound names in review.
 Configure the lint to reject a declared name of one character, including a callback's parameters, such as `(a, b) => a.total - b.total`.
-A type parameter of one capital letter, such as `T`, and `_` for a value that the code never reads are allowed.
+Name every type parameter with a word for what it stands for, such as `Row` in `readFirst<Row>` or `Catalog`.
+Treat a mapped type's key, an inferred type, a type variable that an assignment declares, a const generic parameter, and a lifetime parameter, such as `'input`, as type parameters.
+`_` for a value that the code never reads is allowed.
+Never declare a name that the code already binds where the declaration appears, in an enclosing scope or earlier in the same block, in every language.
+
+Map `get`, `fetch`, and `load` to `read` in the list, so that every lookup of one value starts with `read`, whatever its medium, such as `readInvoice` for `fetchInvoice`.
+Start a search by a condition with `find`, such as `findOverdueInvoice`, and a lookup of many values with `list`, such as `listInvoices`.
+An accessor's `get` keyword, as in `get total()`, is not part of its name, which is `total`.
+Every language's lint holds these mappings, even a language that defines `get` as a keyword.
 
 Declare beside the list the acronyms that readers outside the repository know as words, such as `id`, `api`, `url`, `json`, and `utf8`, and leave them out of the list.
+Case each acronym or initialism inside a name as a word, such as `callbackUrl` and `HttpClient`, so no name with a lowercase letter holds two capitals in a row.
+A name of capitals, digits, and underscores alone, such as the constant `MAX_URL_LENGTH`, cases every word alike and is allowed, except as a type's name, such as `URL`.
 A word that a language itself defines, such as the name of a primitive type, is a word in that language, and that language's lint leaves it out.
 Each unit suffix that the repository declares under `code-measured-value-names`, and the bound words `max` and `min` that it names, are words, and the list leaves them out.
 Reading a name that another system declares, such as a base class's `this.ctx`, is not a declaration and is allowed.
 Keep a declared name that another system fixes, such as an interface's method, a library option, a wire field, or a command-line flag, and suppress its finding as `code-lint-suppressions` requires, with a reason that names that system.
 Keep the external name of a stored or shipped field that the repository owns, as `data-stored-and-shipped-formats` requires, through a serializer rename where one exists and otherwise with a suppressed finding.
 Never remove a word from the list or exempt one name in the lint configuration to let a change pass; suppress that finding instead.
+Run this contract's `assets/` rules with the repository's lint; they reject one-character type parameters, declared names that start with `get`, `fetch`, or `load`, and two capitals in a row.
 
-Violation: `const orderDir = join(root, 'orders')` abbreviates `directory`, and `orders.filter((o) => o.isPaid)` names an order with one letter.
-Allowed: `const orderDirectory = join(root, 'orders')`, `orders.filter((order) => order.isPaid)`, and a constructor that names its parameter `state` and reads its base class's `this.ctx`.
+Violation: `const orderDir = join(root, 'orders')` abbreviates `directory`, `orders.filter((o) => o.isPaid)` names an order with one letter, and `getInvoice`, `fetchInvoice`, and `readFirst<T>` use `get`, `fetch`, and `T`.
+Allowed: `const orderDirectory = join(root, 'orders')`, `orders.filter((order) => order.isPaid)`, `readInvoice`, `readFirst<Row>`, an accessor `get total()`, and a constructor that reads its base class's `this.ctx`.
+Violation: `callbackURL`, `parseJSON`, `HTTPClient`, and `XAxis` each put two capitals in a row, and `type URL = string` names a type in capitals.
+Allowed: `callbackUrl`, `parseJson`, `HttpClient`, `HorizontalAxis`, `type Url = string`, the constant `MAX_URL_LENGTH`, and a call of a dependency's imported `parseURL`.
+Violation: `computeTotal({ invoice })` maps `invoice.lines` with `(invoice) => invoice.total`, which declares the parameter's name `invoice` again.
+Allowed: that callback names its parameter `line`, as in `(line) => line.total`.
 
 ## Checks
 
-Run the repository's lint on the changed files, and confirm it reports no listed word and no one-character name.
-Compare each language's lint configuration with the word list, and confirm each one holds every listed word that its language does not define.
+Run the repository's lint and this contract's `assets/` rules from the repository root on the changed files, and confirm they report no listed word, one-character name, or acronym.
+Compare each language's lint configuration with the word list, and confirm each one holds `get`, `fetch`, `load`, and every other listed word that its language does not define.
 For each compound name that a language's lint cannot split, does any of its words appear in the list?
+Does each name a change declares case every acronym as a word, including one that a digit hides from the lint, such as `runE2E`?
 Does a changed name use an abbreviation or spelling variant that the list lacks, and should the list gain it?
 For each suppression of these rules that a change adds, does its reason name the system that fixes the name?
 Does the change remove a word from the list or exempt a single name in the lint configuration?

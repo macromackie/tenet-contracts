@@ -1,6 +1,7 @@
 ---
 name: code-module-structure-and-control-flow
-message: Keep modules focused and named for their behavior, with explicit inputs, results, and control flow.
+message: Keep modules focused and named for their behavior, start every lowercase function name with a declared verb, and keep inputs, results, and control flow explicit.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -26,11 +27,24 @@ Name values for what they hold.
 
 Never write by hand the parsing, validation, or provider integration that a maintained library provides; call the library and use its types.
 
+Declare a list of verbs, such as `read`, `create`, and `settle`, and start every owned function, method, function-typed member, and function-valued constant whose name begins in lowercase with one.
+Match that first word in every case style, such as `settle` in `settleInvoice` and `settle_invoice`, and configure the repository's lint to reject any other first word.
+The list also holds predicate prefixes from `code-boolean-names`, `on` for event handlers such as `onSubmit`, `use` for hooks, and per-language constructor and conversion prefixes such as `new` and `into`.
+List only verbs and these prefixes, never a noun or adjective such as `total` or `pending`, and no word that `code-spelled-out-names` replaces.
+The verb rule skips names that begin in capitals, such as components, names the language defines, such as constructors, and the `main` function of `code-script-entry-points`.
+Name an accessor, which reads as a property or returns a field, and a test fixture for their values, and a test titled by its name for its behavior.
+Keep a name that an interface or framework fixes, such as a platform's `alarm` method, and suppress its finding as `code-lint-suppressions` requires, with a reason naming that system.
+This contract's `assets/` folder ships a default verb list and lint rules that hold it, and a repository may add or remove verbs in its copy.
+
+Violation: `function total({ invoice }: TotalInput)` and `const finishedResults: ReadResults = ({ run }) => ...` name functions for the values they return.
+Allowed: `computeTotal({ invoice })`, `readFinishedResults({ run })`, `isPaid({ invoice })`, `onSubmit`, `useInvoices`, an `InvoiceRow` component, and an accessor `get total()`.
+
 ## Checks
 
 Read a representative changed call from entry to result: can its inputs, effects, result, error path, and owner be understood without following a chain of forwarding helpers?
 Compare that call before and after the change and confirm the caller needs no more local context than before.
 For each new module or helper, name the behavior it owns and the concept, duplication, or independent operation that justifies it.
 Search changed paths for catch-all module names, generic names, and helpers with a single caller.
+Run the repository's lint on changed files, confirm it reports no function off the verb list, and compare each language's rule and each predicate prefix with the list.
 For each generic stored or wire name or value that another system or a released format fixes, does it appear only in the mapping that reads or writes it, while owned code uses a name for its concept?
 Run the repository's formatter, linter, and type checks; they establish layout and types, not readability.
