@@ -1,0 +1,67 @@
+---
+"concurrency":
+  # A newer push replaces a pull request's run; a release's check always finishes.
+  # The number keeps 2 fork pull requests from one branch name, such as main, out of each other's group.
+  "cancel-in-progress": "${{ github.event_name == 'pull_request' }}"
+  "group": "check-${{ github.event.pull_request.number || github.ref }}"
+"jobs":
+  "library":
+    "name": "Library self-check"
+    "permissions":
+      "contents": "read" # Read the checkout.
+    "runs-on": "ubuntu-latest"
+    "steps":
+      - "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" # v6
+        "with":
+          "persist-credentials": false
+      # Installs every tool that mise.toml pins, at its pin.
+      - "uses": "jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c" # v4
+        "with":
+          "cache": false
+          "version": "2026.8.12"
+      - "run": "mise exec -- uv run --locked --script scripts/check-library.py"
+    "timeout-minutes": 15
+  "minimum-tenet":
+    "env":
+      # The README's minimum Tenet for a contract without assets, and its linux x86_64 archive's SHA-256.
+      # Raise both lines together.
+      "TENET_ARCHIVE_SHA256": "39747fe586f7e23d8b53c6f07fe1f035a7108c3a35efb4e49e987dee9db7a5a4"
+      "TENET_VERSION": "0.7.0"
+    "name": "Install without assets on the minimum Tenet"
+    "permissions":
+      "contents": "read" # Read the checkout.
+    "runs-on": "ubuntu-latest"
+    "steps":
+      - "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" # v6
+        "with":
+          "persist-credentials": false
+      - "name": "Install Tenet"
+        "run": |
+          set -euo pipefail
+          archive="${RUNNER_TEMP}/tenet.tar.xz"
+          curl --proto '=https' --tlsv1.2 --fail --location --silent --show-error --output "${archive}" \
+            "https://github.com/macromackie/tenet/releases/download/v${TENET_VERSION}/tenet-x86_64-unknown-linux-gnu.tar.xz"
+          echo "${TENET_ARCHIVE_SHA256}  ${archive}" | sha256sum --check --strict
+          tar --extract --xz --file "${archive}" --directory "${RUNNER_TEMP}" --strip-components 1 \
+            tenet-x86_64-unknown-linux-gnu/tenet
+      - "name": "Install each contract without assets into a scratch project"
+        "run": |
+          set -euo pipefail
+          project="${RUNNER_TEMP}/project"
+          git init -q "${project}"
+          for folder in contracts/*/; do
+            if [[ ! -d "${folder}assets" ]]; then
+              name=$(basename "${folder}")
+              "${RUNNER_TEMP}/tenet" --root "${project}" contracts add "library/${name}@HEAD" \
+                --source "library=file://${GITHUB_WORKSPACE}" --scope .
+            fi
+          done
+          "${RUNNER_TEMP}/tenet" --root "${project}" validate
+    "timeout-minutes": 5
+"name": "Check"
+"on":
+  "pull_request": {}
+  # release.yml runs this check on every push to main before it tags.
+  "workflow_call": {}
+"permissions": {}
+...

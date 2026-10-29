@@ -1,68 +1,59 @@
-name: Release
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-permissions:
-  contents: write
-concurrency:
-  group: release
-  cancel-in-progress: false
-env:
-  TENET_VERSION: 0.11.0
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Install Tenet
-        run: |
-          curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/macromackie/tenet/releases/download/v$TENET_VERSION/tenet-installer.sh" | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - name: Install every contract into a scratch project
-        run: |
-          set -euo pipefail
-          project=$(mktemp -d)
-          git -C "$project" init -q
-          for contract in contracts/*/CONTRACT.md; do
-            name=$(basename "$(dirname "$contract")")
-            if ! sed -n '2,/^---$/p' "$contract" | grep -qx "name: $name"; then
-              echo "::error file=$contract::The contract name must equal its folder name, $name."
-              exit 1
-            fi
-            tenet --root "$project" contracts add "library/$name@$GITHUB_SHA" --source "library=file://$GITHUB_WORKSPACE" --scope .
-          done
-          tenet --root "$project" validate
-      - name: Tag and publish the version commit
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
+---
+"concurrency":
+  "cancel-in-progress": false
+  "group": "release"
+"jobs":
+  "check":
+    "name": "Check"
+    "permissions":
+      "contents": "read" # The check reads the checkout.
+    "uses": "./.github/workflows/check.yml"
+  "release":
+    "name": "Tag and publish"
+    "needs":
+      - "check"
+    "permissions":
+      "contents": "write" # Create the version tag and its GitHub release.
+    "runs-on": "ubuntu-latest"
+    "steps":
+      - "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" # v6
+        "with":
+          "persist-credentials": false
+      - "env":
+          "GH_REPO": "${{ github.repository }}"
+          "GH_TOKEN": "${{ github.token }}"
+        "name": "Tag and publish the version commit"
+        "run": |
           set -euo pipefail
           tag=$(git log -1 --format=%B)
-          if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if ! [[ "${tag}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Not a version commit; nothing to release."
             exit 0
           fi
-          awk -v heading="## $tag" '$0 == heading {found = 1; next} found && /^## / {exit} found' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
-          if ! grep -q . "$RUNNER_TEMP/notes.md"; then
-            echo "::error file=CHANGELOG.md::Add a ## $tag section before releasing."
+          awk -v heading="## ${tag}" '$0 == heading {found = 1; next} found && /^## / {exit} found' CHANGELOG.md > "${RUNNER_TEMP}/notes.md"
+          if ! grep -q . "${RUNNER_TEMP}/notes.md"; then
+            echo "::error file=CHANGELOG.md::Add a ## ${tag} section before releasing."
             exit 1
           fi
-          existing=$(git ls-remote --tags origin "refs/tags/$tag" | cut -f1)
-          if [ -n "$existing" ] && [ "$existing" != "$GITHUB_SHA" ]; then
-            echo "::error::$tag already points to a different commit. Use a new version."
+          existing=$(git ls-remote --tags origin "refs/tags/${tag}" | cut -f1)
+          if [[ -n "${existing}" && "${existing}" != "${GITHUB_SHA}" ]]; then
+            echo "::error::${tag} already points to a different commit. Use a new version."
             exit 1
           fi
-          if [ -z "$existing" ]; then
-            gh api "repos/$GH_REPO/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA" > /dev/null
+          if [[ -z "${existing}" ]]; then
+            gh api "repos/${GH_REPO}/git/refs" -f ref="refs/tags/${tag}" -f sha="${GITHUB_SHA}" > /dev/null
           fi
-          if gh release view "$tag" > /dev/null 2>&1; then
-            echo "$tag is already published."
+          if gh release view "${tag}" > /dev/null 2>&1; then
+            echo "${tag} is already published."
             exit 0
           fi
-          gh release create "$tag" --verify-tag --title "$tag" --notes-file "$RUNNER_TEMP/notes.md"
+          gh release create "${tag}" --verify-tag --title "${tag}" --notes-file "${RUNNER_TEMP}/notes.md"
+    "timeout-minutes": 10
+"name": "Release"
+"on":
+  "push":
+    "branches":
+      - "main"
+  "workflow_dispatch": {}
+"permissions": {}
+...
