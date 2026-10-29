@@ -26,7 +26,7 @@ Mark each type inline in a statement that also imports values, such as `import {
 Never write a statement whose every name carries an inline `type`, because a compiler that keeps imports as written still loads that module at run time.
 Import each module specifier in exactly one statement, merging its type and value names, where `./usage.md?raw` and `./usage.md?url` are different specifiers.
 
-Declare the namespace libraries in the repository's lint configuration, replacing the shipped default list, and list only a package whose own documentation imports it as one namespace.
+Declare the namespace libraries in the repository's lint configuration, where the shipped list is empty, and list only a package whose own documentation imports it as one namespace.
 Write no namespace import of a module off that list, such as `import * as totals from './totals.ts'`, and import each name the file uses instead.
 Import a runtime built-in module's names by name too, never through its default export, which is the whole module, such as `import { readFile } from 'node:fs/promises'`.
 Import each test runner function a test calls, such as `expect`, by name from the runner's module, never as a global or from the runtime's test or assertion module.

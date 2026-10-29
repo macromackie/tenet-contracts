@@ -1,0 +1,36 @@
+id: parameter-mutations-tsx
+snapshots:
+  "function addLine({ order, line }: AddLineInput) { order.lines.push(line); }":
+    labels:
+    - source: order.lines.push(line)
+      style: primary
+      start: 50
+      end: 72
+    - source: push
+      style: secondary
+      start: 62
+      end: 66
+    - source: order
+      style: secondary
+      start: 50
+      end: 55
+    - source: order.lines
+      style: secondary
+      start: 50
+      end: 61
+    - source: order.lines.push
+      style: secondary
+      start: 50
+      end: 66
+    - source: order
+      style: secondary
+      start: 19
+      end: 24
+    - source: order
+      style: secondary
+      start: 19
+      end: 24
+    - source: "function addLine({ order, line }: AddLineInput) { order.lines.push(line); }"
+      style: secondary
+      start: 0
+      end: 75

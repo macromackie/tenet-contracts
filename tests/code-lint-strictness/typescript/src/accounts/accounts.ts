@@ -19,7 +19,7 @@ function isTransient(error: ProviderBusy): boolean {
 }
 
 function buildTimeoutFailure(): Effect.Effect<never, ProviderBusy> {
-  return Effect.gen(function* buildTimeoutFailureSteps() {
+  return Effect.gen(function* () {
     return yield* new ProviderBusy({ status: BUSY_STATUS });
   });
 }
@@ -41,7 +41,7 @@ export function readAccount({ account }: ReadAccountInput): Effect.Effect<Accoun
 }
 
 /** Reads two accounts together. */
-export const readAccountPair = Effect.fn("readAccountPair")(function* readAccountPairSteps({
+export const readAccountPair = Effect.fn("readAccountPair")(function* ({
   account,
 }: ReadAccountInput) {
   const first = readStoredAccount({ account });

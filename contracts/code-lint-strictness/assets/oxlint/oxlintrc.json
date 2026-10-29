@@ -38,7 +38,9 @@
     {
       "files": [
         "**/errors.ts",
+        "**/errors.mts",
         "**/schemas.ts",
+        "**/schemas.mts",
         "**/schemas/**"
       ],
       "rules": {
@@ -49,6 +51,7 @@
     {
       "files": [
         "**/settings.ts",
+        "**/settings.mts",
         "**/settings/**"
       ],
       "rules": {
@@ -135,11 +138,12 @@
         "includeCommonJSModuleExports": true
       }
     ],
+    // code-typescript-effect-errors passes `Effect.gen` and `Effect.fn('name')` an anonymous generator.
     "func-names": [
       "error",
       "always",
       {
-        "generators": "always"
+        "generators": "never"
       }
     ],
     "id-length": [

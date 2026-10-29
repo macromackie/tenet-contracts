@@ -13,7 +13,7 @@ function refundInvoice({
   invoice,
   status,
 }: RefundInvoiceInput): Effect.Effect<Response, RefundRefused> {
-  return Effect.gen(function* refundInvoiceSteps() {
+  return Effect.gen(function* () {
     if (status !== ACCEPTED) {
       return yield* new RefundRefused({ invoice, status });
     }

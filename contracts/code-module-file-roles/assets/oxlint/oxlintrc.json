@@ -21,7 +21,7 @@
       }
     },
     {
-      "files": ["**/errors.ts", "**/schemas.ts"],
+      "files": ["**/errors.ts", "**/errors.mts", "**/schemas.ts", "**/schemas.mts"],
       "rules": {
         // C: code-module-file-roles lets a module's tagged error classes share its errors file and its schema classes its schemas file.
         "max-classes-per-file": "off"

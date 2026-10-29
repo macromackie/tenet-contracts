@@ -1,0 +1,12 @@
+{
+  "name": "env-tool",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "effect": "4.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "7.0.2"
+  }
+}

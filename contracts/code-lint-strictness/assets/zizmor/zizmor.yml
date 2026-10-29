@@ -1,6 +1,7 @@
 ---
 # The strictest zizmor settings that code-lint-strictness requires.
-# zizmor runs every audit by default; this file sets the strictest policy of each audit that takes one, and turns none off.
+# zizmor runs every audit by default; this file sets the strictest policy of each audit that takes one,
+# and turns one off, with its reason letters on the line above it.
 #
 # zizmor reads only its own file, so copy this file to `.github/zizmor.yml`.
 # List each action the workflows use under `forbidden-uses` in that copy, as an owner, `owner/repo`, or `owner/repo@ref` pattern.
@@ -17,6 +18,11 @@
     "config":
       # An empty allow list reports every action, so each action a workflow uses is listed before it runs.
       "allow": []
+  # R: the audit asks for the `$/` form of a same-repository action or reusable workflow,
+  # which actionlint 1.7.12 rejects in `uses:`; it accepts only the `./` form.
+  # Turn the audit back on when the pinned actionlint accepts `$/`.
+  "self-repository":
+    "disable": true
   "unpinned-uses":
     "config":
       "policies":

@@ -1,6 +1,7 @@
 ---
 name: cli-output-channels
 message: Write a command-line program's result to standard output and every other line to standard error through one output module, and end the process only from its entry point with a declared exit status.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -22,10 +23,15 @@ A process exit status, including 0 and 130, is a value the program defines, not 
 Library code returns an outcome from a closed set, such as a review's overall status, and only the entry point maps each outcome to its exit status.
 
 Enforce these rules with the repository's lint, which reports every console call, print macro, and stream handle outside the output module, every process exit outside the output module and the entry point, and every exit status written as a number outside the one declaration of the program's exit statuses.
+Load this contract's `assets/` configuration and the stream entries of `code-lint-strictness`'s shipped configuration where the lint can; they read the output module as `output`, and the set of exit statuses as `ExitStatus`.
+A repository may rename these, and adds to those entries each dependency's function that opens a standard stream, such as a terminal library's constructor.
+Where the lint cannot scope a rule to the output module's path, suppress that rule at each of the output module's calls.
 Suppress a finding only as `code-lint-suppressions` allows.
 
 Violation: a deploy step calls `console.log('deploy: waiting for readiness')` and then `process.exit(1)` in the middle of the script.
+Violation: the entry point returns `ExitCode::from(2)` when a deploy is refused.
 Allowed: the deploy step calls the output module's `reportProgress({ line: 'waiting for readiness' })`, and the entry point passes `ExitStatus.Refused` to `finish`.
+Allowed: the entry point returns `ExitCode::from(ExitStatus::Refused)`, through the conversion that the declaration of `ExitStatus` implements.
 
 ## Checks
 

@@ -320,8 +320,10 @@ The library has 168 contracts.
 
 ## Skills
 
-Start with `tenet` for CLI usage, `tenet-adoption` for adoption and updates, or one of the curation skills. Install one
-with Tenet 0.11.0 or later:
+Start with `tenet` for CLI usage, `tenet-adoption` for adoption and updates, or one of the curation skills.
+`env-curation` sets or clears one key of a dotenv file without printing its value, and `cargo-dist-release` regenerates
+cargo-dist's release workflow for a Cargo workspace in a subfolder of its repository. Install one with Tenet 0.11.0 or
+later:
 
 ```sh
 tenet skills add tenet/tenet-adoption
@@ -341,9 +343,11 @@ contracts and skills: area-first names, one sentence per line, no company or unn
 releases. Run `uv run --locked --script scripts/check-library.py` before opening a pull request, with the tools that
 `mise.toml` pins installed, such as through `mise install`. It runs `scripts/lint-contracts.py`, which also checks that
 the tables above list each contract once, under its area, with its message. It then runs the shipped checkers on the
-library, compiles and lints the Effect probe, checks the release version, and installs every contract and skill. Test
-cases for a contract's tool files live in `tests/<contract>/<tool>/`, outside the folder that projects install. Accepted
-changes ship in the next tag and are credited in the changelog.
+library, compiles and lints the Effect probe and the env tool, runs the env tool's check with fake values, checks the
+release version, and installs every contract and skill. The Check workflow runs it on each pull request and before each
+release, and installs each contract without assets with Tenet 0.7.0. Test cases for a contract's tool files live in
+`tests/<contract>/<tool>/`, outside the folder that projects install. Accepted changes ship in the next tag and are
+credited in the changelog.
 
 ## Releases
 

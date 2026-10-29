@@ -7,7 +7,7 @@
 # Clippy has no setting that extends another file, so copy this file as the workspace's clippy.toml,
 # and comment any local change beside the key it changes.
 # A repository may declare its own value for a threshold below, with a comment naming the contract that lets it.
-# Fill that copy's `disallowed-names` and `doc-valid-idents` lists, as the comment above each says.
+# Fill that copy's `disallowed-methods`, `disallowed-names`, and `doc-valid-idents` lists, as the comment above each says.
 # Keys stay in alphabetical order.
 # A new Clippy version adds options, so this file is tested against Clippy 1.98.0; raise it in a reviewed upgrade.
 
@@ -37,6 +37,15 @@ check-inconsistent-struct-field-initializers = true
 check-private-items = true
 # code-function-size declares a maximum complexity per function.
 cognitive-complexity-threshold = 15
+# cli-output-channels opens a handle to either standard stream only in the output module.
+# The restriction group already denies the print macros (`print_stdout`, `print_stderr`) and `std::process::exit` (`exit`).
+# Clippy has no path scope, so the output module's one call of each function carries an outer
+# `#[expect(clippy::disallowed_methods, reason = "...")]`, as code-lint-suppressions allows.
+# Add each dependency's function that opens a standard stream, such as a terminal library's constructor.
+disallowed-methods = [
+  { path = "std::io::stderr", reason = "Open standard error only in the output module, as cli-output-channels requires." },
+  { path = "std::io::stdout", reason = "Open standard output only in the output module, as cli-output-channels requires." },
+]
 # Add each abbreviation and spelling variant in the repository's code-spelled-out-names word list.
 disallowed-names = [".."]
 # Add each product and proper name that the repository's spelling check accepts.

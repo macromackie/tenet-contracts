@@ -1,0 +1,8 @@
+---
+# Each case comes from a Violation or Allowed line of cli-output-channels.
+"id": "numeric-exit-statuses-rust"
+"invalid":
+  - "fn main() -> ExitCode { ExitCode::from(2) }"
+"valid":
+  - "fn main() -> ExitCode { ExitCode::from(ExitStatus::Refused) }"
+...

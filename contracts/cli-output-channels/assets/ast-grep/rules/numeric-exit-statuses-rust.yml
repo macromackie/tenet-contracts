@@ -1,0 +1,43 @@
+---
+# cli-output-channels: write each exit status as a member of the program's one closed set, never as a number.
+# Rust only; Clippy's restriction group reports every `std::process::exit` call, whatever its argument.
+"id": "numeric-exit-statuses-rust"
+# The output module, which may hold the exit-status declaration.
+"ignores":
+  - "**/output.rs"
+"language": "Rust"
+"message": "Pass a member of the program's exit-status set, such as `ExitStatus::Refused`, instead of a number."
+"note": |
+  The rule reports an integer literal, such as `2`, `2_u8`, or `-1`, passed as the only argument to `ExitCode::from` or to `exit`, with or without a `std::process::` or `process::` prefix.
+  The exit-status declaration is exempt: a call inside an `impl` block of the set `ExitStatus`, or inside a trait implementation that names it, such as `impl From<ExitStatus> for ExitCode`.
+  The output module is exempt by the path under `ignores`.
+  A repository whose set or output module has another name edits the `regex` below or `ignores`.
+"rule":
+  "all":
+    - "has":
+        "field": "function"
+        "regex": "^(?:(?:std::)?process::)?(?:ExitCode::from|exit)$"
+    # One argument, which is an integer literal or a negated one.
+    - "has":
+        "field": "arguments"
+        "has":
+          "any":
+            - "kind": "integer_literal"
+            - "has":
+                "kind": "integer_literal"
+              "kind": "unary_expression"
+        "regex": '^\([^,]*\)$'
+  "kind": "call_expression"
+  "not":
+    "inside":
+      "any":
+        - "has":
+            "field": "type"
+            "regex": "^ExitStatus$"
+        - "has":
+            "field": "trait"
+            "regex": '\bExitStatus\b'
+      "kind": "impl_item"
+      "stopBy": "end"
+"severity": "error"
+...

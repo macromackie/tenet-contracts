@@ -47,7 +47,7 @@ export function readInvoice({
   Cause.TimeoutError | InvoiceNotFound | ProviderReplyInvalid | RequestDropped,
   InvoiceStore
 > {
-  return Effect.gen(function* readInvoiceSteps() {
+  return Effect.gen(function* () {
     const store = yield* InvoiceStore;
     const found = yield* store.findInvoice({ invoice });
 
@@ -71,7 +71,7 @@ export function readInvoice({
 }
 
 /** Sends one reminder for each overdue invoice, a few at a time. */
-export const remindInvoices = Effect.fn("remindInvoices")(function* remindInvoicesSteps({
+export const remindInvoices = Effect.fn("remindInvoices")(function* ({
   invoices,
 }: RemindInvoicesInput) {
   const store = yield* InvoiceStore;

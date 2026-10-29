@@ -8,7 +8,8 @@ Check that the library's assets load and pass in their pinned tools, and that a 
 
 Run `uv run --locked --script scripts/check-library.py`; it checks the library that holds it.
 It runs lint-contracts.py and the shipped checkers on the library's own files.
-It compiles and lints the Effect probe, and checks the Effect names and the release version.
+It compiles and lints the Effect probe and the env tool, runs the env tool's system check with fake
+values, and checks the Effect names and the release version.
 It installs every contract and skill with the pinned Tenet.
 """
 
@@ -40,24 +41,43 @@ STRICTNESS = f"contracts/{STRICTNESS_CONTRACT}/assets"
 """The folder of the shipped checker configurations that code-lint-strictness holds."""
 PROBE = "tests/code-lint-strictness/typescript"
 """The Effect probe project, written in the Allowed forms of the Effect contracts."""
+ENV_TOOL = "skills/env-curation/scripts"
+"""The env tool that the env-curation skill ships, with its system check."""
+RELEASE_SCRIPTS = "skills/cargo-dist-release/scripts"
+"""The release workflow script that the cargo-dist-release skill ships."""
+GUIDANCE_CHECK = "contracts/contract-maintenance/assets/uv"
+"""The guidance check that contract-maintenance ships, with its packages locked beside it."""
+PYTHON_RESOURCES = (RELEASE_SCRIPTS, GUIDANCE_CHECK)
+"""The Python scripts that a skill or a contract ships."""
 VERSION_COMMANDS = {
     "aqua:ast-grep/ast-grep": ("ast-grep", "--version"),
     "aqua:astral-sh/ruff": ("ruff", "--version"),
     "aqua:astral-sh/ty": ("ty", "--version"),
     "aqua:crate-ci/typos": ("typos", "--version"),
+    "aqua:koalaman/shellcheck": ("shellcheck", "--version"),
+    "aqua:rhysd/actionlint": ("actionlint", "--version"),
     "aqua:tamasfe/taplo": ("taplo", "--version"),
+    "aqua:zizmorcore/zizmor": ("zizmor", "--version"),
     "github:macromackie/tenet": ("tenet", "--version"),
     "node": ("node", "--version"),
     # The markdownlint-cli2 command has no version option; linting no files prints its version.
     "npm:markdownlint-cli2": ("markdownlint-cli2", "#**"),
     "npm:oxfmt": ("oxfmt", "--version"),
+    "pipx:pyflakes": ("pyflakes", "--version"),
     "pipx:yamllint": ("yamllint", "--version"),
     "uv": ("uv", "--version"),
 }
 """Each pinned tool's command and the arguments that make it print its version."""
 LIBRARY_CHECKS = (
     ("uv", "run", "--script", "scripts/lint-contracts.py"),
-    ("yamllint", "--strict", "--config-file", f"{STRICTNESS}/yamllint/yamllint.yaml", "contracts"),
+    (
+        "yamllint",
+        "--strict",
+        "--config-file",
+        f"{STRICTNESS}/yamllint/yamllint.yaml",
+        "contracts",
+        ".github",
+    ),
     ("markdownlint-cli2", "--config", f"{STRICTNESS}/markdownlint/markdownlint.jsonc", "**/*.md"),
     ("oxfmt", "--check", "**/*.md"),
     (
@@ -66,10 +86,21 @@ LIBRARY_CHECKS = (
         "contracts/code-typescript-import-statements/assets/oxfmt/oxfmtrc.json",
         "--check",
         f"{PROBE}/src",
+        ENV_TOOL,
     ),
     ("typos", "--config", f"{STRICTNESS}/typos/typos.toml", "."),
-    ("ruff", "check", "--no-cache", "scripts"),
-    ("ruff", "format", "--no-cache", "--check", "scripts"),
+    # Offline, because the online audits call GitHub, and a check never calls a live service.
+    (
+        "zizmor",
+        "--offline",
+        "--persona=auditor",
+        "--strict-collection",
+        "--config",
+        ".github/zizmor.yml",
+        ".",
+    ),
+    ("ruff", "check", "--no-cache", "scripts", *PYTHON_RESOURCES),
+    ("ruff", "format", "--no-cache", "--check", "scripts", *PYTHON_RESOURCES),
     (
         "ty",
         "check",
@@ -80,9 +111,24 @@ LIBRARY_CHECKS = (
         "--extra-search-path",
         "scripts",
         "scripts",
+        # The guidance check imports packages that only its own environment installs.
+        RELEASE_SCRIPTS,
     ),
 )
 """The shipped checkers that run on the library's own files, from the library root."""
+ACTIONLINT = (
+    "env",
+    "SHELLCHECK_OPTS=--enable=all --severity=style",
+    "actionlint",
+    "-shellcheck=shellcheck",
+    "-pyflakes=pyflakes",
+)
+"""
+The actionlint run, with every optional shellcheck check and pyflakes on the workflows' scripts.
+
+actionlint takes the nearest folder with `.git` and `.github/workflows` as the project and reads
+`.github/actionlint.yaml` there, so it runs in the committed snapshot, whose project is the library.
+"""
 RULE_SETS = "contracts/*/assets/ast-grep/sgconfig.yml"
 RULE_TESTS = "tests/*/ast-grep/sgconfig.yml"
 OXLINT_FILES = "contracts/*/assets/oxlint/*.json"
@@ -165,7 +211,16 @@ def check_library_files() -> list[str]:
     toml_files = sorted(str(path.relative_to(ROOT)) for path in ROOT.glob("**/*.toml"))
     taplo = ("taplo", "fmt", "--check", "--config", f"{STRICTNESS}/taplo/taplo.toml", *toml_files)
     scans = [
-        ("ast-grep", "scan", "--config", str(path.relative_to(ROOT)), "scripts", f"{PROBE}/src")
+        (
+            "ast-grep",
+            "scan",
+            "--config",
+            str(path.relative_to(ROOT)),
+            "scripts",
+            f"{PROBE}/src",
+            "skills",
+            *PYTHON_RESOURCES,
+        )
         for path in sorted(ROOT.glob(RULE_SETS))
     ]
     tests = [
@@ -291,12 +346,12 @@ def copy_snapshot(*, snapshot: Path) -> None:
     ):
         subprocess.run(command, check=True, cwd=snapshot)
 
-    for folder in (snapshot, snapshot / PROBE):
+    for folder in (snapshot, snapshot / PROBE, snapshot / ENV_TOOL):
         subprocess.run(NPM_CI, check=True, cwd=folder)
 
 
-def check_probe(*, snapshot: Path) -> list[str]:
-    """Compile the Effect probe, and lint it with every shipped oxlint file in one configuration."""
+def check_typescript(*, snapshot: Path) -> list[str]:
+    """Compile and lint the probe and the env tool, and run the env tool's check on fake values."""
     write_oxlint_layers(snapshot=snapshot)
     oxlint = (
         "node_modules/.bin/oxlint",
@@ -305,10 +360,14 @@ def check_probe(*, snapshot: Path) -> list[str]:
         "--config",
         OXLINT_LAYERS,
         f"{PROBE}/src",
+        ENV_TOOL,
     )
     commands = (
         (("node_modules/.bin/tsc", "--noEmit", "--project", "."), snapshot / PROBE),
+        (("node_modules/.bin/tsc", "--noEmit", "--project", "."), snapshot / ENV_TOOL),
         (oxlint, snapshot),
+        # It runs the real tool on a scratch file with fake values and reads them through mise.
+        (("node", "check/check-env-tool.mts"), snapshot / ENV_TOOL),
     )
 
     return [
@@ -482,10 +541,11 @@ def check_snapshot(*, scratch: Path) -> list[str]:
     snapshot = scratch / "library"
 
     copy_snapshot(snapshot=snapshot)
-    probe_errors = check_probe(snapshot=snapshot)
+    typescript_errors = check_typescript(snapshot=snapshot)
 
     return [
-        *probe_errors,
+        *typescript_errors,
+        *run_check(command=ACTIONLINT, folder=snapshot),
         *check_effect_names(snapshot=snapshot),
         *install_library(snapshot=snapshot, adopter=scratch / "adopter"),
     ]

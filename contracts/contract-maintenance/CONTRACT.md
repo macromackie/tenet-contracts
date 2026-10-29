@@ -1,6 +1,7 @@
 ---
 name: contract-maintenance
 message: Keep adopted contracts scoped, reviewable, and consistent with their implementation.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -14,6 +15,8 @@ Contracts describe the agreed implementation baseline rather than an aspirationa
 Define shared obligations once; nested contracts inherit their parents and add local ownership, concrete boundaries, or explicit exceptions.
 Keep shared requirements usable without private tooling.
 Keep numbered folders and indexes consistent; do not renumber unrelated rules.
+Keep each relative link in a guidance document, such as a contract, a skill, or an agent instruction file, resolving to a file in the repository.
+Declare the frontmatter fields that each kind of guidance document needs, such as a skill's `name` and `description`, and give each document of that kind every field as a nonempty string.
 
 Put local exceptions and additions to an adopted shared contract under a final `## Local adaptations` heading.
 Edit an adopted upstream sentence only when a local requirement must replace it, and propose general improvements to the shared source.
@@ -44,4 +47,5 @@ Identify what would violate each rule and how a reviewer would notice.
 For each added or tightened rule, does it allow one form per case, chosen without prevalence as a reason, and does a tool check it wherever one can?
 Check inherited requirements, exceptions, indexes, and commands for conflicts or duplication.
 Validate documents with the repository's contract checks, confirm that each named command exists and runs from its stated working directory, then review actual behavior and run the affected project checks.
+Run the guidance check in this contract's `assets/` folder from the repository root over the repository's guidance documents, with one `--require` pattern for each kind of document whose frontmatter fields the repository declares, where its runtime can run.
 Inspect any obligation left to judgment rather than assuming that passing the mechanical portion closes the contract.

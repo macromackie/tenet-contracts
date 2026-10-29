@@ -2,20 +2,13 @@
 # code-typescript-import-statements: the declared namespace libraries, matched by the rules in ../rules as `misimported-namespace-library`.
 # Each entry pairs one library's specifier with its namespace's name, the camelCase form of the package's name without its scope.
 # An entry matches an import statement of its library that does more than import that namespace, with or without `type`.
-# The default list holds `@stylexjs/stylex` as `stylex` and `valibot` as `valibot`, whose documentation imports each as one namespace.
+# The shipped list is empty, so no library is checked until a repository declares one.
+# A repository's copy adds one `all` entry per library: a `regex` for its specifier and a `not` holding a `regex` for its namespace import.
 # Keep the libraries identical to the `ignore` list of `import/no-namespace` in ../../oxlint/oxlintrc.json.
-# A repository adds or removes entries in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
-# The regexes read only the statement's text, so the TypeScript and Tsx rules share them.
+# A repository adds its entries in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
+# Each entry's regexes read only the statement's text, so the TypeScript and Tsx rules share them.
 "id": "misimported-namespace-library"
 "language": "TypeScript"
 "rule":
-  "any":
-    - "all":
-        - "regex": '\bfrom\s*[''"]@stylexjs/stylex[''"]'
-        - "not":
-            "regex": '^import\s+(?:type\s+)?\*\s+as\s+stylex\s+from\s*[''"]'
-    - "all":
-        - "regex": '\bfrom\s*[''"]valibot[''"]'
-        - "not":
-            "regex": '^import\s+(?:type\s+)?\*\s+as\s+valibot\s+from\s*[''"]'
+  "any": []
 ...

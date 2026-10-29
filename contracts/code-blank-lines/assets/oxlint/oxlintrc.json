@@ -39,7 +39,7 @@
       {
         "blankLine": "always",
         "next": {
-          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression']"
+          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression'], ExpressionStatement[expression.type='YieldExpression'][expression.delegate=true]"
         },
         "prev": "*"
       },
@@ -47,16 +47,16 @@
         "blankLine": "always",
         "next": "*",
         "prev": {
-          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression']"
+          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression'], ExpressionStatement[expression.type='YieldExpression'][expression.delegate=true]"
         }
       },
       {
         "blankLine": "any",
         "next": {
-          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression']"
+          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression'], ExpressionStatement[expression.type='YieldExpression'][expression.delegate=true]"
         },
         "prev": {
-          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression']"
+          "selector": "ExpressionStatement[expression.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.expression.type='CallExpression'], ExpressionStatement[expression.operator='void'][expression.argument.type=/^(CallExpression|NewExpression|AwaitExpression)$/], ExpressionStatement[expression.operator='void'][expression.argument.expression.type='CallExpression'], ExpressionStatement[expression.type='YieldExpression'][expression.delegate=true]"
         }
       },
       {

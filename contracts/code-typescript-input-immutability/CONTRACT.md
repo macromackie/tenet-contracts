@@ -7,7 +7,7 @@ requires-tenet: 0.11.0
 ## Rules
 
 Never assign to a parameter, or to a property at any depth of an object that a parameter holds, such as `order.status = status` or `order.totals.net = net`.
-Never call a method that changes a collection a parameter holds at any depth, such as `push`, `splice`, `sort`, `reverse`, `set`, `add`, or `delete`, and never pass a parameter's value as the target of `Object.assign`.
+Never call a method that changes a collection a parameter holds at any depth, such as `push`, `splice`, `sort`, `reverse`, `set`, `add`, `delete`, or `clear`, and never pass a parameter's value as the target of `Object.assign`.
 Changing a field of `this` in the class's own method, such as `this.#cache.set(key, value)`, is not changing a parameter.
 A collection that the function itself created, such as an array, `Map`, or `Set`, may change before the function returns it, except through `sort`, `reverse`, or the `delete` operator.
 `code-typescript-effect-absent-values` decides whether code may assign a field of an object that the function created.
@@ -46,7 +46,7 @@ Allowed: `const { secret, ...publicRecord } = record`, and `delete process.env.O
 
 ## Checks
 
-Run the lint from the repository root, and confirm it rejects `lines: Line[]`, a local `Array<Line>`, and `delete copy.secret`.
+Run the lint and `assets/` rules from the repository root, and confirm they reject `lines: Line[]`, a local `Array<Line>`, `delete copy.secret`, and `order.lines.push(line)`.
 From the package directory, run the package's type check.
 For each value a change modifies in place, did the same function create it?
 For each mutable array type a change writes in a local's or a private field's annotation, does only that function or class fill the array?

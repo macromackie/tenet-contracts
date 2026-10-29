@@ -1,0 +1,9 @@
+---
+# This library's copy of the actionlint file that code-lint-strictness ships.
+# The workflows use no self-hosted runner and no configuration variable, so both lists stay empty.
+# scripts/check-library.py runs actionlint with this file, shellcheck at every optional check, and pyflakes.
+
+"config-variables": []
+"self-hosted-runner":
+  "labels": []
+...

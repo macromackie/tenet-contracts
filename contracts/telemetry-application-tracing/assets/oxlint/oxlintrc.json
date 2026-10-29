@@ -1,7 +1,7 @@
 {
   "overrides": [
     {
-      "files": ["**/logger/log.ts"],
+      "files": ["**/logger/log.ts", "**/logger/log.mts"],
       "rules": {
         // C: telemetry-application-tracing allows console calls and stream handles only in the logger module.
         "no-console": "off",
@@ -16,7 +16,17 @@
       "error",
       { "object": "process", "property": "stdout" },
       { "object": "process", "property": "stderr" },
-      { "object": "globalThis", "property": "console" }
+      { "object": "globalThis", "property": "console" },
+      // Effect's console service and the Effect functions that write a log line.
+      { "object": "Console" },
+      { "object": "Effect", "property": "log" },
+      { "object": "Effect", "property": "logDebug" },
+      { "object": "Effect", "property": "logError" },
+      { "object": "Effect", "property": "logFatal" },
+      { "object": "Effect", "property": "logInfo" },
+      { "object": "Effect", "property": "logTrace" },
+      { "object": "Effect", "property": "logWarning" },
+      { "object": "Effect", "property": "logWithLevel" }
     ]
   }
 }

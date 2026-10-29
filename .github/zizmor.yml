@@ -1,0 +1,20 @@
+---
+# This library's copy of the zizmor file that code-lint-strictness ships.
+# scripts/check-library.py runs zizmor offline with the auditor persona, so a check never calls GitHub.
+
+"rules":
+  "forbidden-uses":
+    "config":
+      # Each action that a workflow here uses.
+      "allow":
+        - "actions/checkout"
+        - "jdx/mise-action"
+  # R: as in the shipped file, actionlint 1.7.12 rejects the `$/` form that the audit asks for.
+  "self-repository":
+    "disable": true
+  "unpinned-uses":
+    "config":
+      "policies":
+        # Every action, first-party ones included, is pinned to a full commit hash.
+        "*": "hash-pin"
+...

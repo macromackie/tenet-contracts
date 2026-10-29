@@ -1,0 +1,8 @@
+---
+# Test cases for code-typescript-input-immutability's ast-grep rules; run from the library root:
+# ast-grep test -c tests/code-typescript-input-immutability/ast-grep/sgconfig.yml
+"ruleDirs":
+  - "../../../contracts/code-typescript-input-immutability/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+...

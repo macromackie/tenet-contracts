@@ -1,0 +1,30 @@
+---
+# code-typescript-effect-errors: yield, return, or pass on each Effect a call builds, never leave it as a bare statement that never runs.
+# TypeScript variant (.ts, .mts, .cts); floating-effects-tsx.yml is identical except for `id`, `language`, and this line.
+"id": "floating-effects-typescript"
+"language": "TypeScript"
+"message": "Yield, return, or pass on this Effect, such as `return yield* Effect.fail(new InvoiceNotFound({ invoice }))`, because a bare statement builds it and never runs it."
+"note": |
+  An Effect is a description that runs only when it is yielded inside `Effect.gen` or `Effect.fn`, returned, or passed to a run function at an entry point.
+  The rule reports each statement that is only a call of an `Effect` member, such as `Effect.fail(new InvoiceNotFound({ invoice }));` or `Effect.forEach(invoices, (invoice) => remind({ invoice }));`.
+  A call of a run function, such as `Effect.runFork(program);` at an entry point, runs the Effect and is not reported.
+  A call of another value's method that returns an Effect, such as `store.save({ invoice });`, is left to review, because the rule cannot read types.
+"rule":
+  "has":
+    "has":
+      "all":
+        - "has":
+            "field": "object"
+            "kind": "identifier"
+            "regex": "^Effect$"
+        - "not":
+            "has":
+              "field": "property"
+              "regex": "^run"
+      "field": "function"
+      "kind": "member_expression"
+    "kind": "call_expression"
+  # `Effect.fail(new InvoiceNotFound({ invoice }));` written as a statement.
+  "kind": "expression_statement"
+"severity": "error"
+...

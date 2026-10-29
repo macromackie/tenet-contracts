@@ -1,0 +1,20 @@
+// The output module, the one file allowed console calls, stream handles, and the process exit, is `output.ts`, or `output.mts` for a script.
+// A repository whose output module has another path names it in an override of its own configuration.
+{
+  "overrides": [
+    {
+      "files": ["**/output.ts", "**/output.mts"],
+      "rules": {
+        // C: cli-output-channels writes the standard streams only through the output module.
+        "no-console": "off",
+        // C: same as `no-console`, for `process.stdout` and `process.stderr`.
+        "no-restricted-properties": "off",
+        // C: cli-output-channels ends the process from the output module's one exit function.
+        "unicorn/no-process-exit": "off"
+      }
+    }
+  ],
+  "rules": {
+    "no-console": "error"
+  }
+}

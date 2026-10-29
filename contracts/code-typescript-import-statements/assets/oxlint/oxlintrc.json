@@ -67,7 +67,7 @@
     "import/no-namespace": [
       "error",
       {
-        "ignore": ["@stylexjs/stylex", "valibot"]
+        "ignore": []
       }
     ],
     "no-restricted-imports": [

@@ -26,14 +26,14 @@ Map its failure in the `catch` option to a tagged error class that keeps the cau
 Never write a `catch` clause or call a promise's `then`, `catch`, or `finally` method, though a `try` with only a `finally` clause may release a resource.
 Declare every function that returns a promise `async`, even one without `await`, write `return await` for each promise it returns, and discard a promise only with `void`.
 
-Run an Effect, such as with `Effect.runPromise`, only at an entry point that a framework or runtime calls, such as a request or click handler.
+Run an Effect, such as with `Effect.runPromise`, only at an entry point that a framework or runtime calls, such as a request or click handler, and never build one in a bare statement, such as `Effect.fail(new InvoiceNotFound({ invoice }));`, which never runs it.
 Map each tag to that entry point's response there, such as a 404 response for `InvoiceNotFound` or a retry prompt for a dropped request.
-Elsewhere, compose Effects with `pipe` as `code-typescript-call-arguments` allows, and write the bound statements that it requires inside `Effect.gen`, such as `const invoice = yield* readInvoice({ id })`.
+Elsewhere, compose Effects with `pipe` as `code-typescript-call-arguments` allows, and write the bound statements that it requires, such as `const invoice = yield* readInvoice({ id })`, in an anonymous generator that `Effect.gen` takes, or that `Effect.fn('name')` takes for a function whose calls a trace records, never with `Effect.withSpan` around the function's result.
 Give each entry point one defect handler that records the defect and ends its unit of work, such as a server's 500 response or a command's error exit status.
 Wrap each route of a user interface in an error boundary, and pass it the defects of that route's event handlers and asynchronous reads, which it cannot catch itself.
 Catch a defect only in an entry point's defect handler, and never log a failure or defect and then continue, whether in a component or anywhere else.
 
-Configure the repository's lint to reject bare runtime errors, thrown literals, `catch` clauses, inline `catch` handlers, and the other promise forms above, suppressing a finding only as `code-lint-suppressions` allows.
+Configure the repository's lint to reject bare runtime errors, thrown literals, `catch` clauses, inline `catch` handlers, the other promise forms above, and `Effect` calls written as bare statements, suppressing a finding only as `code-lint-suppressions` allows.
 Keep off any lint rule that reports a tagged error class's declaration, such as one requiring `new` before each call whose name ends in `Error`.
 Where the repository's lint can load the configuration in this contract's `assets/` folder, load it from the repository's own lint configuration.
 
@@ -43,6 +43,7 @@ Violation: `readInvoice({ invoice })` throws `new Error('invoice row missing')` 
 Violation: a component calls `readInvoice({ id }).catch(() => {})`, so a dropped request shows no retry and a defect never reaches the route's error boundary.
 Violation: `function readInvoice(signal: Readonly<AbortSignal>) { return fetch(INVOICE_URL, { signal }).then((response) => response.json()) }` chains the promise with `then` and returns it from a function that is not `async`.
 Violation: a click handler calls `save({ invoice })` as a statement, so the promise is discarded without `void`.
+Violation: `Effect.fail(new InvoiceNotFound({ invoice }));` as a statement inside `Effect.gen` builds the failure and drops it, so the lookup succeeds.
 Allowed: `return yield* new RefundRefused({ invoice, status })`, which the request handler handles with `Effect.catchTag('RefundRefused', ...)`.
 Allowed: `throw new InvoiceMissing({ invoice })` inside `Effect.gen` for a row that the same object wrote, and `return yield* new InvoiceNotFound({ invoice })` for a number a caller supplied.
 Allowed: `async function readInvoice(signal: Readonly<AbortSignal>): Promise<unknown> { const response = await fetch(INVOICE_URL, { signal }); return await response.json() }`, which `Effect.tryPromise({ catch: buildRequestDropped, try: readInvoice })` calls.

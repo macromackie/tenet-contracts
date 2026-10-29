@@ -1,0 +1,64 @@
+---
+# code-typescript-input-immutability: never call a method that changes a collection a parameter holds; build a new value instead.
+# TypeScript variant (.ts, .mts, .cts); parameter-mutations-tsx.yml is identical except for `id`, `language`, and this line.
+"id": "parameter-mutations-typescript"
+"language": "TypeScript"
+"message": "Return a new value instead of changing a collection that a parameter holds, such as `return { ...order, lines: [...order.lines, line] }`."
+"note": |
+  The rule reports a call of `push`, `splice`, `sort`, `reverse`, `set`, `add`, `delete`, or `clear` whose receiver is a parameter of an enclosing function or a chain of properties and indexes read from one, such as `order.lines.push(line)`.
+  A receiver that a call, `new`, or an array literal builds, such as `[...order.lines]`, is a new collection and is not reported.
+  A parameter is any name the function's parameter list binds, including a destructured property, such as `order` in `({ order, line }: AddLineInput)`.
+  A collection that the function itself created, such as `const ids: string[] = []` before `ids.push(id)`, is not a parameter and is not reported.
+  A field of `this`, such as `this.#cache.set(key, value)`, is not a parameter and is not reported.
+"rule":
+  "all":
+    - "has":
+        "all":
+          - "has":
+              "field": "property"
+              "regex": "^(?:push|splice|sort|reverse|set|add|delete|clear)$"
+          - "has":
+              "any":
+                # `lines.push(line)`.
+                - "kind": "identifier"
+                  "pattern": "$PARAMETER"
+                # `order.lines.push(line)` and `order.lines[index].push(line)`: the chain's first name.
+                - "all":
+                    - "any":
+                        - "kind": "member_expression"
+                        - "kind": "subscript_expression"
+                    - "has":
+                        "kind": "identifier"
+                        "pattern": "$PARAMETER"
+                        "stopBy": "end"
+                    # `order.lines.filter(isOpen).push(line)` and `[...order.lines].push(line)` change a new array.
+                    - "not":
+                        "has":
+                          "any":
+                            - "kind": "array"
+                            - "kind": "call_expression"
+                            - "kind": "new_expression"
+                          "stopBy": "end"
+              "field": "object"
+        "field": "function"
+        "kind": "member_expression"
+    - "inside":
+        "any":
+          # A parameter list, such as `({ order, line }: AddLineInput)` or `(lines: readonly Line[])`.
+          - "has":
+              "field": "parameters"
+              "has":
+                "any":
+                  - "kind": "identifier"
+                  - "kind": "shorthand_property_identifier_pattern"
+                "pattern": "$PARAMETER"
+                "stopBy": "end"
+          # An arrow function's one unparenthesized parameter, such as `lines => lines.push(line)`.
+          - "has":
+              "field": "parameter"
+              "kind": "identifier"
+              "pattern": "$PARAMETER"
+        "stopBy": "end"
+  "kind": "call_expression"
+"severity": "error"
+...

@@ -5,6 +5,7 @@
 # The logger module, the only file allowed stream handles.
 "ignores":
   - "**/logger/log.ts"
+  - "**/logger/log.mts"
 "language": "TypeScript"
 "message": "Write this line through the logger function; only the logger module imports `stdout` or `stderr` from `node:process`."
 "note": |

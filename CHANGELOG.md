@@ -7,6 +7,117 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 because `tenet contracts update` without `--ref` moves straight to the newest release. Tenet 0.11.0 installs every
 release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v12.0.0
+
+`cli-output-channels` and `contract-maintenance` now ship tool configuration under `assets/`, so installing or updating
+them needs Tenet 0.11.0 or later. The other 114 contracts, which ship no `assets/`, still install with Tenet 0.7.0 or
+later. The new and changed lint files fail on code that complied before; run each tool's autofix where it has one, then
+rewrite or suppress what remains as `code-lint-suppressions` allows.
+
+### Upgrading
+
+Raise Tenet to 0.11.0 first. With `.tenet.lock` and the installed copies committed, run
+`tenet contracts update --ref v12.0.0`.
+
+- No rule moved to another contract.
+- New assets: 10 files in 4 contracts. `cli-output-channels` ships an ast-grep rule set with
+  `numeric-exit-statuses-rust` and an oxlint file. `code-typescript-effect-errors` adds the `floating-effects` rules and
+  `code-typescript-input-immutability` the `parameter-mutations` rules, each for TypeScript and Tsx.
+  `contract-maintenance` ships `assets/uv/check-guidance.py` with its uv lock and output module; run it with one
+  `--require` pattern per kind of guidance document, as its entry says.
+- Changed assets: `code-lint-strictness`'s oxlint file rejects a named generator, such as
+  `Effect.gen(function* load() { ... })`, so drop the name. Its Clippy file reports `std::io::stdout` and
+  `std::io::stderr`; suppress that at each of the output module's calls, as `cli-output-channels` says.
+  `telemetry-application-tracing`'s oxlint file rejects `Console` and `Effect.log` calls outside `logger/log.ts`, so
+  move them into the logger module. `code-typescript-import-statements` ships an empty namespace library list; a
+  repository that imports `@stylexjs/stylex` or `valibot` as a namespace adds it to its own lint file and utility copy.
+- New skills: `cargo-dist-release` and `env-curation`. Install either with `tenet skills add tenet/NAME`.
+- Roll back with `tenet contracts update --ref v11.1.0`. This release added no contract, so every copy returns to its
+  v11.1.0 text. A tool file that v11.1.0 lacks stays in place, leaves the lock, and makes `update` exit 1; delete it
+  with `git rm`. Remove an added skill with `tenet skills remove PATH`.
+
+### Tightened
+
+- `cli-output-channels`: the contract now ships its lint. A new `numeric-exit-statuses-rust` ast-grep rule reports an
+  integer literal passed to `ExitCode::from` or `std::process::exit`, such as `ExitCode::from(2)`, outside the output
+  module and the `ExitStatus` declaration, with one violation and one allowed case under `tests/`. A new oxlint file
+  sets `no-console` and exempts `output.ts` from it, from `no-restricted-properties`, and from
+  `unicorn/no-process-exit`. The rules say to load these and `code-lint-strictness`'s stream entries, and to suppress a
+  rule at each of the output module's calls where the lint cannot scope it to a path. Before, nothing shipped reported a
+  stream handle or a numeric exit status.
+- `code-blank-lines`: a `yield*` statement now takes a blank line on each side like a call statement, except between
+  call statements, and the shipped oxlint file's `padding-line-between-statements` selectors include it. Before,
+  `const first = yield* readOrder({ id });` directly followed by `yield* notify({ order: first });` passed.
+- `code-lint-strictness`: the shipped oxlint file sets `func-names` `generators` to `never`, so a generator function
+  expression is anonymous, such as `Effect.gen(function* () { ... })`, as `code-typescript-effect-errors` now writes it.
+  Before, each anonymous generator failed and a named one passed; now a named one fails.
+  The shipped Clippy file's new `disallowed-methods` entries report `std::io::stdout` and `std::io::stderr` outside the
+  output module that `cli-output-channels` declares; its restriction group already denies the print macros and
+  `std::process::exit`. A repository adds each dependency's function that opens a standard stream to that list.
+- `code-typescript-effect-errors`: an `Effect` call written as a bare statement, such as
+  `Effect.fail(new InvoiceNotFound({ invoice }));`, which builds the Effect and never runs it, now violates the contract.
+  The new `floating-effects-typescript` and `floating-effects-tsx` rules report it, except a run function such as
+  `Effect.runFork`, with one violation and one allowed case under `tests/`. The bound statements now go in an
+  anonymous generator, and `Effect.fn('name')` is the one form for a function whose calls a trace records, never
+  `Effect.withSpan` around the function's result.
+- `code-typescript-import-statements`: the shipped namespace library list is empty. `import/no-namespace` no longer
+  ignores two named vendor packages, and the `misimported-namespace-library` utility matches no library until a
+  repository's own copy adds one. A repository that imports a library as a namespace declares it in both lists, as the
+  rules already said; before, the shipped list named vendors that the contract's name does not carry.
+- `code-typescript-input-immutability`: the new `parameter-mutations-typescript` and `parameter-mutations-tsx` rules
+  report `push`, `splice`, `sort`, `reverse`, `set`, `add`, `delete`, or `clear` called on a parameter or on a chain of
+  properties and indexes read from one, such as `order.lines.push(line)`, with one violation and one allowed case under
+  `tests/`. `clear` joins the rule's list of changing methods, and the lint check again expects a finding on
+  `order.lines.push(line)`.
+- `contract-maintenance`: each relative link in a guidance document, such as a contract, a skill, or an agent
+  instruction file, must resolve to a file in the repository. A repository declares the frontmatter fields each kind of
+  guidance document needs, such as a skill's `name` and `description`, and each document of that kind gives every field
+  as a nonempty string. The contract now ships the check, `assets/uv/check-guidance.py` with its uv lock and output
+  module, and needs Tenet 0.11.0. Run it from the repository root on the paths that hold guidance, with one
+  `--require PATTERN=FIELD,...` per kind of document, where the first matching pattern applies and an empty field list
+  exempts the documents it matches. It reports each missing link target and missing field on standard output and its
+  summary on standard error, and an unreadable frontmatter block or link ends it with the document's path. Before, a
+  broken link or a skill without a `description` complied.
+- `telemetry-application-tracing`: the shipped oxlint file's `no-restricted-properties` now rejects Effect's `Console`
+  module and the `Effect.log`, `logDebug`, `logError`, `logFatal`, `logInfo`, `logTrace`, `logWarning`, and
+  `logWithLevel` functions outside `logger/log.ts`, as the rule against a logging library's function outside the
+  logger module already required. Before, the lint passed them.
+
+### Loosened
+
+- `cli-output-channels`, `code-lint-strictness`, `code-module-file-roles`, and `telemetry-application-tracing`: each
+  shipped oxlint or ast-grep file that exempts a declared file role now also matches the role's `.mts` file, which
+  `code-typescript-node-scripts` requires for every script and helper module: `output.mts`, `errors.mts`,
+  `schemas.mts`, `settings.mts`, and `logger/log.mts`. Before, a script's output module failed `no-console`, and its
+  errors and schemas files took the rules that those roles are exempt from, such as `max-classes-per-file`.
+- `code-lint-strictness`: the shipped zizmor file turns the `self-repository` audit off with reason R. The audit asks
+  for the `$/` form of a same-repository action or reusable workflow, such as `uses: $/.github/workflows/check.yml`,
+  which actionlint 1.7.12 rejects; before, each `uses: ./` call failed one of the two checkers.
+
+### Added
+
+- `scripts/check-library.py` runs zizmor offline and actionlint, with shellcheck and pyflakes, on the library's
+  workflows, using `.github/zizmor.yml` and `.github/actionlint.yaml`, its copies of the files that
+  `code-lint-strictness` ships. It also runs ruff on the Python scripts that a skill or a contract ships, ty on the
+  release script, and every shipped ast-grep rule set on the skills and the guidance check. In the committed copy, it
+  installs the env tool's packages, compiles it with `tsc --noEmit`, lints it with every shipped oxlint file, and runs
+  its system check with fake values. `ruff.toml` applies the shipped ruff file to those scripts.
+- `.github/workflows/check.yml` runs `scripts/check-library.py` on each pull request, with the tools that `mise.toml`
+  pins, and installs each contract that ships no `assets/` with Tenet 0.7.0, the oldest Tenet the README names for one.
+  `release.yml` runs it before tagging a version commit, in place of its own install with Tenet 0.11.0.
+- `env-curation` is a new skill that sets, replaces, or clears one key of a dotenv file, such as the file that mise
+  loads through `_.file`, without printing its value. Its `scripts/env-tool.mts` reads the value from a named variable,
+  a prompt with echo off, or one line of piped input, refuses a value passed as an argument without printing it, and
+  replaces the file through an owner-only temporary file and one rename, refusing a file that changed meanwhile. It is
+  written on effect, with 8 tagged error classes, asynchronous `node:fs/promises` calls, and an output module that ends
+  with a closed `ExitStatus`. `scripts/check/check-env-tool.mts` runs the real tool on a scratch file with fake values,
+  reads them back through `mise env --json`, and checks each refusal. `scripts/package.json` and its lockfile pin
+  effect 4.0.4, the probe's version, as the tool's one dependency, and TypeScript 7.0.2 for its type check.
+- `cargo-dist-release` is a new skill that regenerates the release workflow cargo-dist writes for a Cargo workspace in a
+  subfolder of its repository. Its `scripts/generate-release.py` copies the workspace without `target` to a temporary
+  Git repository, runs `dist generate` there, and copies `.github/workflows/release.yml` back. `--workspace` names the
+  workspace, `--prefix` the start of the temporary folder's name, and `--dist` the cargo-dist command.
+
 ## v11.1.0
 
 ### Loosened

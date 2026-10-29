@@ -9,7 +9,7 @@ type ReadSavedInvoiceInput = { readonly invoice: string };
 export function readSavedInvoice({
   invoice,
 }: ReadSavedInvoiceInput): Effect.Effect<Invoice, never, InvoiceStore> {
-  return Effect.gen(function* readSavedInvoiceSteps() {
+  return Effect.gen(function* () {
     const store = yield* InvoiceStore;
     const found = yield* store.findInvoice({ invoice });
 
