@@ -31,3 +31,9 @@ command stops the script with its own error, and the workspace keeps its previou
 
 Never edit the generated workflow by hand: change the dist configuration and run the script again. Review the
 workflow's diff before committing it, and run the repository's workflow checks on it.
+
+Keep action pins in `github-action-commits`. When an audit requires version comments, include each comment inside
+its reference string so cargo-dist generates the audited text. With cargo-dist 0.33.0, the value
+`d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0` generates the pinned checkout action and its version comment.
+Run `dist plan --output-format=json` in the standalone release checkout before publication. It detects drift between
+the workflow and the configuration before a release tag exists.

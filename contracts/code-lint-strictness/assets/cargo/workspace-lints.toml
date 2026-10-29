@@ -96,6 +96,8 @@ keyword_idents_2018 = "deny"
 keyword_idents_2024 = "deny"
 let_underscore = { level = "deny", priority = -1 }
 let_underscore_drop = "deny"
+# On macOS, set MACOSX_DEPLOYMENT_TARGET in .cargo/config.toml under [env] to the same minimum
+# as the Rust target when compiling C dependencies such as ring; otherwise the linker warns about mismatched targets.
 linker_info = "deny"
 macro_use_extern_crate = "deny"
 meta_variable_misuse = "deny"

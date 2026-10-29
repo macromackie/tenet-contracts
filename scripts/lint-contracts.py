@@ -80,8 +80,10 @@ AREA_ROW = re.compile(r"^\|\s*`(?P<area>[a-z]+)`\s*\|", flags=re.MULTILINE)
 """A row of the README's naming table, whose areas form the closed list of name prefixes."""
 AREA_HEADING = re.compile(r"^#### (?P<area>[a-z]+)$", flags=re.MULTILINE)
 CONTRACT_ROW = re.compile(
-    r"^\|\s*`(?P<name>[a-z0-9]+(?:-[a-z0-9]+)+)`\s*\|\s*(?P<requirement>.+?)\s*\|$",
+    r"^\|\s*`(?P<name>[a-z0-9]+(?:-[a-z0-9]+)+)`\s*\|\s*(?P<requirement>.+?)\s*\|"
+    r"\s*(?P<coverage>[^|]+?)\s*\|$",
 )
+COVERAGE_KINDS = frozenset({"tool-checked", "judged with eval", "judged and unmeasured"})
 CONTRACT_COUNT = re.compile(r"^The library has (?P<count>\d+) contracts\.$", flags=re.MULTILINE)
 RELEASE_HEADING = re.compile(r"^## (?P<version>v\d+\.\d+\.\d+)$", flags=re.MULTILINE)
 """A release's changelog heading; the changelog lists releases newest first."""
@@ -138,6 +140,7 @@ class ReadmeRow:
     area: str
     name: str
     requirement: str
+    coverage: str
 
 
 def is_hidden(*, character: str) -> bool:
@@ -327,7 +330,13 @@ def read_readme_rows(*, text: str) -> list[ReadmeRow]:
             requirement = row["requirement"].replace("\\|", "|")
 
             rows.append(
-                ReadmeRow(number=number, area=area, name=row["name"], requirement=requirement)
+                ReadmeRow(
+                    number=number,
+                    area=area,
+                    name=row["name"],
+                    requirement=requirement,
+                    coverage=row["coverage"],
+                )
             )
 
     return rows
@@ -341,7 +350,11 @@ def check_readme_row(*, row: ReadmeRow, names: set[str], messages: dict[str, str
     if row.name not in names:
         return [f"{place}: remove {row.name}, which names no contract"]
 
-    errors = []
+    errors = (
+        [f"{place}: declare coverage as one of {', '.join(sorted(COVERAGE_KINDS))}"]
+        if row.coverage not in COVERAGE_KINDS
+        else []
+    )
 
     if area != row.area:
         errors.append(f"{place}: move {row.name} to the table under #### {area}")

@@ -8,7 +8,7 @@
 # Run it from the workspace root, with every warning raised to an error:
 #   cargo deny --all-features --locked check --deny warnings
 # The advisories check fetches the advisory database, so the run needs network access to it.
-# A new cargo-deny version adds checks, so this file is tested against cargo-deny 0.19.0;
+# A new cargo-deny version adds checks, so this file is tested against cargo-deny 0.19.9;
 # pin that exact version and raise it in a reviewed upgrade.
 
 [advisories]

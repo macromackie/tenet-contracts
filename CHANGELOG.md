@@ -7,6 +7,21 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 because `tenet contracts update` without `--ref` moves straight to the newest release. Tenet 0.11.0 installs every
 release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v12.0.1
+
+### Clarified
+
+- `cargo-dist-release`: explain how version comments stay in generated action references and how standalone planning
+  detects workflow drift before publication.
+- The contract index identifies shipped tool checks, development evaluations, and unmeasured judgments. These
+  coverage labels do not change any requirement.
+
+- `code-lint-strictness`: the cargo-deny asset is tested with 0.19.9, which fixes a build-check deadlock with one or
+  two worker threads. The configured checks and lint levels are unchanged.
+
+- `code-lint-strictness`: the Rust lint asset explains how to align C dependencies with Rust's macOS deployment target
+  through `MACOSX_DEPLOYMENT_TARGET` while retaining `linker_info = "deny"`.
+
 ## v12.0.0
 
 `cli-output-channels` and `contract-maintenance` now ship tool configuration under `assets/`, so installing or updating

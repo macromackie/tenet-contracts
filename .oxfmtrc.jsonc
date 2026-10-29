@@ -1,0 +1,3 @@
+// The library formats its Markdown with oxfmt's defaults.
+// This file keeps a parent directory's oxfmt config, such as an adopter's root config, from applying here.
+{}
