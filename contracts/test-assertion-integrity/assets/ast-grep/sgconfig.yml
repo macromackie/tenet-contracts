@@ -1,2 +1,4 @@
-ruleDirs:
-  - rules
+---
+"ruleDirs":
+  - "rules"
+...

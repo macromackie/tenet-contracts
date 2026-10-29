@@ -1,55 +1,57 @@
+---
 # ui-design-tokens: select a variant's style by indexing one style definition keyed by the variant's members, never by comparing the variant with a member.
 # Tsx variant (.tsx); it differs from the TypeScript variant only in `id`, `language`, and this line.
 # The rule targets StyleX, whose `stylex.create` defines styles as an object keyed by name and whose `stylex.props` applies them.
 # A repository on another styling library with such objects writes its own rule for that library's apply call.
-id: variant-style-comparisons-tsx
-language: Tsx
-severity: error
-message: Index one style definition keyed by the variant's members, such as `toneStyles[tone]`, instead of comparing the variant with a member.
-note: |
+"id": "variant-style-comparisons-tsx"
+"language": "Tsx"
+"message": "Index one style definition keyed by the variant's members, such as `toneStyles[tone]`, instead of comparing the variant with a member."
+"note": |
   A comparison with `===`, `==`, `!==`, or `!=` reports when one side is a fixed value and the comparison is an operand of `&&` inside the arguments of `stylex.props`.
   A fixed value is a string literal or a member of a capitalized name, such as `Tone.Positive`.
   A comparison of two run-time values, such as `row.id === selectedId && styles.selected`, is a boolean condition, not a variant, and is not reported.
   A type test, such as `typeof size === 'number' && styles.fixed`, is not reported.
   Give every member a key, with an empty style for a member that adds nothing, so a type checker rejects a member added without a style.
-utils:
+"rule":
+  "inside":
+    "has":
+      "field": "operator"
+      "regex": "^&&$"
+    "inside":
+      "inside":
+        "kind": "call_expression"
+        "pattern": "stylex.props($$$)"
+      "kind": "arguments"
+      "stopBy": "end"
+    "kind": "binary_expression"
+  "matches": "member-comparison"
+"severity": "error"
+"utils":
   # A value fixed in the source, such as `'positive'` or `Tone.Positive`.
-  fixed-value:
-    any:
-      - kind: string
-      - kind: member_expression
-        has:
-          field: object
-          kind: identifier
-          regex: "^[A-Z]"
+  "fixed-value":
+    "any":
+      - "kind": "string"
+      - "has":
+          "field": "object"
+          "kind": "identifier"
+          "regex": "^[A-Z]"
+        "kind": "member_expression"
   # A comparison of a value with a fixed value, such as `tone === 'positive'`.
-  member-comparison:
-    kind: binary_expression
-    not:
-      has:
-        kind: unary_expression
-        regex: "^typeof"
-    all:
-      - has:
-          field: operator
-          regex: "^[!=]==?$"
-      - any:
-          - has:
-              field: left
-              matches: fixed-value
-          - has:
-              field: right
-              matches: fixed-value
-rule:
-  matches: member-comparison
-  inside:
-    kind: binary_expression
-    has:
-      field: operator
-      regex: "^&&$"
-    inside:
-      kind: arguments
-      stopBy: end
-      inside:
-        kind: call_expression
-        pattern: stylex.props($$$)
+  "member-comparison":
+    "all":
+      - "has":
+          "field": "operator"
+          "regex": "^[!=]==?$"
+      - "any":
+          - "has":
+              "field": "left"
+              "matches": "fixed-value"
+          - "has":
+              "field": "right"
+              "matches": "fixed-value"
+    "kind": "binary_expression"
+    "not":
+      "has":
+        "kind": "unary_expression"
+        "regex": "^typeof"
+...

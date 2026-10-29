@@ -55,7 +55,7 @@ Allowed: `if (Option.isNone(found))` holds `recordQuietRun({ account });`, a bla
 
 Run the repository's lint from the repository root, and confirm that it rejects `note: string | null`, `return undefined` in a typed function, and `replaces?: Option.Option<string>`.
 Confirm also that it rejects `Schema.NullOr(Schema.String)`, `Option.match`, an `else` after `Option.isSome`, and `draft.note = Option.some(text)` after `const draft: Draft = { id, note: Option.none() }`.
-From each affected package root, run the type check, so each declared `Option` type and each `return null` meets the type it must satisfy.
+From each affected package root, run the type check against effect 4.0.0 or later, so each declared `Option` type and each `return null` meets the type it must satisfy.
 For each dependency's nullable result that a change returns, stores in a field, or passes to an owned function, is it converted with `Option.fromNullishOr` first?
 For each `Option` a change adds, is an empty value a value rather than an expected failure, which `code-typescript-effect-errors` makes a tagged error?
 For each `?:` field a change adds, may a caller leave it out of an owned function's argument, and does each conditional spread omit a callee's `?:` field?

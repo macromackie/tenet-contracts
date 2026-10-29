@@ -1,39 +1,41 @@
+---
 # code-typescript-collection-iteration: iterate with `for...of`, never with a `forEach` or `reduce` method.
 # TypeScript variant (.ts, .mts, .cts); collection-callbacks-tsx.yml is identical except for `id`, `language`, and this line.
-id: collection-callbacks-typescript
-language: TypeScript
-severity: error
-message: Iterate over a collection with `for...of`, and keep a running total in a `let` that the loop advances, instead of calling `forEach`, `reduce`, or `reduceRight`.
-note: |
+"id": "collection-callbacks-typescript"
+"language": "TypeScript"
+"message": "Iterate over a collection with `for...of`, and keep a running total in a `let` that the loop advances, instead of calling `forEach`, `reduce`, or `reduceRight`."
+"note": |
   Write `for (const order of orders) { ship({ order }); }` and `let total = 0; for (const order of orders) { total += order.amount; }`.
   Read an index with `for (const [index, order] of orders.entries())`, and a map's entries with `for (const [key, value] of prices)`.
   The rule reports a `forEach`, `reduce`, or `reduceRight` method called on any value, and leaves alone a function called on a capitalized namespace, such as `Ledger.forEach(entries, (entry) => postEntry({ entry }))`.
   A function called on a namespace that the file imports, such as `chartKit.forEach(entries, (entry) => postEntry({ entry }))` after `import * as chartKit from '@acme/chart-kit'`, is left alone.
-rule:
-  kind: call_expression
-  has:
-    field: function
-    kind: member_expression
-    all:
-      - has:
-          field: property
-          regex: ^(forEach|reduce|reduceRight)$
+"rule":
+  "has":
+    "all":
+      - "has":
+          "field": "property"
+          "regex": "^(forEach|reduce|reduceRight)$"
       # A namespace is a capitalized name with a lowercase letter, or one capital letter, and a path of them, such as `Children` in `Children.forEach`.
       # A constant in capital snake case, such as `DEFAULT_ORDERS`, is a value, not a namespace.
-      - not:
-          has:
-            field: object
-            any:
-              - kind: identifier
-                regex: ^[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?$
-              - kind: member_expression
-                regex: ^[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?(\.[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?)+$
+      - "not":
+          "has":
+            "any":
+              - "kind": "identifier"
+                "regex": "^[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?$"
+              - "kind": "member_expression"
+                "regex": '^[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?(\.[A-Z]([A-Za-z0-9]*[a-z][A-Za-z0-9]*)?)+$'
+            "field": "object"
+    "field": "function"
+    "kind": "member_expression"
+  "kind": "call_expression"
   # A function of a namespace this file imports, such as `chartKit.forEach(...)` after `import * as chartKit from '@acme/chart-kit'`.
-  not:
-    all:
-      - pattern: $NAMESPACE.$FUNCTION($$$ARGUMENTS)
-      - inside:
-          kind: program
-          stopBy: end
-          has:
-            pattern: import * as $NAMESPACE from $SOURCE
+  "not":
+    "all":
+      - "pattern": "$NAMESPACE.$FUNCTION($$$ARGUMENTS)"
+      - "inside":
+          "has":
+            "pattern": "import * as $NAMESPACE from $SOURCE"
+          "kind": "program"
+          "stopBy": "end"
+"severity": "error"
+...

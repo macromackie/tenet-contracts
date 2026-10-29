@@ -1,10 +1,12 @@
+---
 # ui-react-typescript-jsx-attributes: the declared style calls whose result an element may spread, matched by ../rules as `attribute-style-call`.
 # Each entry is a call's function as written, such as `stylex.props`, the call that returns a class name and inline style.
 # A repository lists its own style calls in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
-id: attribute-style-call
-language: Tsx
-rule:
-  kind: call_expression
-  has:
-    field: function
-    regex: ^(stylex\.props)$
+"id": "attribute-style-call"
+"language": "Tsx"
+"rule":
+  "has":
+    "field": "function"
+    "regex": '^(stylex\.props)$'
+  "kind": "call_expression"
+...

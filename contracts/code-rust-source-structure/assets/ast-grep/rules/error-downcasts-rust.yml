@@ -1,78 +1,80 @@
+---
 # code-rust-source-structure: never recover a type from an opaque error, a cause, or a `dyn Any` value; match an `enum`'s variants instead.
 # Rust only; the contract covers no other language.
 # Scan with this folder's sgconfig.yml and exclude the declared generated path patterns, such as
 # `ast-grep scan -c .contracts/NNN-code-rust-source-structure/assets/ast-grep/sgconfig.yml --globs '!target/**'`.
-id: error-downcasts-rust
-language: Rust
-severity: error
-message: 'Match an `enum`''s variants, such as `Err(SettleError::Closed { id })` from a function that returns an error type the crate owns, instead of recovering a type with a downcast.'
-note: |
+"id": "error-downcasts-rust"
+"language": "Rust"
+"message": "Match an `enum`'s variants, such as `Err(SettleError::Closed { id })` from a function that returns an error type the crate owns, instead of recovering a type with a downcast."
+"note": |
   A call of `downcast_ref`, `downcast_mut`, or `downcast` is reported, as a method or through a path, with or without a turbofish, such as `error.downcast_ref::<SettleError>()` or `Arc::downcast(value)`.
   A call of `is` with a turbofish, such as `error.is::<SettleError>()`, is reported too, because it tests the same recovered type.
   A downcast passed by name as an argument, such as `find_map(<dyn Error>::downcast_ref::<io::Error>)`, is reported too.
   Test code is checked like production code.
   When a dependency hands over only an opaque value, such as `Box<dyn Error>` or a panic payload, downcast it in the one call that receives it, under a suppression that names the dependency.
-rule:
-  any:
-    - kind: call_expression
-      has:
-        field: function
-        any:
+"rule":
+  "any":
+    - "has":
+        "any":
           # `error.downcast_ref()` and `Arc::downcast(value)`, whose type is inferred.
-          - kind: field_expression
-            has:
-              field: field
-              regex: ^(?:downcast_ref|downcast_mut|downcast)$
-          - kind: scoped_identifier
-            has:
-              field: name
-              regex: ^(?:downcast_ref|downcast_mut|downcast)$
+          - "has":
+              "field": "field"
+              "regex": "^(?:downcast_ref|downcast_mut|downcast)$"
+            "kind": "field_expression"
+          - "has":
+              "field": "name"
+              "regex": "^(?:downcast_ref|downcast_mut|downcast)$"
+            "kind": "scoped_identifier"
           # `error.downcast_ref::<SettleError>()` and `error.is::<SettleError>()`.
-          - kind: generic_function
-            has:
-              field: function
-              any:
-                - kind: field_expression
-                  has:
-                    field: field
-                    regex: ^(?:downcast_ref|downcast_mut|downcast|is)$
-                - kind: scoped_identifier
-                  has:
-                    field: name
-                    regex: ^(?:downcast_ref|downcast_mut|downcast|is)$
+          - "has":
+              "any":
+                - "has":
+                    "field": "field"
+                    "regex": "^(?:downcast_ref|downcast_mut|downcast|is)$"
+                  "kind": "field_expression"
+                - "has":
+                    "field": "name"
+                    "regex": "^(?:downcast_ref|downcast_mut|downcast|is)$"
+                  "kind": "scoped_identifier"
+              "field": "function"
+            "kind": "generic_function"
+        "field": "function"
+      "kind": "call_expression"
     # A downcast passed by name, such as `find_map(<dyn Error>::downcast_ref::<io::Error>)`.
-    - kind: generic_function
-      inside:
-        kind: arguments
-      has:
-        field: function
-        kind: scoped_identifier
-        has:
-          field: name
-          regex: ^(?:downcast_ref|downcast_mut|downcast|is)$
-    - kind: scoped_identifier
-      inside:
-        kind: arguments
-      has:
-        field: name
-        regex: ^(?:downcast_ref|downcast_mut|downcast)$
+    - "has":
+        "field": "function"
+        "has":
+          "field": "name"
+          "regex": "^(?:downcast_ref|downcast_mut|downcast|is)$"
+        "kind": "scoped_identifier"
+      "inside":
+        "kind": "arguments"
+      "kind": "generic_function"
+    - "has":
+        "field": "name"
+        "regex": "^(?:downcast_ref|downcast_mut|downcast)$"
+      "inside":
+        "kind": "arguments"
+      "kind": "scoped_identifier"
     # The same calls inside a macro's arguments, such as `assert!(error.is::<SettleError>())`, which stay unparsed tokens.
-    - kind: identifier
-      regex: ^(?:downcast_ref|downcast_mut|downcast)$
-      inside:
-        kind: token_tree
-      follows:
-        regex: ^(?:\.|::)$
-      precedes:
-        any:
-          - regex: ^::$
-          - kind: token_tree
-            regex: ^\(
-    - kind: identifier
-      regex: ^is$
-      inside:
-        kind: token_tree
-      follows:
-        regex: ^(?:\.|::)$
-      precedes:
-        regex: ^::$
+    - "follows":
+        "regex": '^(?:\.|::)$'
+      "inside":
+        "kind": "token_tree"
+      "kind": "identifier"
+      "precedes":
+        "any":
+          - "regex": "^::$"
+          - "kind": "token_tree"
+            "regex": '^\('
+      "regex": "^(?:downcast_ref|downcast_mut|downcast)$"
+    - "follows":
+        "regex": '^(?:\.|::)$'
+      "inside":
+        "kind": "token_tree"
+      "kind": "identifier"
+      "precedes":
+        "regex": "^::$"
+      "regex": "^is$"
+"severity": "error"
+...

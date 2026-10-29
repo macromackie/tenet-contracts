@@ -1,5 +1,5 @@
 # The strictest typos settings that code-lint-strictness requires.
-# Every check runs with typos' own dictionary, and no word is allowed beyond it.
+# Every check runs with typos' own dictionary, and it allows only the spellings below that installed contracts reproduce.
 #
 # typos reads only its own file, so copy this file to `typos.toml` at the repository root.
 # Run it from the repository root, where it checks every file that no ignore file excludes:
@@ -7,6 +7,7 @@
 # Rename a misspelled identifier rather than listing it as a word.
 # Add a word to `[default.extend-words]` in that copy only beside a comment that starts with its reason letters,
 # such as Q for a protocol's or dependency's own spelling that the code must reproduce.
+# Add a generated file's path to `extend-exclude` only beside a comment naming the tool that writes it, such as a lockfile's package manager.
 # A new typos version adds corrections, so this file is tested against typos-cli 1.51.1;
 # pin that exact version and raise it in a reviewed upgrade.
 
@@ -16,8 +17,22 @@ check-filename = true
 # One spelling for each word, in the locale that platform names such as `color` and `serialize` use.
 locale = "en-us"
 
+[default.extend-identifiers]
+# Q: oxlint's `max-lines-per-function` option `IIFEs`, which code-function-size's shipped oxlint file sets.
+IIFEs = "IIFEs"
+
 [files]
 # The version control folder holds no source.
 extend-exclude = [".git/"]
 # Check hidden files and folders too, such as workflow files.
 ignore-hidden = false
+
+# Contract files, whose examples spell out the variants and misspellings that their rules name.
+[type.contract]
+extend-glob = ["CONTRACT.md"]
+
+[type.contract.extend-words]
+# Q: code-spelled-out-names names `colour` as a spelling variant that a word list replaces with `color`.
+colour = "colour"
+# Q: code-typescript-effect-schemas' violation decodes a misspelled `retrys` field.
+retrys = "retrys"

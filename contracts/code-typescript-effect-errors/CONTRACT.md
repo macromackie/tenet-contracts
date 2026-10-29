@@ -10,7 +10,7 @@ Treat a failure as expected when any caller or user could act differently becaus
 Treat every other failure as a defect, such as a record that the same object wrote now missing or corrupt, which means the code's own invariant broke.
 An empty result, such as a search that matches nothing, is a value, but a lookup that finds no record for a caller's identifier is an expected failure.
 
-Fail with a tagged error class for each expected failure, such as `class InvoiceNotFound extends Schema.TaggedErrorClass<InvoiceNotFound>()('InvoiceNotFound', { invoice: Schema.String }) {}`, and treat its tag as the failure's stable code.
+Fail with a tagged error class for each expected failure, such as `class InvoiceNotFound extends Schema.TaggedError<InvoiceNotFound>()('InvoiceNotFound', { invoice: Schema.String }) {}`, and treat its tag as the failure's stable code.
 Use `Effect.die`, `Effect.orDie`, or `throw` only for a defect, and give it a tagged error class with fields that locate it, such as `new InvoiceMissing({ invoice })`.
 Give each tagged error the fields its handler needs, such as the invoice number or the provider's status, never only a message string.
 Give each failure that a handler treats differently its own tag; a field may refine a tag only with a member of a closed set, such as a provider's refusal kind, never with a free-form code string.
@@ -49,7 +49,7 @@ Allowed: `async function readInvoice(signal: Readonly<AbortSignal>): Promise<unk
 
 ## Checks
 
-Run the type check from each package root; an Effect's error type lists every tag it can fail with.
+Run the type check from each package root against effect 4.0.0 or later; an Effect's error type lists every tag it can fail with.
 Run the repository's lint with type information from the repository root, and confirm that it reports no type configuration error and rejects each form the lint rule names.
 For each failure a change adds, could any caller or user act differently because of it, and is it a tagged error if so and a tagged defect otherwise?
 For each tagged error a change adds, which code handles it by tag, and does every Effect between them pass it up in its error type?

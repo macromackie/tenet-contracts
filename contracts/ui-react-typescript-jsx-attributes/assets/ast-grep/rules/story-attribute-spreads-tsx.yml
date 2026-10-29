@@ -1,22 +1,24 @@
+---
 # ui-react-typescript-jsx-attributes: in a story file, spread into an element only the result of a declared style call or the story's `args`.
-id: story-attribute-spreads-tsx
-language: Tsx
-severity: error
-message: Pass each of these attributes by name; a story file spreads only the story's `args` or a declared style call.
-files:
+"files":
   - "**/*.stories.tsx"
-rule:
-  kind: spread_element
-  inside:
-    kind: jsx_expression
-    inside:
-      any:
-        - kind: jsx_opening_element
-        - kind: jsx_self_closing_element
-  not:
-    any:
-      - has:
-          matches: attribute-style-call
-      - has:
-          kind: identifier
-          regex: ^args$
+"id": "story-attribute-spreads-tsx"
+"language": "Tsx"
+"message": "Pass each of these attributes by name; a story file spreads only the story's `args` or a declared style call."
+"rule":
+  "inside":
+    "inside":
+      "any":
+        - "kind": "jsx_opening_element"
+        - "kind": "jsx_self_closing_element"
+    "kind": "jsx_expression"
+  "kind": "spread_element"
+  "not":
+    "any":
+      - "has":
+          "matches": "attribute-style-call"
+      - "has":
+          "kind": "identifier"
+          "regex": "^args$"
+"severity": "error"
+...

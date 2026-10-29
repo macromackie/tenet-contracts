@@ -1,22 +1,24 @@
+---
 # ui-react-typescript-jsx-attributes: spread into an element only the result of a declared style call, and pass every other attribute by name.
 # Files whose names end in `.stories.tsx` are story files, which story-attribute-spreads-tsx.yml checks instead.
-id: attribute-spreads-tsx
-language: Tsx
-severity: error
-message: Pass each of these attributes by name, such as `orders={state.orders}`; spread only a declared style call, such as `{...stylex.props(styles.row)}`.
-note: |
+"id": "attribute-spreads-tsx"
+"ignores":
+  - "**/*.stories.tsx"
+"language": "Tsx"
+"message": "Pass each of these attributes by name, such as `orders={state.orders}`; spread only a declared style call, such as `{...stylex.props(styles.row)}`."
+"note": |
   The declared style calls are the `attribute-style-call` list in this folder's utils, which a repository replaces with its own.
   Spread the call itself; a variable that holds its result is reported.
-ignores:
-  - "**/*.stories.tsx"
-rule:
-  kind: spread_element
-  inside:
-    kind: jsx_expression
-    inside:
-      any:
-        - kind: jsx_opening_element
-        - kind: jsx_self_closing_element
-  not:
-    has:
-      matches: attribute-style-call
+"rule":
+  "inside":
+    "inside":
+      "any":
+        - "kind": "jsx_opening_element"
+        - "kind": "jsx_self_closing_element"
+    "kind": "jsx_expression"
+  "kind": "spread_element"
+  "not":
+    "has":
+      "matches": "attribute-style-call"
+"severity": "error"
+...

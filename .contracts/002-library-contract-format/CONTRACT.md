@@ -30,7 +30,7 @@ Leave `## Local adaptations` out of library contracts; adopters add that heading
 
 ## Checks
 
-Run `python3 scripts/lint-contracts.py` from the repository root.
+Run `uv run --script scripts/lint-contracts.py` from the repository root.
 Install each changed contract into a scratch repository with `tenet contracts add`, then run `tenet validate` there.
 For each changed rule, what code or history would violate it?
 Does any changed rule repeat a requirement another library contract owns?

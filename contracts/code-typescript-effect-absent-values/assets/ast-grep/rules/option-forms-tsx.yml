@@ -1,25 +1,27 @@
+---
 # code-typescript-effect-absent-values: use an `Option` in one form per case, never `Option.match` or an `if` with an `else` that tests one.
 # Tsx variant (.tsx); option-forms-typescript.yml is identical except for `id`, `language`, and this line.
-id: option-forms-tsx
-language: Tsx
-severity: error
-message: "Use `Option.getOrElse` for a default, `Option.map` for a derived value, an `Option.isNone` guard when the empty case leaves, or `Option.isSome` around code for a value alone when the empty case carries on, never with an `else`."
-note: |
+"id": "option-forms-tsx"
+"language": "Tsx"
+"message": "Use `Option.getOrElse` for a default, `Option.map` for a derived value, an `Option.isNone` guard when the empty case leaves, or `Option.isSome` around code for a value alone when the empty case carries on, never with an `else`."
+"note": |
   This reports every `Option.match`, called or passed, and an `if` statement whose condition is an `Option.isSome` or `Option.isNone` call and that has an `else` clause.
   A `match` imported from the `Option` module under another name, or an `Option` namespace imported under another name, is not reported.
-rule:
-  any:
-    - kind: member_expression
-      pattern: Option.match
-    - kind: if_statement
-      all:
-        - has:
-            field: condition
-            has:
-              kind: call_expression
-              has:
-                field: function
-                regex: ^Option\.(isSome|isNone)$
-        - has:
-            field: alternative
-            kind: else_clause
+"rule":
+  "any":
+    - "kind": "member_expression"
+      "pattern": "Option.match"
+    - "all":
+        - "has":
+            "field": "condition"
+            "has":
+              "has":
+                "field": "function"
+                "regex": '^Option\.(isSome|isNone)$'
+              "kind": "call_expression"
+        - "has":
+            "field": "alternative"
+            "kind": "else_clause"
+      "kind": "if_statement"
+"severity": "error"
+...

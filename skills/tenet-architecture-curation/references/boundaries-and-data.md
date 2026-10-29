@@ -1,10 +1,10 @@
 # Choosing a boundary
 
-| Structure | Reason to introduce it |
-| --- | --- |
-| Function | A coherent operation deserves a name. |
-| Module or file | One responsibility can be understood separately. |
-| Nested folder | Related modules form a subsystem with a small entry point. |
+| Structure        | Reason to introduce it                                              |
+| ---------------- | ------------------------------------------------------------------- |
+| Function         | A coherent operation deserves a name.                               |
+| Module or file   | One responsibility can be understood separately.                    |
+| Nested folder    | Related modules form a subsystem with a small entry point.          |
 | Package or crate | Enforce a dependency, runtime, ownership, or actual reuse boundary. |
 
 A report subsystem can separate input validation, label metrics, and summary construction behind one entry point.

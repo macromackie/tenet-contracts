@@ -1,37 +1,39 @@
+---
 # code-typescript-effect-errors: wrap a foreign call that can fail with an Effect constructor, never with a catch clause or a promise's catch method.
 # TypeScript variant (.ts, .mts, .cts); catch-handlers-tsx.yml is identical except for `id`, `language`, and this line.
-id: catch-handlers-typescript
-language: TypeScript
-severity: error
-message: Wrap the foreign call with `Effect.try` or `Effect.tryPromise` and map its failure in the `catch` option, instead of catching it here.
-note: |
+"id": "catch-handlers-typescript"
+"language": "TypeScript"
+"message": "Wrap the foreign call with `Effect.try` or `Effect.tryPromise` and map its failure in the `catch` option, instead of catching it here."
+"note": |
   Wrap each foreign call that can fail once, where it is called, such as `Effect.tryPromise({ catch: buildRequestDropped, try: readInvoice })`.
   Only an entry point's one defect handler catches a defect, through the Effect it runs or a user interface's error boundary, never a catch clause.
   A `try` statement with only a `finally` clause, and a combinator of an Effect module such as `Effect.catch`, are not reported.
   A promise's `catch` method is reported when its handler is written inline; a handler passed by name is left to review.
-rule:
-  any:
+"rule":
+  "any":
     # `try { ... } catch (error) { ... }`.
-    - kind: catch_clause
+    - "kind": "catch_clause"
     # `promise.catch((error) => ...)` with an inline handler.
     # A PascalCase receiver such as `Effect` names a module, and a schema's `.catch(fallback)` takes a value, so neither is reported.
-    - kind: call_expression
-      all:
-        - has:
-            field: function
-            kind: member_expression
-            all:
-              - has:
-                  field: property
-                  regex: ^catch$
-              - not:
-                  has:
-                    field: object
-                    kind: identifier
-                    regex: ^[A-Z]
-        - has:
-            field: arguments
-            has:
-              any:
-                - kind: arrow_function
-                - kind: function_expression
+    - "all":
+        - "has":
+            "all":
+              - "has":
+                  "field": "property"
+                  "regex": "^catch$"
+              - "not":
+                  "has":
+                    "field": "object"
+                    "kind": "identifier"
+                    "regex": "^[A-Z]"
+            "field": "function"
+            "kind": "member_expression"
+        - "has":
+            "field": "arguments"
+            "has":
+              "any":
+                - "kind": "arrow_function"
+                - "kind": "function_expression"
+      "kind": "call_expression"
+"severity": "error"
+...

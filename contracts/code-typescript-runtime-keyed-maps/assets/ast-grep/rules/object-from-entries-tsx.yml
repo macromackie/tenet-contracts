@@ -1,12 +1,14 @@
+---
 # code-typescript-runtime-keyed-maps: build a lookup from a collection with `new Map(entries)`, and `Object.fromEntries` only for a plain object that a dependency or written format takes.
 # Tsx variant (.tsx); object-from-entries-typescript.yml differs only in `id`, `language`, and this line.
-id: object-from-entries-tsx
-language: Tsx
-severity: error
-message: "Build this lookup with `new Map(entries)`; where a dependency or a written format takes a plain object, suppress this finding with a reason that names it."
-note: |
+"id": "object-from-entries-tsx"
+"language": "Tsx"
+"message": "Build this lookup with `new Map(entries)`; where a dependency or a written format takes a plain object, suppress this finding with a reason that names it."
+"note": |
   This reports every `Object.fromEntries`, called or passed.
   The lint cannot see where a value goes, so a call that builds a plain object for a dependency or a written format carries a suppression whose reason names that dependency or format.
-rule:
-  kind: member_expression
-  pattern: Object.fromEntries
+"rule":
+  "kind": "member_expression"
+  "pattern": "Object.fromEntries"
+"severity": "error"
+...

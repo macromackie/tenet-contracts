@@ -1,0 +1,12 @@
+id: untagged-errors-typescript
+snapshots:
+  throw new Error('the payment provider refused the refund');:
+    labels:
+    - source: new Error('the payment provider refused the refund')
+      style: primary
+      start: 6
+      end: 58
+    - source: Error
+      style: secondary
+      start: 10
+      end: 15

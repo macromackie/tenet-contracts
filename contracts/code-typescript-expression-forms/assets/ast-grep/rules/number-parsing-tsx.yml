@@ -1,18 +1,20 @@
+---
 # code-typescript-expression-forms: parse decimal text with `Number(text)`, and text in another base with `Number.parseInt(text, radix)`.
 # Tsx variant (.tsx); number-parsing-typescript.yml is the TypeScript variant.
 # Keep the two otherwise identical; they differ only in `id` and `language`.
 # The oxlint file in this contract reports a `parseInt` or `Number.parseInt` call without a radix.
 # This rule reports the global `parseInt` and `parseFloat`, `Number.parseFloat`, and `Number.parseInt` given the decimal radix as a literal.
-id: number-parsing-tsx
-language: Tsx
-severity: error
-message: Parse decimal text with `Number(text)`, and text in another base with `Number.parseInt(text, radix)`.
-note: |
+"id": "number-parsing-tsx"
+"language": "Tsx"
+"message": "Parse decimal text with `Number(text)`, and text in another base with `Number.parseInt(text, radix)`."
+"note": |
   Keep `Number.parseInt` for text in another base, such as `Number.parseInt(byte, HEX_RADIX)`.
-rule:
-  any:
-    - pattern: parseInt
-    - pattern: parseFloat
-    - pattern: Number.parseFloat
-    - pattern: Number.parseInt($TEXT, 10)
-    - pattern: Number.parseInt($TEXT, 10,)
+"rule":
+  "any":
+    - "pattern": "parseInt"
+    - "pattern": "parseFloat"
+    - "pattern": "Number.parseFloat"
+    - "pattern": "Number.parseInt($TEXT, 10)"
+    - "pattern": "Number.parseInt($TEXT, 10,)"
+"severity": "error"
+...

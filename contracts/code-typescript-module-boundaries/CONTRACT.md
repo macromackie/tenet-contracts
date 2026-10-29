@@ -26,6 +26,7 @@ Declare a maximum number of distinct modules that one file imports, counting typ
 Enforce the cycle and entry-point rules with a dependency check that resolves each import to a file, never with a pattern over import text.
 Configure that check to fail on a cycle through any import, on an import that bypasses an entry point, and on a relative import it cannot resolve.
 The repository's lint may extend or run the configuration that this contract ships under `assets/`.
+A configuration that extends it also copies its `settings`, because the lint does not read them through `extends` and fails every file as unknown without them.
 That configuration reports each of those failures except a cycle through a dynamic import, an `import()` type, an import-equals declaration, or `require()`, and it skips dot-named files.
 List in that configuration every `tsconfig.json` that declares path aliases, or the check treats those imports as packages and misses their bypasses.
 Suppress a cycle or entry-point finding only as `code-lint-suppressions` allows.

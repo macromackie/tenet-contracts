@@ -1,0 +1,34 @@
+// The strictest oxlint settings for vitest test files that code-lint-strictness requires.
+// Extend this file right after `oxlintrc.json` only where vitest runs the repository's tests, so vitest's rules run only on the files it loads.
+// oxlint runs a plugin's rules only in an override that turns the plugin on, so each contract's vitest override turns it on again.
+// Its files are vitest's default test file names; a directory glob such as `**/test/**` would add helper files that vitest does not load.
+{
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.*",
+        "**/*.spec.*"
+      ],
+      "plugins": [
+        "vitest"
+      ],
+      "rules": {
+        "vitest/consistent-test-it": [
+          "error",
+          {
+            "fn": "test",
+            "withinDescribe": "test"
+          }
+        ],
+        // R: contradicts `vitest/prefer-importing-vitest-globals`, which stays on, so each test imports `{ test }` from the runner.
+        "vitest/no-importing-vitest-globals": "off",
+        // R: contradicts `vitest/prefer-called-times`, which stays on.
+        "vitest/prefer-called-once": "off",
+        // C, R: same as `vitest/prefer-to-be-truthy`.
+        "vitest/prefer-to-be-falsy": "off",
+        // C, R: contradicts `vitest/prefer-strict-boolean-matchers`; code-typescript-boolean-conditions bans truthiness tests.
+        "vitest/prefer-to-be-truthy": "off"
+      }
+    }
+  ]
+}

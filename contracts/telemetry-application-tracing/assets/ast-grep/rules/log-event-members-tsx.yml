@@ -1,37 +1,39 @@
+---
 # telemetry-application-tracing: name the logger call's event by a member of the declared set, never by its literal value.
 # Tsx variant (.tsx); log-event-members-typescript.yml is identical except for `id`, `language`, and this line.
-id: log-event-members-tsx
-language: Tsx
-severity: error
-message: "Name this event by its member of the declared set, such as `LogEvent.InvoiceSettled`, never by a string or template literal."
-note: |
+"id": "log-event-members-tsx"
+"language": "Tsx"
+"message": "Name this event by its member of the declared set, such as `LogEvent.InvoiceSettled`, never by a string or template literal."
+"note": |
   The rule reads the `event` pair in the first argument of the logger function that the shared `logger-function` rule names.
   It reports the pair when its value holds a string or template literal anywhere, such as `'invoice.settled'`, `'invoice.settled' as LogEvent`, or `LogEvent['InvoiceSettled']`.
   A constant object's value union also accepts a member's bare literal, so the type check alone does not require the member.
-rule:
-  kind: pair
-  has:
-    field: key
-    regex: ^(?:event|'event'|"event")$
-  all:
-    - has:
-        field: value
-        any:
-          - kind: string
-          - kind: template_string
-          - has:
-              stopBy: end
-              any:
-                - kind: string
-                - kind: template_string
-  inside:
-    kind: object
-    nthChild: 1
-    inside:
-      kind: arguments
-      inside:
-        kind: call_expression
-        has:
-          field: function
-          kind: identifier
-          matches: logger-function
+"rule":
+  "all":
+    - "has":
+        "any":
+          - "kind": "string"
+          - "kind": "template_string"
+          - "has":
+              "any":
+                - "kind": "string"
+                - "kind": "template_string"
+              "stopBy": "end"
+        "field": "value"
+  "has":
+    "field": "key"
+    "regex": '^(?:event|''event''|"event")$'
+  "inside":
+    "inside":
+      "inside":
+        "has":
+          "field": "function"
+          "kind": "identifier"
+          "matches": "logger-function"
+        "kind": "call_expression"
+      "kind": "arguments"
+    "kind": "object"
+    "nthChild": 1
+  "kind": "pair"
+"severity": "error"
+...

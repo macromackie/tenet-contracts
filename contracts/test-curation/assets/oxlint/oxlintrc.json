@@ -1,7 +1,8 @@
+// Extend this file only where vitest runs the repository's tests, after code-lint-strictness's `vitest.json`.
 {
   "overrides": [
     {
-      "files": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+      "files": ["**/*.test.*", "**/*.spec.*"],
       "plugins": ["vitest"],
       "rules": {
         "vitest/require-test-timeout": "error"

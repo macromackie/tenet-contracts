@@ -1,0 +1,9 @@
+{
+  "extends": ["../../../contracts/code-lint-strictness/assets/typescript/tsconfig.json", "../../../contracts/code-typescript-node-scripts/assets/typescript/tsconfig.json"],
+  "compilerOptions": {
+    "lib": ["es2024", "esnext.disposable", "dom"],
+    "target": "es2024",
+    "types": []
+  },
+  "include": ["src"]
+}

@@ -1,17 +1,8 @@
+---
 # code-closed-value-sets: name each HTTP method through its declared set, such as `HttpMethod.Post`, never as a literal.
 # Tsx variant (.tsx); http-method-literals-typescript.yml lacks the markup attribute case and differs otherwise only in `id`, `language`, and this line.
-id: http-method-literals-tsx
-language: Tsx
-severity: error
-message: Name this HTTP method through its declared set, such as `HttpMethod.Post`, instead of writing its literal value.
-note: |
-  A literal that holds only an uppercase method token, such as `'POST'`, is reported wherever it appears, including a type such as `'GET' | 'POST'`.
-  `HEAD`, which also names a version-control ref, and a method in another case, such as `'get'`, are reported only where a method belongs.
-  Those places are a property or markup attribute named `method`, `formMethod`, `httpMethod`, or `requestMethod`, a comparison or `switch` on a method, and a list or union that holds another method.
-  A method inside a longer string, such as `'GET /orders'`, is left to review.
-  A key of a declared style definition call, such as `stylex.create({ 'GET': {} })`, is not reported.
-  The module that declares the method set and the test files are exempt by the path patterns under `ignores`; replace them with the repository's declared paths.
-ignores:
+"id": "http-method-literals-tsx"
+"ignores":
   # The module that declares the method set.
   - "**/http-method.*"
   # Test files, which may state the methods they expect as literals.
@@ -21,117 +12,128 @@ ignores:
   - "**/tests/**"
   - "**/testing/**"
   - "**/__tests__/**"
-utils:
-  # A literal that holds one uppercase method token other than `HEAD`.
-  method-token:
-    any:
-      - kind: string
-        regex: ^["'](GET|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)["']$
-      - kind: template_string
-        regex: ^`(GET|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)`$
-  # A literal that holds one method token in any case, `HEAD` included.
-  any-case-method-token:
-    any:
-      - kind: string
-        regex: ^["'](?i:GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)["']$
-      - kind: template_string
-        regex: ^`(?i:GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)`$
-  # A property or attribute name that holds a method, such as `method`, `formMethod`, or `httpMethod`, but not `deliveryMethod`.
-  method-name:
-    regex: ^["']?(?i:(form_?|http_?|request_?)?method)["']?$
-  # An expression that reads such a name, such as `request.method`.
-  method-read:
-    regex: (^|[^A-Za-z0-9_$])(?i:(form_?|http_?|request_?)?method)([^A-Za-z0-9_$]|$)
-  # A place where only a method belongs.
-  method-position:
-    any:
-      # `{ method: 'head' }`.
-      - inside:
-          kind: pair
-          field: value
-          has:
-            field: key
-            matches: method-name
-      # `method: 'get'` in a type.
-      - inside:
-          kind: literal_type
-          inside:
-            stopBy: end
-            kind: type_annotation
-            inside:
-              kind: property_signature
-              has:
-                field: name
-                matches: method-name
-      # `request.method === 'head'`.
-      - inside:
-          kind: binary_expression
-          all:
-            - has:
-                field: operator
-                regex: ^[!=]==?$
-            - has:
-                matches: method-read
-      # `case 'head':` in a `switch` on a method.
-      - inside:
-          kind: switch_case
-          field: value
-          inside:
-            kind: switch_body
-            inside:
-              kind: switch_statement
-              has:
-                field: value
-                matches: method-read
-      # `['GET', 'HEAD']`.
-      - inside:
-          kind: array
-          has:
-            matches: method-token
-      # `<form method="post">`.
-      - inside:
-          kind: jsx_attribute
-          has:
-            kind: property_identifier
-            matches: method-name
-      # `<form method={'post'}>`.
-      - inside:
-          kind: jsx_expression
-          inside:
-            kind: jsx_attribute
-            has:
-              kind: property_identifier
-              matches: method-name
-      # `'GET' | 'HEAD'`.
-      - inside:
-          kind: literal_type
-          inside:
-            kind: union_type
-            stopBy:
-              not:
-                kind: union_type
-            has:
-              stopBy: end
-              matches: method-token
-rule:
-  all:
-    - any:
-        - matches: method-token
-        - all:
-            - matches: any-case-method-token
-            - matches: method-position
+"language": "Tsx"
+"message": "Name this HTTP method through its declared set, such as `HttpMethod.Post`, instead of writing its literal value."
+"note": |
+  A literal that holds only an uppercase method token, such as `'POST'`, is reported wherever it appears, including a type such as `'GET' | 'POST'`.
+  `HEAD`, which also names a version-control ref, and a method in another case, such as `'get'`, are reported only where a method belongs.
+  Those places are a property or markup attribute named `method`, `formMethod`, `httpMethod`, or `requestMethod`, a comparison or `switch` on a method, and a list or union that holds another method.
+  A method inside a longer string, such as `'GET /orders'`, is left to review.
+  A key of a declared style definition call, such as `stylex.create({ 'GET': {} })`, is not reported.
+  The module that declares the method set and the test files are exempt by the path patterns under `ignores`; replace them with the repository's declared paths.
+"rule":
+  "all":
+    - "any":
+        - "matches": "method-token"
+        - "all":
+            - "matches": "any-case-method-token"
+            - "matches": "method-position"
     # A key of a style definition, which may write a member's value because its library compiles only literal keys.
     # The declared definition call is `stylex.create`; a repository replaces this pattern with its own style library's call.
-    - not:
-        inside:
-          kind: pair
-          field: key
-          inside:
-            kind: object
-            inside:
-              kind: arguments
-              inside:
-                kind: call_expression
-                has:
-                  field: function
-                  regex: ^(stylex\.create)$
+    - "not":
+        "inside":
+          "field": "key"
+          "inside":
+            "inside":
+              "inside":
+                "has":
+                  "field": "function"
+                  "regex": '^(stylex\.create)$'
+                "kind": "call_expression"
+              "kind": "arguments"
+            "kind": "object"
+          "kind": "pair"
+"severity": "error"
+"utils":
+  # A literal that holds one method token in any case, `HEAD` included.
+  "any-case-method-token":
+    "any":
+      - "kind": "string"
+        "regex": '^["''](?i:GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)["'']$'
+      - "kind": "template_string"
+        "regex": "^`(?i:GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)`$"
+  # A property or attribute name that holds a method, such as `method`, `formMethod`, or `httpMethod`, but not `deliveryMethod`.
+  "method-name":
+    "regex": '^["'']?(?i:(form_?|http_?|request_?)?method)["'']?$'
+  # A place where only a method belongs.
+  "method-position":
+    "any":
+      # `{ method: 'head' }`.
+      - "inside":
+          "field": "value"
+          "has":
+            "field": "key"
+            "matches": "method-name"
+          "kind": "pair"
+      # `method: 'get'` in a type.
+      - "inside":
+          "inside":
+            "inside":
+              "has":
+                "field": "name"
+                "matches": "method-name"
+              "kind": "property_signature"
+            "kind": "type_annotation"
+            "stopBy": "end"
+          "kind": "literal_type"
+      # `request.method === 'head'`.
+      - "inside":
+          "all":
+            - "has":
+                "field": "operator"
+                "regex": "^[!=]==?$"
+            - "has":
+                "matches": "method-read"
+          "kind": "binary_expression"
+      # `case 'head':` in a `switch` on a method.
+      - "inside":
+          "field": "value"
+          "inside":
+            "inside":
+              "has":
+                "field": "value"
+                "matches": "method-read"
+              "kind": "switch_statement"
+            "kind": "switch_body"
+          "kind": "switch_case"
+      # `['GET', 'HEAD']`.
+      - "inside":
+          "has":
+            "matches": "method-token"
+          "kind": "array"
+      # `<form method="post">`.
+      - "inside":
+          "has":
+            "kind": "property_identifier"
+            "matches": "method-name"
+          "kind": "jsx_attribute"
+      # `<form method={'post'}>`.
+      - "inside":
+          "inside":
+            "has":
+              "kind": "property_identifier"
+              "matches": "method-name"
+            "kind": "jsx_attribute"
+          "kind": "jsx_expression"
+      # `'GET' | 'HEAD'`.
+      - "inside":
+          "inside":
+            "has":
+              "matches": "method-token"
+              "stopBy": "end"
+            "kind": "union_type"
+            "stopBy":
+              "not":
+                "kind": "union_type"
+          "kind": "literal_type"
+  # An expression that reads such a name, such as `request.method`.
+  "method-read":
+    "regex": "(^|[^A-Za-z0-9_$])(?i:(form_?|http_?|request_?)?method)([^A-Za-z0-9_$]|$)"
+  # A literal that holds one uppercase method token other than `HEAD`.
+  "method-token":
+    "any":
+      - "kind": "string"
+        "regex": '^["''](GET|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)["'']$'
+      - "kind": "template_string"
+        "regex": "^`(GET|POST|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)`$"
+...

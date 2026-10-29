@@ -1,15 +1,17 @@
+---
 # code-typescript-input-immutability: never write an array type as `Array<T>` or `ReadonlyArray<T>`.
 # TypeScript variant (.ts, .mts, .cts); array-generics-tsx.yml differs only in `id`, `language`, and this line.
-id: array-generics-typescript
-language: TypeScript
-severity: error
-message: "Write this type as `readonly T[]`, never as `Array<T>` or `ReadonlyArray<T>`."
-note: |
+"id": "array-generics-typescript"
+"language": "TypeScript"
+"message": "Write this type as `readonly T[]`, never as `Array<T>` or `ReadonlyArray<T>`."
+"note": |
   Every `Array<...>` and `ReadonlyArray<...>` type reference is reported, including a local variable's annotation, which may use the mutable `T[]` instead.
   A `new Array<T>()` expression is not a type reference and is left to review.
   This rule has no fix, because an element type such as `A | B` needs parentheses, as in `readonly (A | B)[]`.
-rule:
-  kind: generic_type
-  has:
-    field: name
-    regex: ^(Array|ReadonlyArray)$
+"rule":
+  "has":
+    "field": "name"
+    "regex": "^(Array|ReadonlyArray)$"
+  "kind": "generic_type"
+"severity": "error"
+...

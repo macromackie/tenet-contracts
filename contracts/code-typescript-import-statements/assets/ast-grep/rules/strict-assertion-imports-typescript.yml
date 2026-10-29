@@ -1,34 +1,36 @@
+---
 # code-typescript-import-statements: outside tests, import the strict assertion function only as `import { strict as assert } from 'node:assert'`.
 # TypeScript variant (.ts, .mts, .cts); it differs from the Tsx variant only in `id`, `language`, and this line.
 # Scan with this folder's sgconfig.yml from the repository root, such as
 # `ast-grep scan -c .contracts/NNN-code-typescript-import-statements/assets/ast-grep/sgconfig.yml`.
-id: strict-assertion-imports-typescript
-language: TypeScript
-severity: error
-message: Import the strict assertion function as `import { strict as assert } from 'node:assert'`, so that each call names its module, such as `assert.equal(total, 42)`.
-note: |
-  A named import of `strict` from `node:assert` passes only under the local name `assert`.
-  The repository's lint rejects every other name imported from `node:assert`, except a type-only one, and every import of `node:assert/strict`, `assert`, or `assert/strict`.
-  Test files are skipped, because the lint rejects every assertion module import there.
-ignores:
+"id": "strict-assertion-imports-typescript"
+"ignores":
   # Test files, which import every assertion function from the test runner's module instead.
   - "**/*.test.*"
   - "**/*.spec.*"
   - "**/test/**"
   - "**/tests/**"
   - "**/__tests__/**"
-rule:
-  kind: import_specifier
-  has:
-    field: name
-    regex: ^strict$
-  not:
-    has:
-      field: alias
-      regex: ^assert$
-  inside:
-    kind: import_statement
-    stopBy: end
-    has:
-      field: source
-      regex: ^['"]node:assert['"]$
+"language": "TypeScript"
+"message": "Import the strict assertion function as `import { strict as assert } from 'node:assert'`, so that each call names its module, such as `assert.equal(total, 42)`."
+"note": |
+  A named import of `strict` from `node:assert` passes only under the local name `assert`.
+  The repository's lint rejects every other name imported from `node:assert`, except a type-only one, and every import of `node:assert/strict`, `assert`, or `assert/strict`.
+  Test files are skipped, because the lint rejects every assertion module import there.
+"rule":
+  "has":
+    "field": "name"
+    "regex": "^strict$"
+  "inside":
+    "has":
+      "field": "source"
+      "regex": '^[''"]node:assert[''"]$'
+    "kind": "import_statement"
+    "stopBy": "end"
+  "kind": "import_specifier"
+  "not":
+    "has":
+      "field": "alias"
+      "regex": "^assert$"
+"severity": "error"
+...

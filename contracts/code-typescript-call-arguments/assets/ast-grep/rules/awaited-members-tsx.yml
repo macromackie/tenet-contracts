@@ -1,49 +1,51 @@
+---
 # code-typescript-call-arguments: bind an awaited or `yield*` value to a name before reading its member.
 # Tsx variant (.tsx); awaited-members-typescript.yml is the TypeScript variant.
 # Keep the two otherwise identical; they differ only in `id` and `language`.
 # The oxlint file in this contract reports a member read from a parenthesized `await`, such as `(await read()).result`.
 # This rule reports the forms it misses: a `yield*` value, and an awaited value behind an assertion or extra parentheses.
-id: awaited-members-tsx
-language: Tsx
-severity: error
-message: Bind this awaited or `yield*` value to a name before reading its member.
-note: |
+"id": "awaited-members-tsx"
+"language": "Tsx"
+"message": "Bind this awaited or `yield*` value to a name before reading its member."
+"note": |
   Write `const order = yield* readOrder({ id })`, then read `order.total`.
   Destructuring where the value is bound, such as `const { total } = yield* readOrder({ id })`, binds it.
-utils:
-  # An `await` or `yield*` expression, seen through parentheses and type or non-null assertions.
-  waited:
-    any:
-      - kind: await_expression
-      - kind: yield_expression
-        regex: ^yield\s*\*
-      - kind: parenthesized_expression
-        has:
-          matches: waited
-      - any:
-          - kind: as_expression
-          - kind: satisfies_expression
-          - kind: non_null_expression
-        has:
-          nthChild: 1
-          matches: waited
+"rule":
+  "any":
+    - "kind": "member_expression"
+    - "kind": "subscript_expression"
+  "has":
+    "field": "object"
+    "matches": "waited"
+    "not":
+      "matches": "bare-await"
+"severity": "error"
+"utils":
   # An `await` in one pair of parentheses, which the oxlint file reports.
   # tree-sitter parses `await read() as Reply` as an `await` of the assertion, which TypeScript reads the other way round.
-  bare-await:
-    kind: parenthesized_expression
-    has:
-      kind: await_expression
-      not:
-        has:
-          any:
-            - kind: as_expression
-            - kind: satisfies_expression
-rule:
-  any:
-    - kind: member_expression
-    - kind: subscript_expression
-  has:
-    field: object
-    matches: waited
-    not:
-      matches: bare-await
+  "bare-await":
+    "has":
+      "kind": "await_expression"
+      "not":
+        "has":
+          "any":
+            - "kind": "as_expression"
+            - "kind": "satisfies_expression"
+    "kind": "parenthesized_expression"
+  # An `await` or `yield*` expression, seen through parentheses and type or non-null assertions.
+  "waited":
+    "any":
+      - "kind": "await_expression"
+      - "kind": "yield_expression"
+        "regex": '^yield\s*\*'
+      - "has":
+          "matches": "waited"
+        "kind": "parenthesized_expression"
+      - "any":
+          - "kind": "as_expression"
+          - "kind": "satisfies_expression"
+          - "kind": "non_null_expression"
+        "has":
+          "matches": "waited"
+          "nthChild": 1
+...

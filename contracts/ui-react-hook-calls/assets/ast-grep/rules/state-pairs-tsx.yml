@@ -1,71 +1,73 @@
+---
 # ui-react-hook-calls: destructure each state hook into `[thing, setThing]`; only a lazy initializer may bind the value alone.
 # Tsx variant (.tsx); it differs from the TypeScript and JavaScript variants only in `id`, `language`, and this line.
 # Scan with this folder's sgconfig.yml, such as `ast-grep scan -c .contracts/NNN-ui-react-hook-calls/assets/ast-grep/sgconfig.yml`.
-id: state-pairs-tsx
-language: Tsx
-severity: error
-message: Destructure this state hook into `[thing, setThing]`, such as `const [draft, setDraft] = useState('')`, or bind the value alone only with a lazy initializer.
-note: |
+"id": "state-pairs-tsx"
+"language": "Tsx"
+"message": "Destructure this state hook into `[thing, setThing]`, such as `const [draft, setDraft] = useState('')`, or bind the value alone only with a lazy initializer."
+"note": |
   Each call of `useState` or `React.useState` must be the value of a destructured declaration.
   Two names are allowed when the second starts with `set` and a capital letter, such as `[draft, setDraft]`.
   One name is allowed when the first argument is an inline arrow function, such as `const [revision] = useState(() => order.revision)`.
   Review confirms that the setter's name is `set` followed by the value's name, such as `setDraft` for `draft`.
-utils:
-  state-hook-call:
-    kind: call_expression
-    has:
-      field: function
-      any:
-        - kind: identifier
-          regex: ^useState$
-        - kind: member_expression
-          has:
-            field: property
-            regex: ^useState$
-  state-pair:
-    kind: variable_declarator
-    has:
-      field: name
-      kind: array_pattern
-      all:
-        - has:
-            nthChild: 1
-            kind: identifier
-            not:
-              regex: ^set[A-Z]
-        - has:
-            nthChild: 2
-            kind: identifier
-            regex: ^set[A-Z]
-        - not:
-            has:
-              nthChild: 3
-  lazy-lone-value:
-    kind: variable_declarator
-    all:
-      - has:
-          field: name
-          kind: array_pattern
-          all:
-            - has:
-                nthChild: 1
-                kind: identifier
-                not:
-                  regex: ^set[A-Z]
-            - not:
-                has:
-                  nthChild: 2
-      - has:
-          field: value
-          has:
-            field: arguments
-            has:
-              nthChild: 1
-              kind: arrow_function
-rule:
-  matches: state-hook-call
-  not:
-    inside:
-      any:
-        - matches: state-pair
-        - matches: lazy-lone-value
+"rule":
+  "matches": "state-hook-call"
+  "not":
+    "inside":
+      "any":
+        - "matches": "state-pair"
+        - "matches": "lazy-lone-value"
+"severity": "error"
+"utils":
+  "lazy-lone-value":
+    "all":
+      - "has":
+          "all":
+            - "has":
+                "kind": "identifier"
+                "not":
+                  "regex": "^set[A-Z]"
+                "nthChild": 1
+            - "not":
+                "has":
+                  "nthChild": 2
+          "field": "name"
+          "kind": "array_pattern"
+      - "has":
+          "field": "value"
+          "has":
+            "field": "arguments"
+            "has":
+              "kind": "arrow_function"
+              "nthChild": 1
+    "kind": "variable_declarator"
+  "state-hook-call":
+    "has":
+      "any":
+        - "kind": "identifier"
+          "regex": "^useState$"
+        - "has":
+            "field": "property"
+            "regex": "^useState$"
+          "kind": "member_expression"
+      "field": "function"
+    "kind": "call_expression"
+  "state-pair":
+    "has":
+      "all":
+        - "has":
+            "kind": "identifier"
+            "not":
+              "regex": "^set[A-Z]"
+            "nthChild": 1
+        - "has":
+            "kind": "identifier"
+            "nthChild": 2
+            "regex": "^set[A-Z]"
+        - "not":
+            "has":
+              "nthChild": 3
+      "field": "name"
+      "kind": "array_pattern"
+    "kind": "variable_declarator"
+...

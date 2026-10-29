@@ -1,0 +1,4 @@
+# Python caches the bytecode of scripts/output.py here when a script imports it.
+__pycache__/
+# npm installs the packages that package.json and the probe under tests/ pin here.
+node_modules/

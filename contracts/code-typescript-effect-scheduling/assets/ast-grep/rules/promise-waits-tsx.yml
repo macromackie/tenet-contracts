@@ -1,29 +1,31 @@
+---
 # code-typescript-effect-scheduling: build and combine Effects, never hand-built promises or promise combinators.
 # Tsx variant (.tsx); promise-waits-typescript.yml is identical except for `id`, `language`, and this line.
-id: promise-waits-tsx
-language: Tsx
-severity: error
-message: Build the wait with `Effect.callback` or `Effect.tryPromise`, and combine Effects with `Effect.forEach`, `Effect.all`, `Effect.race`, or `Effect.timeout`, instead of a hand-built promise or a promise combinator.
-note: |
+"id": "promise-waits-tsx"
+"language": "Tsx"
+"message": "Build the wait with `Effect.callback` or `Effect.tryPromise`, and combine Effects with `Effect.forEach`, `Effect.all`, `Effect.race`, or `Effect.timeout`, instead of a hand-built promise or a promise combinator."
+"note": |
   Build an Effect from a callback API with `Effect.callback`, which hands the callback an `AbortSignal` and runs the cleanup Effect it returns on interruption.
   Wrap a foreign promise once with `Effect.tryPromise`, passing the `signal` it hands its function to the foreign call.
   Run work over a collection with `Effect.forEach` and a declared `concurrency`, and bound a wait with `Effect.timeout` or `Effect.timeoutOrElse`.
   The rule reports `new Promise`, `Promise.withResolvers`, `Promise.all`, `Promise.allSettled`, `Promise.any`, and `Promise.race`, called or passed by name.
-rule:
-  any:
+"rule":
+  "any":
     # `new Promise((resolve) => ...)`.
-    - kind: new_expression
-      has:
-        field: constructor
-        kind: identifier
-        regex: ^Promise$
+    - "has":
+        "field": "constructor"
+        "kind": "identifier"
+        "regex": "^Promise$"
+      "kind": "new_expression"
     # `Promise.all(...)`, `Promise.race(...)`, and the other combinators, also when passed by name.
-    - kind: member_expression
-      all:
-        - has:
-            field: object
-            kind: identifier
-            regex: ^Promise$
-        - has:
-            field: property
-            regex: ^(all|allSettled|any|race|withResolvers)$
+    - "all":
+        - "has":
+            "field": "object"
+            "kind": "identifier"
+            "regex": "^Promise$"
+        - "has":
+            "field": "property"
+            "regex": "^(all|allSettled|any|race|withResolvers)$"
+      "kind": "member_expression"
+"severity": "error"
+...

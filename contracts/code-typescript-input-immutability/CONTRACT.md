@@ -30,7 +30,7 @@ Never write an array type as `Array<T>` or `ReadonlyArray<T>`, including in a lo
 When a dependency's declared type requires a mutable array, pass it a copy, such as `[...rows]`, and keep the value's own type read-only.
 
 Give each parameter that declares its type a deeply read-only type, such as `type AddLineInput = { readonly line: Line; readonly order: Order }`.
-Write a dependency's type in its read-only form, such as `Readonly<AbortSignal>`, and list each dependency type that has none, such as `Request`, in the lint's declared allow list.
+Write a dependency's type in its read-only form, such as `Readonly<AbortSignal>`, and write as declared each type that has none, such as `Request`, and each type that `code-typescript-effect-errors` or `code-typescript-effect-absent-values` requires, such as a tagged error class or an `Option`.
 
 Configure the lint to reject each forbidden form wherever a tool supports it, except a test file's `delete` of an environment variable, and to ignore keys rest destructuring drops.
 Where the repository's lint can load the configuration in this contract's `assets/` folder, load it from the repository's own lint configuration.
@@ -46,10 +46,10 @@ Allowed: `const { secret, ...publicRecord } = record`, and `delete process.env.O
 
 ## Checks
 
-Run the type-aware lint from the repository root, and confirm it rejects `lines: Line[]`, a local `Array<Line>`, `delete copy.secret`, and a parameter's `order.lines.push(line)` or type `{ invoice: Invoice }`.
+Run the lint from the repository root, and confirm it rejects `lines: Line[]`, a local `Array<Line>`, and `delete copy.secret`.
 From the package directory, run the package's type check.
 For each value a change modifies in place, did the same function create it?
 For each mutable array type a change writes in a local's or a private field's annotation, does only that function or class fill the array?
-For each array type that the lint does not reach, such as an array's element that is itself an array, is it written `readonly`?
+For each array type and parameter property that the lint does not reach, such as an array's element that is itself an array or the `invoice` in `{ invoice: Invoice }`, is it written `readonly`?
 For each copy a change passes to a dependency, does the dependency's declared type require a mutable array?
 For each environment variable a test changes or deletes, does the test restore its earlier value or absence one variable at a time, never by replacing the environment object?

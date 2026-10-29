@@ -1,0 +1,11 @@
+{
+  "name": "effect-probe",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "effect": "4.0.4"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

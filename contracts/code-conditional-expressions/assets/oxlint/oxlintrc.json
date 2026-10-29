@@ -1,3 +1,4 @@
+// Pin `eslint-plugin-sonarjs` to 4.2.2, the version this file was checked with, in the package that holds `.contracts` or in one above it.
 {
   "jsPlugins": ["eslint-plugin-sonarjs"],
   "rules": {

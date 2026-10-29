@@ -21,7 +21,7 @@ Never reuse a removed contract's name for a different requirement.
 
 ## Checks
 
-Run `python3 scripts/lint-contracts.py` from the repository root.
+Run `uv run --script scripts/lint-contracts.py` from the repository root.
 Could a reader predict a new contract's concern and stack from its name alone?
 Does every technology a changed contract's rules mention appear in its name?
 Does the changelog name the replacement for each renamed or removed contract?

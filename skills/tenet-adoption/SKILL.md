@@ -16,7 +16,7 @@ Inspect repository instructions, applicable contracts, working-tree changes, `.t
 `.agents/tenet-adoption.md` when they exist. Identify the requested skills and contracts. Keep unrelated work intact.
 Shared guidance supplies a starting point; it does not override the user's instructions or the repository's adopted rules.
 
-The public library is https://github.com/macromackie/tenet-contracts. Its `vX.Y.Z` tags are releases, and its
+The public library is `https://github.com/macromackie/tenet-contracts`. Its `vX.Y.Z` tags are releases, and its
 `CHANGELOG.md` classifies each change as Tightened, Loosened, Clarified, Added, or Removed. Clone it into a temporary
 directory, using a task-specific name when runs may overlap:
 

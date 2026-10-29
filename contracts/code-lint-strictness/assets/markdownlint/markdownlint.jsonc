@@ -16,6 +16,8 @@
   "MD009": { "list_item_empty_lines": false, "strict": true },
   // F: the formatter owns line breaks, and a document writes one sentence per line at any length.
   "MD013": false,
+  // Q: a changelog that classifies each release's changes repeats each class heading, such as `### Added`, under every version heading.
+  "MD024": { "siblings_only": true },
   "MD026": { "punctuation": ".,;:!?。，；：！？" },
   "MD029": { "style": "ordered" },
   "MD035": { "style": "---" },

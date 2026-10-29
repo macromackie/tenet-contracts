@@ -1,19 +1,21 @@
+---
 # code-map-and-set-names: the names that end with a plural noun, matched by every rule in ../rules as `plural-name`.
 # A name's last word is its whole name in lowercase or SCREAMING_SNAKE_CASE, its part after the last `_`, or its part from its last capital in camelCase.
 # It is plural when it ends in `s`, but not in `ss` or `ous`, and is not a listed singular noun, or when it is a listed irregular plural.
 # A repository adds words to either list in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
 # The regexes read only a name's text, so the TypeScript, Tsx, Python, and Rust rules share them.
-id: plural-name
-language: TypeScript
-rule:
-  any:
-    - all:
-        - regex: "[sS]$"
-        - not:
+"id": "plural-name"
+"language": "TypeScript"
+"rule":
+  "any":
+    - "all":
+        - "regex": "[sS]$"
+        - "not":
             # Endings that no plural noun has, such as `access`, `progress`, and `previous`.
-            regex: "(?i:ss|ous)$"
-        - not:
+            "regex": "(?i:ss|ous)$"
+        - "not":
             # Singular nouns that end in a single `s`.
-            regex: "(?:(?:^#?|_)(?i:alias|analysis|atlas|axis|basis|bonus|bus|campus|canvas|census|chaos|chassis|corpus|crisis|diagnosis|focus|gas|genus|lens|minus|plus|radius|status|synopsis|thesis|virus)|[A-Za-z0-9](?:Alias|Analysis|Atlas|Axis|Basis|Bonus|Bus|Campus|Canvas|Census|Chaos|Chassis|Corpus|Crisis|Diagnosis|Focus|Gas|Genus|Lens|Minus|Plus|Radius|Status|Synopsis|Thesis|Virus))$"
+            "regex": "(?:(?:^#?|_)(?i:alias|analysis|atlas|axis|basis|bonus|bus|campus|canvas|census|chaos|chassis|corpus|crisis|diagnosis|focus|gas|genus|lens|minus|plus|radius|status|synopsis|thesis|virus)|[A-Za-z0-9](?:Alias|Analysis|Atlas|Axis|Basis|Bonus|Bus|Campus|Canvas|Census|Chaos|Chassis|Corpus|Crisis|Diagnosis|Focus|Gas|Genus|Lens|Minus|Plus|Radius|Status|Synopsis|Thesis|Virus))$"
     # Irregular plurals that do not end in `s`.
-    - regex: "(?:(?:^#?|_)(?i:children|criteria|people)|[A-Za-z0-9](?:Children|Criteria|People))$"
+    - "regex": "(?:(?:^#?|_)(?i:children|criteria|people)|[A-Za-z0-9](?:Children|Criteria|People))$"
+...

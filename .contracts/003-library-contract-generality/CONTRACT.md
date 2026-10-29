@@ -22,7 +22,7 @@ Do not require a checker, command, or file layout that the library does not ship
 
 ## Checks
 
-Run `python3 scripts/lint-contracts.py` from the repository root.
+Run `uv run --script scripts/lint-contracts.py` from the repository root.
 Search changed contracts for company, product, vendor, and tool names, and compare each technology word with the contract's name.
 Does each changed file under `assets/` enforce only rules that its contract's text states?
 Could a team on a different stack follow and check every changed rule?

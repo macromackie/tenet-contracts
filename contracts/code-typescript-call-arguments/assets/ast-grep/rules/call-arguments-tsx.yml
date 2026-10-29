@@ -1,97 +1,100 @@
+---
 # code-typescript-call-arguments: no call, `new`, or `await` inside another call's arguments.
 # Tsx variant (.tsx): call-arguments-typescript.yml plus the JSX boundaries.
 # Keep the two otherwise identical; they differ only in `id`, `language`, and `utils.boundary`.
-id: call-arguments-tsx
-language: Tsx
-severity: error
-message: Bind this call, `new`, or `await` to a name before passing it as an argument.
-note: |
+"id": "call-arguments-tsx"
+# Declared schema and errors files nest builders by design, such as `Schema.Struct({ tags: Schema.Array(Schema.String) })` and a tagged error class's schema fields.
+"ignores":
+  - "**/errors.{ts,mts,cts,tsx}"
+  - "**/schemas.{ts,mts,cts,tsx}"
+"language": "Tsx"
+"message": "Bind this call, `new`, or `await` to a name before passing it as an argument."
+"note": |
   Write `const invoice = await readInvoice({ id })` and pass `invoice`.
   A fluent chain such as `a().b()` counts once, as the outermost call.
   A function, class, or JSX element written in the arguments starts a fresh count.
   Each argument of `pipe(...)` or `.pipe(...)` may be one call; that call's own arguments follow this rule.
   A tagged template such as String.raw`...` is a template, not a call.
-# Declared schema files nest builders by design, such as `Schema.Struct({ tags: Schema.Array(Schema.String) })`.
-ignores:
-  - "**/schemas.{ts,mts,cts,tsx}"
-utils:
-  # A function, class, or JSX element restarts the count.
-  boundary:
-    any:
-      - kind: arrow_function
-      - kind: function_expression
-      - kind: function_declaration
-      - kind: generator_function
-      - kind: generator_function_declaration
-      # A method restarts at its parameters and body; a computed name such as `[key()]` runs where the method is written.
-      - kind: formal_parameters
-        inside:
-          kind: method_definition
-      - kind: statement_block
-        inside:
-          kind: method_definition
-      - kind: class
-      - kind: class_declaration
-      - kind: abstract_class_declaration
-      - kind: jsx_element
-      - kind: jsx_self_closing_element
-  # tree-sitter parses a tagged template as a call whose arguments are the template.
-  tagged-template:
-    kind: call_expression
-    has:
-      field: arguments
-      kind: template_string
-  # The expressions the rule counts.
-  counted:
-    any:
-      - kind: call_expression
-        not:
-          matches: tagged-template
-      - kind: new_expression
-      - kind: await_expression
-  # A type: tree-sitter parses an import type such as `import("./a").T` as a call.
-  type:
-    any:
-      - kind: type_annotation
-      - kind: type_arguments
-      - kind: type_query
-      # The type side of `x as T` and `x satisfies T`.
-      - follows:
-          regex: ^(as|satisfies)$
-          stopBy: end
-        inside:
-          any:
-            - kind: as_expression
-            - kind: satisfies_expression
-  # A direct argument of `pipe(...)` or `X.pipe(...)`.
-  pipe-step:
-    kind: call_expression
-    inside:
-      kind: arguments
-      inside:
-        kind: call_expression
-        has:
-          field: function
-          any:
-            - kind: identifier
-              regex: ^pipe$
-            - kind: member_expression
-              has:
-                field: property
-                regex: ^pipe$
-rule:
-  matches: counted
+"rule":
   # The nearest enclosing argument list, counted expression, boundary, or type must be an argument list.
   # Stopping at a call keeps receivers (`a()` in `a().b()`) and `await` operands from counting twice.
-  inside:
-    kind: arguments
-    stopBy:
-      any:
-        - kind: arguments
-        - matches: counted
-        - matches: boundary
-        - matches: type
-  not:
-    any:
-      - matches: pipe-step
-      - matches: type
+  "inside":
+    "kind": "arguments"
+    "stopBy":
+      "any":
+        - "kind": "arguments"
+        - "matches": "counted"
+        - "matches": "boundary"
+        - "matches": "type"
+  "matches": "counted"
+  "not":
+    "any":
+      - "matches": "pipe-step"
+      - "matches": "type"
+"severity": "error"
+"utils":
+  # A function, class, or JSX element restarts the count.
+  "boundary":
+    "any":
+      - "kind": "arrow_function"
+      - "kind": "function_expression"
+      - "kind": "function_declaration"
+      - "kind": "generator_function"
+      - "kind": "generator_function_declaration"
+      # A method restarts at its parameters and body; a computed name such as `[key()]` runs where the method is written.
+      - "inside":
+          "kind": "method_definition"
+        "kind": "formal_parameters"
+      - "inside":
+          "kind": "method_definition"
+        "kind": "statement_block"
+      - "kind": "class"
+      - "kind": "class_declaration"
+      - "kind": "abstract_class_declaration"
+      - "kind": "jsx_element"
+      - "kind": "jsx_self_closing_element"
+  # The expressions the rule counts.
+  "counted":
+    "any":
+      - "kind": "call_expression"
+        "not":
+          "matches": "tagged-template"
+      - "kind": "new_expression"
+      - "kind": "await_expression"
+  # A direct argument of `pipe(...)` or `X.pipe(...)`.
+  "pipe-step":
+    "inside":
+      "inside":
+        "has":
+          "any":
+            - "kind": "identifier"
+              "regex": "^pipe$"
+            - "has":
+                "field": "property"
+                "regex": "^pipe$"
+              "kind": "member_expression"
+          "field": "function"
+        "kind": "call_expression"
+      "kind": "arguments"
+    "kind": "call_expression"
+  # tree-sitter parses a tagged template as a call whose arguments are the template.
+  "tagged-template":
+    "has":
+      "field": "arguments"
+      "kind": "template_string"
+    "kind": "call_expression"
+  # A type: tree-sitter parses an import type such as `import("./a").T` as a call.
+  "type":
+    "any":
+      - "kind": "type_annotation"
+      - "kind": "type_arguments"
+      - "kind": "type_query"
+      # The type side of `x as T` and `x satisfies T`.
+      - "follows":
+          "regex": "^(as|satisfies)$"
+          "stopBy": "end"
+        "inside":
+          "any":
+            - "kind": "as_expression"
+            - "kind": "satisfies_expression"
+...

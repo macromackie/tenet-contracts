@@ -1,59 +1,71 @@
+---
 # code-typescript-input-immutability: write every array type as `readonly T[]` and every tuple type as `readonly [A, B]`, except a local variable's or a private class field's annotation.
 # TypeScript variant (.ts, .mts, .cts); readonly-array-types-tsx.yml differs only in `id`, `language`, and this line.
-id: readonly-array-types-typescript
-language: TypeScript
-severity: error
-message: "Write this array type as `readonly T[]` or this tuple type as `readonly [A, B]`; only the own annotation of a local variable inside a function body or of a private class field may stay mutable."
-note: |
+"fix": "readonly $TYPE"
+"id": "readonly-array-types-typescript"
+"language": "TypeScript"
+"message": "Write this array type as `readonly T[]` or this tuple type as `readonly [A, B]`; only the own annotation of a local variable inside a function body or of a private class field may stay mutable."
+"note": |
   An array type `T[]` or a tuple type `[A, B]` is reported unless `readonly` directly precedes it, in a parameter, a property, a return type, a type alias, a type argument, a constraint, or a module-level constant.
   The element of an array type, such as the `Cell[]` in `readonly Cell[][]`, and a tuple's rest element, such as `...number[]` in `readonly [string, ...number[]]`, are left to the outer type.
   One exemption is the whole annotation of a `const` or `let` declarator inside a function body, such as `const rows: Row[] = []` that the function fills before it returns or passes the array on.
   The other is the whole annotation of a class field with a private name, such as `readonly #entries: Entry[] = []` that only its class fills; a public field and a getter's return type are still reported.
   A type argument inside either annotation, such as the `Row[]` in `Map<string, Row[]>`, is still reported.
   The fix prepends `readonly `; code that then calls `push`, `sort`, or `splice` on the value, or passes it where a mutable array is declared, fails the type check until it builds a new array or passes a copy.
-utils:
+"rule":
+  "all":
+    - "any":
+        - "kind": "array_type"
+        - "kind": "tuple_type"
+    - "pattern": "$TYPE"
+  "not":
+    "any":
+      - "inside":
+          "kind": "readonly_type"
+          "stopBy": "neighbor"
+      - "inside":
+          "kind": "array_type"
+          "stopBy": "neighbor"
+      - "inside":
+          "kind": "rest_type"
+          "stopBy": "neighbor"
+      - "inside":
+          "matches": "local-annotation"
+          "stopBy": "neighbor"
+      - "inside":
+          "matches": "private-field-annotation"
+          "stopBy": "neighbor"
+"severity": "error"
+"utils":
   # The whole type annotation of a `const` or `let` declarator inside a function body.
-  local-annotation:
-    kind: type_annotation
-    inside:
-      kind: variable_declarator
-      stopBy: neighbor
-      inside:
-        kind: lexical_declaration
-        stopBy: neighbor
-        inside:
-          stopBy: end
-          kind: statement_block
-          inside:
-            stopBy: neighbor
-            any:
-              - kind: function_declaration
-              - kind: generator_function_declaration
-              - kind: function_expression
-              - kind: generator_function
-              - kind: arrow_function
-              - kind: method_definition
-              - kind: class_static_block
+  "local-annotation":
+    "inside":
+      "inside":
+        "inside":
+          "inside":
+            "any":
+              - "kind": "function_declaration"
+              - "kind": "generator_function_declaration"
+              - "kind": "function_expression"
+              - "kind": "generator_function"
+              - "kind": "arrow_function"
+              - "kind": "method_definition"
+              - "kind": "class_static_block"
+            "stopBy": "neighbor"
+          "kind": "statement_block"
+          "stopBy": "end"
+        "kind": "lexical_declaration"
+        "stopBy": "neighbor"
+      "kind": "variable_declarator"
+      "stopBy": "neighbor"
+    "kind": "type_annotation"
   # The whole type annotation of a class field with a private name, such as `#entries`, which no caller can reach.
-  private-field-annotation:
-    kind: type_annotation
-    inside:
-      kind: public_field_definition
-      stopBy: neighbor
-      has:
-        field: name
-        kind: private_property_identifier
-rule:
-  all:
-    - any:
-        - kind: array_type
-        - kind: tuple_type
-    - pattern: $TYPE
-  not:
-    any:
-      - inside: { kind: readonly_type, stopBy: neighbor }
-      - inside: { kind: array_type, stopBy: neighbor }
-      - inside: { kind: rest_type, stopBy: neighbor }
-      - inside: { matches: local-annotation, stopBy: neighbor }
-      - inside: { matches: private-field-annotation, stopBy: neighbor }
-fix: readonly $TYPE
+  "private-field-annotation":
+    "inside":
+      "has":
+        "field": "name"
+        "kind": "private_property_identifier"
+      "kind": "public_field_definition"
+      "stopBy": "neighbor"
+    "kind": "type_annotation"
+...

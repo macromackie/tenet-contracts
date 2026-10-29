@@ -7,7 +7,7 @@ requires-tenet: 0.11.0
 ## Rules
 
 A diagnostic is a line a program writes for a person about its run, such as an error, a refusal, a warning, or a progress line, and the message of any error it raises.
-Prefix each diagnostic line that a command-line program writes once with the program's name and a colon, such as `deploy: `, where its output module writes the line, never inside the error message itself.
+Prefix each diagnostic line that a command-line program writes once with the program's name, a colon, and a space, such as `deploy:`, where its output module writes the line, never inside the error message itself.
 End each message without a period, and join its clauses with a colon or a semicolon instead of writing a second sentence.
 Name the operation that failed and the input it failed on, such as a file, a record, or a command.
 Carry the cause's own message in the error's cause chain when the output module prints that chain, and otherwise append it to the message after a colon.
@@ -36,7 +36,7 @@ Suppress a finding only as `code-lint-suppressions` allows.
 Violation: `Commit or stash every change first.` starts with a capital, ends with a period, and names neither the operation nor the uncommitted files.
 Violation: `Cannot read "invoices/7.json"` starts with a capitalized common word, so it reads wrongly after a colon, as in `import: Cannot read "invoices/7.json"`.
 Violation: `import: read "invoices/7.json": no such file` above a printed cause chain that ends in `no such file` shows the cause's message twice.
-Violation: the message `` `read invoice ${path}` `` prints `read invoice ` when `path` is empty, so the reader cannot see which value failed.
+Violation: the message `` `read invoice ${path}` `` prints `read invoice` and a trailing space when `path` is empty, so the reader cannot see which value failed.
 Allowed: `tag "v0.3.1": the working tree has "2" uncommitted files; commit or stash them` names the operation, its input, and the fix.
 Allowed: where the output prints no cause chain, `` `read invoice ${JSON.stringify(path)}: ${error.message}` `` prints `read invoice "": no such file`, showing the empty path.
 Allowed: `OrderStore.settle refused invoice "7": the invoice is closed` starts with an identifier spelled as the code spells it.

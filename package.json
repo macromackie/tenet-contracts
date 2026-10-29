@@ -1,0 +1,14 @@
+{
+  "name": "tenet-contracts",
+  "private": true,
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "5.10.0",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-boundaries": "7.3.0",
+    "eslint-plugin-jsdoc": "65.4.2",
+    "eslint-plugin-sonarjs": "4.2.2",
+    "eslint-plugin-unicorn": "79.0.0",
+    "oxlint": "1.80.0",
+    "oxlint-tsgolint": "7.0.2005"
+  }
+}

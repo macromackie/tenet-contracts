@@ -1,0 +1,16 @@
+# The tools that scripts/check-library.py runs, at the versions the library's assets were checked with.
+# Each is pinned by backend, so a registry change cannot move it; the script refuses a tool that prints another version.
+# package.json pins oxlint and its plugins, and the probe under tests/ pins effect and TypeScript.
+[tools]
+"aqua:ast-grep/ast-grep" = "0.51.0"
+"aqua:astral-sh/ruff" = "0.17.1"
+"aqua:astral-sh/ty" = "0.0.92"
+"aqua:crate-ci/typos" = "1.51.1"
+"aqua:tamasfe/taplo" = "0.10.0"
+"github:macromackie/tenet" = "0.11.0"
+node = "22.23.2"
+"npm:markdownlint-cli2" = "0.24.0"
+"npm:oxfmt" = "0.65.0"
+"pipx:yamllint" = "1.38.0"
+python = "3.14.7"
+uv = "0.12.9"

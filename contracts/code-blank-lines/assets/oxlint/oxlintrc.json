@@ -1,3 +1,4 @@
+// Pin `@stylistic/eslint-plugin` to 5.10.0, the version this file was checked with, in the package that holds `.contracts` or in one above it.
 {
   "jsPlugins": ["@stylistic/eslint-plugin"],
   "rules": {

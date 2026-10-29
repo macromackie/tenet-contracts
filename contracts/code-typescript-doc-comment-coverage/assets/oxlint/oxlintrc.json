@@ -1,3 +1,4 @@
+// Pin `eslint-plugin-jsdoc` to 65.4.2, the version this file was checked with, in the package that holds `.contracts` or in one above it.
 {
   "jsPlugins": [{ "name": "jsdoc-js", "specifier": "eslint-plugin-jsdoc" }],
   "rules": {

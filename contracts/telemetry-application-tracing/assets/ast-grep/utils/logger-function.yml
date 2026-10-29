@@ -1,7 +1,9 @@
+---
 # telemetry-application-tracing: the name of the logger module's function that writes one log line, matched by the call rules in ../rules as `logger-function`.
 # A repository whose logger function has another name sets it in its own copy of this file with the same `id`, loaded through its own `utilDirs` in place of this one.
 # The regex reads only the called identifier's text, so the TypeScript and Tsx rules share it.
-id: logger-function
-language: TypeScript
-rule:
-  regex: ^log$
+"id": "logger-function"
+"language": "TypeScript"
+"rule":
+  "regex": "^log$"
+...

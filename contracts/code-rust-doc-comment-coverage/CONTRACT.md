@@ -14,6 +14,7 @@ An item of a trait implementation needs no doc comment of its own, because the t
 A field or variant of an exported type needs no doc comment of its own.
 Write each doc comment in the prose form that `code-comment-form` requires.
 Enforce these rules over every library crate with this contract's `assets/` configuration, loaded from the repository's own lint configuration, and fail checks on each missing doc comment.
+Run that configuration over each library crate's folder and never over a binary crate, whose `pub` items it cannot tell from a library's.
 Exempt an item only with the suppression that `code-lint-suppressions` describes.
 Hiding an item from generated documentation so that the check passes, such as with `#[doc(hidden)]`, is a violation.
 

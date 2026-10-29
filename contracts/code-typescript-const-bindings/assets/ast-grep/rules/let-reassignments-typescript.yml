@@ -1,10 +1,10 @@
+---
 # code-typescript-const-bindings: reassign a `let` only inside a loop that carries its value or inside a function declared in the function that declares the `let`.
 # TypeScript variant (.ts, .mts, .cts); let-reassignments-tsx.yml differs only in `id`, `language`, and this line.
-id: let-reassignments-typescript
-language: TypeScript
-severity: error
-message: "Reassign this `let` only inside a loop that carries its value or a callback declared in the function that declares it; return a chosen value from a function instead."
-note: |
+"id": "let-reassignments-typescript"
+"language": "TypeScript"
+"message": "Reassign this `let` only inside a loop that carries its value or a callback declared in the function that declares it; return a chosen value from a function instead."
+"note": |
   An assignment, an augmented assignment such as `total += amount` or `label ??= fallback`, or a destructuring assignment such as `[low, high] = [high, low]` writes a name.
   The rule finds the nearest block, case, module, or `for...of` or `for...in` head that declares that name with `let`.
   It reports the write when no loop and no function lies between the write and that declaration.
@@ -14,154 +14,156 @@ note: |
   The rule treats any function between the write and the declaration as a callback; review rejects one that the declaring function calls itself.
   A field of an object literal, such as `state.count += 1`, is not a name; `code-typescript-effect-absent-values` rejects that write.
   `++` and `--` are left to the increment rule, which rejects every one.
-utils:
-  pattern-node:
-    any:
-      - kind: array_pattern
-      - kind: object_pattern
-      - kind: pair_pattern
-      - kind: rest_pattern
-      - kind: assignment_pattern
-      - kind: object_assignment_pattern
-  written-name:
-    any:
-      - kind: identifier
-        inside:
-          any:
-            - kind: parenthesized_expression
-            - kind: non_null_expression
-          inside:
-            field: left
-            any:
-              - kind: assignment_expression
-              - kind: augmented_assignment_expression
-      - kind: identifier
-        inside:
-          field: left
-          any:
-            - kind: assignment_expression
-            - kind: augmented_assignment_expression
-      - any:
-          - kind: identifier
-          - kind: shorthand_property_identifier_pattern
-        not:
-          inside:
-            field: right
-            any:
-              - kind: assignment_pattern
-              - kind: object_assignment_pattern
-        inside:
-          matches: pattern-node
-          inside:
-            stopBy:
-              not:
-                matches: pattern-node
-            kind: assignment_expression
-  binds-name:
-    kind: variable_declarator
-    has:
-      field: name
-      matches: binds-in-pattern
-  declares-let:
-    kind: lexical_declaration
-    regex: ^let\b
-    has:
-      matches: binds-name
-  scope-declaring-let:
-    any:
-      - any:
-          - kind: statement_block
-          - kind: program
-          - kind: switch_case
-          - kind: switch_default
-        has:
-          any:
-            - matches: declares-let
-            - kind: export_statement
-              has:
-                matches: declares-let
-      - kind: for_in_statement
-        regex: ^for\s*(await\s*)?\(\s*let\b
-        has:
-          field: left
-          matches: binds-in-pattern
-  loop-node:
-    any:
-      - kind: for_statement
-      - kind: for_in_statement
-      - kind: while_statement
-      - kind: do_statement
-  function-node:
-    any:
-      - kind: arrow_function
-      - kind: function_expression
-      - kind: function_declaration
-      - kind: generator_function
-      - kind: generator_function_declaration
-      - kind: method_definition
-  carrier:
-    any:
-      - matches: loop-node
-      - matches: function-node
-  binds-in-pattern:
-    any:
-      - pattern: $NAME
-      - has:
-          stopBy: end
-          any:
-            - kind: identifier
-            - kind: shorthand_property_identifier_pattern
-          pattern: $NAME
-rule:
-  matches: written-name
-  pattern: $NAME
-  not:
-    inside:
-      stopBy:
-        matches: carrier
-      kind: catch_clause
-      has:
-        field: parameter
-        matches: binds-in-pattern
-  any:
-    - inside:
-        stopBy:
-          matches: carrier
-        matches: scope-declaring-let
-    - inside:
-        stopBy: end
-        matches: function-node
-      all:
-        - inside:
-            stopBy: end
-            kind: program
-            has:
-              any:
-                - matches: declares-let
-                - kind: export_statement
-                  has:
-                    matches: declares-let
-        - not:
-            inside:
-              stopBy: end
-              any:
-                - kind: for_statement
-                  has:
-                    field: initializer
-                    matches: declares-let
-                - kind: catch_clause
-                  has:
-                    field: parameter
-                    matches: binds-in-pattern
-                - all:
-                    - not:
-                        kind: program
-                    - matches: scope-declaring-let
-                - matches: function-node
-                  has:
-                    field: parameters
-                    matches: binds-in-pattern
-                - kind: arrow_function
-                  has:
-                    field: parameter
-                    pattern: $NAME
+"rule":
+  "any":
+    - "inside":
+        "matches": "scope-declaring-let"
+        "stopBy":
+          "matches": "carrier"
+    - "all":
+        - "inside":
+            "has":
+              "any":
+                - "matches": "declares-let"
+                - "has":
+                    "matches": "declares-let"
+                  "kind": "export_statement"
+            "kind": "program"
+            "stopBy": "end"
+        - "not":
+            "inside":
+              "any":
+                - "has":
+                    "field": "initializer"
+                    "matches": "declares-let"
+                  "kind": "for_statement"
+                - "has":
+                    "field": "parameter"
+                    "matches": "binds-in-pattern"
+                  "kind": "catch_clause"
+                - "all":
+                    - "not":
+                        "kind": "program"
+                    - "matches": "scope-declaring-let"
+                - "has":
+                    "field": "parameters"
+                    "matches": "binds-in-pattern"
+                  "matches": "function-node"
+                - "has":
+                    "field": "parameter"
+                    "pattern": "$NAME"
+                  "kind": "arrow_function"
+              "stopBy": "end"
+      "inside":
+        "matches": "function-node"
+        "stopBy": "end"
+  "matches": "written-name"
+  "not":
+    "inside":
+      "has":
+        "field": "parameter"
+        "matches": "binds-in-pattern"
+      "kind": "catch_clause"
+      "stopBy":
+        "matches": "carrier"
+  "pattern": "$NAME"
+"severity": "error"
+"utils":
+  "binds-in-pattern":
+    "any":
+      - "pattern": "$NAME"
+      - "has":
+          "any":
+            - "kind": "identifier"
+            - "kind": "shorthand_property_identifier_pattern"
+          "pattern": "$NAME"
+          "stopBy": "end"
+  "binds-name":
+    "has":
+      "field": "name"
+      "matches": "binds-in-pattern"
+    "kind": "variable_declarator"
+  "carrier":
+    "any":
+      - "matches": "loop-node"
+      - "matches": "function-node"
+  "declares-let":
+    "has":
+      "matches": "binds-name"
+    "kind": "lexical_declaration"
+    "regex": '^let\b'
+  "function-node":
+    "any":
+      - "kind": "arrow_function"
+      - "kind": "function_expression"
+      - "kind": "function_declaration"
+      - "kind": "generator_function"
+      - "kind": "generator_function_declaration"
+      - "kind": "method_definition"
+  "loop-node":
+    "any":
+      - "kind": "for_statement"
+      - "kind": "for_in_statement"
+      - "kind": "while_statement"
+      - "kind": "do_statement"
+  "pattern-node":
+    "any":
+      - "kind": "array_pattern"
+      - "kind": "object_pattern"
+      - "kind": "pair_pattern"
+      - "kind": "rest_pattern"
+      - "kind": "assignment_pattern"
+      - "kind": "object_assignment_pattern"
+  "scope-declaring-let":
+    "any":
+      - "any":
+          - "kind": "statement_block"
+          - "kind": "program"
+          - "kind": "switch_case"
+          - "kind": "switch_default"
+        "has":
+          "any":
+            - "matches": "declares-let"
+            - "has":
+                "matches": "declares-let"
+              "kind": "export_statement"
+      - "has":
+          "field": "left"
+          "matches": "binds-in-pattern"
+        "kind": "for_in_statement"
+        "regex": '^for\s*(await\s*)?\(\s*let\b'
+  "written-name":
+    "any":
+      - "inside":
+          "any":
+            - "kind": "parenthesized_expression"
+            - "kind": "non_null_expression"
+          "inside":
+            "any":
+              - "kind": "assignment_expression"
+              - "kind": "augmented_assignment_expression"
+            "field": "left"
+        "kind": "identifier"
+      - "inside":
+          "any":
+            - "kind": "assignment_expression"
+            - "kind": "augmented_assignment_expression"
+          "field": "left"
+        "kind": "identifier"
+      - "any":
+          - "kind": "identifier"
+          - "kind": "shorthand_property_identifier_pattern"
+        "inside":
+          "inside":
+            "kind": "assignment_expression"
+            "stopBy":
+              "not":
+                "matches": "pattern-node"
+          "matches": "pattern-node"
+        "not":
+          "inside":
+            "any":
+              - "kind": "assignment_pattern"
+              - "kind": "object_assignment_pattern"
+            "field": "right"
+...

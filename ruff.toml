@@ -1,0 +1,12 @@
+# The library's scripts take the strictest ruff settings that code-lint-strictness ships.
+extend = "contracts/code-lint-strictness/assets/ruff/ruff.toml"
+include = ["scripts/*.py"]
+line-length = 100
+src = ["scripts"]
+target-version = "py314"
+
+[lint.per-file-ignores]
+# C: code-module-structure-and-control-flow forbids the placeholder `__init__.py` this rule asks for; scripts are not a package.
+"scripts/*.py" = ["implicit-namespace-package"]
+# Q: cli-output-channels has the output module write the standard streams and end the process.
+"scripts/output.py" = ["banned-api", "print"]

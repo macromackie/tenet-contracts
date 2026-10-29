@@ -1,13 +1,13 @@
+---
 # code-module-file-roles: a source file exports at most one function, with its private helpers.
 # JavaScript variant (.js, .mjs, .cjs, .jsx); it differs from the TypeScript and Tsx variants in `id`, `language`, this line, and its lack of type assertion wrappers.
 # Keep this folder out of the repository's root ast-grep configuration, because `--globs` applies to every rule in a scan.
 # Scan with this folder's sgconfig.yml and exclude the declared namespace and generated path patterns, such as
 # `ast-grep scan -c .contracts/NNN-code-module-file-roles/assets/ast-grep/sgconfig.yml --globs '!src/uuid/uuid.ts'`.
-id: exported-functions-javascript
-language: JavaScript
-severity: error
-message: Move this exported function to its own file; a file exports at most one function, with its private helpers.
-note: |
+"id": "exported-functions-javascript"
+"language": "JavaScript"
+"message": "Move this exported function to its own file; a file exports at most one function, with its private helpers."
+"note": |
   Each exported function after the first in a file is reported.
   A function declaration, a function expression, an arrow function, and a generator count, whether named or default.
   A function value counts inside parentheses.
@@ -16,78 +16,80 @@ note: |
   Review covers a function that an export list such as `export { a, b }` or a default export such as `export default main` names.
   Review also covers a function that a call returns, that `exports.name =` or `module.exports` binds, or that an exported `namespace` block holds.
   A file that an entry point re-exports under one namespace, such as `export * as Uuid from './uuid.ts'`, is exempt through its declared path pattern.
-utils:
-  # A function written as a value.
-  bare-function:
-    any:
-      - kind: arrow_function
-      - kind: function_expression
-      - kind: generator_function
-  # A node that wraps a value without changing it, such as `(value)`.
-  value-wrapper:
-    any:
-      - kind: parenthesized_expression
-  # A function value, bare or inside wrappers, such as `(() => 1)`.
-  function-value:
-    any:
-      - matches: bare-function
-      - matches: value-wrapper
-        has:
-          matches: bare-function
-          stopBy:
-            not:
-              matches: value-wrapper
-  # A declarator whose value is a function, such as `parseLine = () => ...`, under a name no route framework requires, such as `loader`.
-  function-declarator:
-    kind: variable_declarator
-    has:
-      field: value
-      matches: function-value
-    not:
-      has:
-        field: name
-        matches: framework-export-name
-  # A top-level export statement that exports a function.
-  exported-function:
-    kind: export_statement
-    inside:
-      kind: program
-    # Each branch skips a function under a name that a route framework requires, such as `loader`, so the statement's other functions still count.
-    any:
-      - has:
-          field: declaration
-          any:
-            - kind: function_declaration
-            - kind: generator_function_declaration
-          not:
-            has:
-              field: name
-              matches: framework-export-name
-      - has:
-          field: declaration
-          any:
-            - kind: lexical_declaration
-            - kind: variable_declaration
-          has:
-            matches: function-declarator
-      - has:
-          field: value
-          matches: function-value
-rule:
-  any:
+"rule":
+  "any":
     # An export statement that exports a function after an earlier one.
-    - matches: exported-function
-      follows:
-        matches: exported-function
-        stopBy: end
+    - "follows":
+        "matches": "exported-function"
+        "stopBy": "end"
+      "matches": "exported-function"
     # A function declarator after an earlier one in the same exported declaration, such as `export const openOrder = () => OrderStatus.Open, closeOrder = () => OrderStatus.Closed`.
-    - matches: function-declarator
-      follows:
-        matches: function-declarator
-        stopBy: end
-      inside:
-        any:
-          - kind: lexical_declaration
-          - kind: variable_declaration
-        inside:
-          matches: exported-function
+    - "follows":
+        "matches": "function-declarator"
+        "stopBy": "end"
+      "inside":
+        "any":
+          - "kind": "lexical_declaration"
+          - "kind": "variable_declaration"
+        "inside":
+          "matches": "exported-function"
+      "matches": "function-declarator"
+"severity": "error"
+"utils":
+  # A function written as a value.
+  "bare-function":
+    "any":
+      - "kind": "arrow_function"
+      - "kind": "function_expression"
+      - "kind": "generator_function"
+  # A top-level export statement that exports a function.
+  "exported-function":
+    # Each branch skips a function under a name that a route framework requires, such as `loader`, so the statement's other functions still count.
+    "any":
+      - "has":
+          "any":
+            - "kind": "function_declaration"
+            - "kind": "generator_function_declaration"
+          "field": "declaration"
+          "not":
+            "has":
+              "field": "name"
+              "matches": "framework-export-name"
+      - "has":
+          "any":
+            - "kind": "lexical_declaration"
+            - "kind": "variable_declaration"
+          "field": "declaration"
+          "has":
+            "matches": "function-declarator"
+      - "has":
+          "field": "value"
+          "matches": "function-value"
+    "inside":
+      "kind": "program"
+    "kind": "export_statement"
+  # A declarator whose value is a function, such as `parseLine = () => ...`, under a name no route framework requires, such as `loader`.
+  "function-declarator":
+    "has":
+      "field": "value"
+      "matches": "function-value"
+    "kind": "variable_declarator"
+    "not":
+      "has":
+        "field": "name"
+        "matches": "framework-export-name"
+  # A function value, bare or inside wrappers, such as `(() => 1)`.
+  "function-value":
+    "any":
+      - "matches": "bare-function"
+      - "has":
+          "matches": "bare-function"
+          "stopBy":
+            "not":
+              "matches": "value-wrapper"
+        "matches": "value-wrapper"
+  # A node that wraps a value without changing it, such as `(value)`.
+  "value-wrapper":
+    "any":
+      - "kind": "parenthesized_expression"
+...

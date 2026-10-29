@@ -1,10 +1,10 @@
+---
 # code-typescript-runtime-keyed-maps: never assign to an object's property through a key that is not a literal, except on a declared array or closed-set record.
 # Tsx variant (.tsx); computed-key-writes-typescript.yml differs only in `id`, `language`, and this line.
-id: computed-key-writes-tsx
-language: Tsx
-severity: error
-message: "Hold a lookup that code fills in a `Map` and add each entry with `set`, or tally a closed set in a `const` annotated `Record<Set, Value>` keyed by its members, instead of writing `record[key] = value`."
-note: |
+"id": "computed-key-writes-tsx"
+"language": "Tsx"
+"message": "Hold a lookup that code fills in a `Map` and add each entry with `set`, or tally a closed set in a `const` annotated `Record<Set, Value>` keyed by its members, instead of writing `record[key] = value`."
+"note": |
   This reports `=`, a compound assignment such as `+=` or `??=`, and `++` or `--` whose target is `object[key]` with a key that is not a literal.
   A literal key is a string, a number, or a template without placeholders; `record[OrderStatus.Open]` is not a literal key.
   An element of an array is not reported when the function that holds the write declares the array by name with an array type, such as `const receipts: Receipt[] = []`.
@@ -16,180 +16,182 @@ note: |
   It also reports a variable rebuilt from a spread of itself plus a computed key, such as `totals = { ...totals, [key]: amount }`.
   An array that a parameter, a field, or a call result holds is reported, as is a nested target such as `grid[row][column]`.
   Entries added by `Object.assign` or `Reflect.set` are not reported.
-utils:
-  # A key written in source: a string, a number, or a template without placeholders.
-  literal-key:
-    any:
-      - kind: string
-      - kind: number
-      - kind: template_string
-        not:
-          has:
-            kind: template_substitution
+"rule":
+  "any":
+    - "has":
+        "field": "left"
+        "matches": "computed-target"
+      "kind": "assignment_expression"
+    - "has":
+        "field": "left"
+        "matches": "computed-target"
+      "kind": "augmented_assignment_expression"
+    - "has":
+        "field": "argument"
+        "matches": "computed-target"
+      "kind": "update_expression"
+    - "all":
+        - "has":
+            "field": "left"
+            "kind": "identifier"
+            "pattern": "$RECORD"
+        - "has":
+            "all":
+              - "has":
+                  "has":
+                    "kind": "identifier"
+                    "pattern": "$RECORD"
+                  "kind": "spread_element"
+              - "has":
+                  "has":
+                    "field": "key"
+                    "kind": "computed_property_name"
+                  "kind": "pair"
+            "field": "right"
+            "kind": "object"
+      "kind": "assignment_expression"
+"severity": "error"
+"utils":
   # A declarator that gives its binding an array type or builds an array.
-  array-declarator:
-    kind: variable_declarator
-    any:
-      - has:
-          field: type
-          has:
-            any:
-              - kind: array_type
-              - kind: readonly_type
-              - kind: generic_type
-                has:
-                  field: name
-                  regex: ^(Array|ReadonlyArray|\w+Array)$
-      - has:
-          field: value
-          any:
-            - kind: array
-            - kind: new_expression
-              has:
-                field: constructor
-                regex: ^(Array|\w+Array)$
-            - kind: call_expression
-              has:
-                field: function
-                regex: ^Array\.(from|of)$
-  # An array that the function holding the write declares by name.
-  declared-array:
-    kind: identifier
-    pattern: $ARRAY
-    inside:
-      stopBy:
-        any:
-          - kind: function_declaration
-          - kind: function_expression
-          - kind: arrow_function
-          - kind: method_definition
-          - kind: generator_function_declaration
-          - kind: generator_function
-      kind: statement_block
-      has:
-        stopBy: end
-        matches: array-declarator
-        has:
-          field: name
-          pattern: $ARRAY
+  "array-declarator":
+    "any":
+      - "has":
+          "field": "type"
+          "has":
+            "any":
+              - "kind": "array_type"
+              - "kind": "readonly_type"
+              - "has":
+                  "field": "name"
+                  "regex": '^(Array|ReadonlyArray|\w+Array)$'
+                "kind": "generic_type"
+      - "has":
+          "any":
+            - "kind": "array"
+            - "has":
+                "field": "constructor"
+                "regex": '^(Array|\w+Array)$'
+              "kind": "new_expression"
+            - "has":
+                "field": "function"
+                "regex": '^Array\.(from|of)$'
+              "kind": "call_expression"
+          "field": "value"
+    "kind": "variable_declarator"
   # A `const` annotated `Record<Set, Value>` whose literal keys every entry by a member of `Set`, such as `[CheckState.Passed]`.
-  closed-set-record-declarator:
-    kind: variable_declarator
-    inside:
-      kind: lexical_declaration
-      regex: ^const\b
-    all:
-      - has:
-          field: type
-          has:
-            kind: generic_type
-            all:
-              - has:
-                  field: name
-                  regex: ^Record$
-              - has:
-                  field: type_arguments
-                  has:
-                    nthChild: 1
-                    kind: type_identifier
-                    pattern: $SET
-      - has:
-          field: value
-          kind: object
-          all:
-            - has:
-                kind: pair
-            - not:
-                has:
-                  any:
-                    - kind: shorthand_property_identifier
-                    - kind: spread_element
-                    - kind: method_definition
-                    - kind: pair
-                      not:
-                        has:
-                          field: key
-                          kind: computed_property_name
-                          has:
-                            kind: member_expression
-                            has:
-                              field: object
-                              pattern: $SET
-  # A closed-set record that the function holding the write declares by name.
-  declared-closed-set-record:
-    kind: identifier
-    pattern: $TALLY
-    inside:
-      stopBy:
-        any:
-          - kind: function_declaration
-          - kind: function_expression
-          - kind: arrow_function
-          - kind: method_definition
-          - kind: generator_function_declaration
-          - kind: generator_function
-      kind: statement_block
-      has:
-        stopBy:
-          any:
-            - kind: function_declaration
-            - kind: function_expression
-            - kind: arrow_function
-            - kind: method_definition
-            - kind: generator_function_declaration
-            - kind: generator_function
-            - kind: class_body
-        matches: closed-set-record-declarator
-        has:
-          field: name
-          pattern: $TALLY
+  "closed-set-record-declarator":
+    "all":
+      - "has":
+          "field": "type"
+          "has":
+            "all":
+              - "has":
+                  "field": "name"
+                  "regex": "^Record$"
+              - "has":
+                  "field": "type_arguments"
+                  "has":
+                    "kind": "type_identifier"
+                    "nthChild": 1
+                    "pattern": "$SET"
+            "kind": "generic_type"
+      - "has":
+          "all":
+            - "has":
+                "kind": "pair"
+            - "not":
+                "has":
+                  "any":
+                    - "kind": "shorthand_property_identifier"
+                    - "kind": "spread_element"
+                    - "kind": "method_definition"
+                    - "kind": "pair"
+                      "not":
+                        "has":
+                          "field": "key"
+                          "has":
+                            "has":
+                              "field": "object"
+                              "pattern": "$SET"
+                            "kind": "member_expression"
+                          "kind": "computed_property_name"
+          "field": "value"
+          "kind": "object"
+    "inside":
+      "kind": "lexical_declaration"
+      "regex": '^const\b'
+    "kind": "variable_declarator"
   # The target `object[key]` with a key that is not a literal, on anything but a declared array or closed-set record.
-  computed-target:
-    kind: subscript_expression
-    all:
-      - has:
-          field: index
-          not:
-            matches: literal-key
-      - not:
-          has:
-            field: object
-            matches: declared-array
-      - not:
-          has:
-            field: object
-            matches: declared-closed-set-record
-rule:
-  any:
-    - kind: assignment_expression
-      has:
-        field: left
-        matches: computed-target
-    - kind: augmented_assignment_expression
-      has:
-        field: left
-        matches: computed-target
-    - kind: update_expression
-      has:
-        field: argument
-        matches: computed-target
-    - kind: assignment_expression
-      all:
-        - has:
-            field: left
-            kind: identifier
-            pattern: $RECORD
-        - has:
-            field: right
-            kind: object
-            all:
-              - has:
-                  kind: spread_element
-                  has:
-                    kind: identifier
-                    pattern: $RECORD
-              - has:
-                  kind: pair
-                  has:
-                    field: key
-                    kind: computed_property_name
+  "computed-target":
+    "all":
+      - "has":
+          "field": "index"
+          "not":
+            "matches": "literal-key"
+      - "not":
+          "has":
+            "field": "object"
+            "matches": "declared-array"
+      - "not":
+          "has":
+            "field": "object"
+            "matches": "declared-closed-set-record"
+    "kind": "subscript_expression"
+  # An array that the function holding the write declares by name.
+  "declared-array":
+    "inside":
+      "has":
+        "has":
+          "field": "name"
+          "pattern": "$ARRAY"
+        "matches": "array-declarator"
+        "stopBy": "end"
+      "kind": "statement_block"
+      "stopBy":
+        "any":
+          - "kind": "function_declaration"
+          - "kind": "function_expression"
+          - "kind": "arrow_function"
+          - "kind": "method_definition"
+          - "kind": "generator_function_declaration"
+          - "kind": "generator_function"
+    "kind": "identifier"
+    "pattern": "$ARRAY"
+  # A closed-set record that the function holding the write declares by name.
+  "declared-closed-set-record":
+    "inside":
+      "has":
+        "has":
+          "field": "name"
+          "pattern": "$TALLY"
+        "matches": "closed-set-record-declarator"
+        "stopBy":
+          "any":
+            - "kind": "function_declaration"
+            - "kind": "function_expression"
+            - "kind": "arrow_function"
+            - "kind": "method_definition"
+            - "kind": "generator_function_declaration"
+            - "kind": "generator_function"
+            - "kind": "class_body"
+      "kind": "statement_block"
+      "stopBy":
+        "any":
+          - "kind": "function_declaration"
+          - "kind": "function_expression"
+          - "kind": "arrow_function"
+          - "kind": "method_definition"
+          - "kind": "generator_function_declaration"
+          - "kind": "generator_function"
+    "kind": "identifier"
+    "pattern": "$TALLY"
+  # A key written in source: a string, a number, or a template without placeholders.
+  "literal-key":
+    "any":
+      - "kind": "string"
+      - "kind": "number"
+      - "kind": "template_string"
+        "not":
+          "has":
+            "kind": "template_substitution"
+...

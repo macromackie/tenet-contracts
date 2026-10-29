@@ -40,7 +40,7 @@ Allowed: a webhook's `ProviderEvent` schema declares the one field code reads an
 
 ## Checks
 
-From the package directory, run the package's type check.
+From the package directory, run the package's type check against effect 4.0.0 or later.
 Run the repository's lint from the repository root, and confirm that it reports a camelCase schema constant, an inline `typeof Invoice.Type`, and a decode call without `onExcessProperty: 'error'`.
 Search the change for imports of validation libraries other than Effect Schema, and confirm that each one serves a declared consumer.
 For each boundary a change adds, which schema decodes it, and where is its type's one alias?

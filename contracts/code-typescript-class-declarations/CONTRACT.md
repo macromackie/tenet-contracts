@@ -5,7 +5,7 @@ message: Declare a TypeScript class only where a runtime or library requires one
 
 ## Rules
 
-Declare a class only where a runtime or library requires one: a class the runtime instantiates, such as a stateful actor, a container, or a worker entry point; a tagged error class that `code-typescript-effect-errors` requires; or a service key class with an empty body that an effect or dependency-injection library requires to name a service.
+Declare a class only where a runtime or library requires one: a class the runtime instantiates, such as a stateful actor, a container, or a worker entry point; a tagged error class that `code-typescript-effect-errors` requires; a schema class that `code-typescript-effect-schemas` allows; or a service key class with an empty body that an effect or dependency-injection library requires to name a service.
 Write every other unit that holds dependencies or state, such as a store, a client, or a driver, as a factory function that returns named functions that close over them, such as `createInvoiceStore({ sql })` returning `{ settleInvoice }`.
 Keep a factory's storage handle and other dependencies in its closure, and never return them beside its functions.
 A plain record that holds values and no storage handle is data and needs no factory.

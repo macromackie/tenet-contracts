@@ -1,3 +1,10 @@
+// The strictest oxlint settings that code-lint-strictness requires.
+// Every rule group runs at error, and each rule left off names its reason on the line above it.
+//
+// oxlint reads `env`, `globals`, and `settings` only from the configuration it runs, never through `extends`.
+// Set `env` for the runtimes the repository's JavaScript files run in, such as `"node": true`, in the repository's own configuration.
+// Extend `vitest.json` beside this file, right after this file, only where vitest runs the repository's tests.
+// This file was checked with oxlint 1.80.0 and oxlint-tsgolint 7.0.2005; pin both to those exact versions.
 {
   "categories": {
     "correctness": "error",
@@ -30,11 +37,12 @@
     },
     {
       "files": [
+        "**/errors.ts",
         "**/schemas.ts",
         "**/schemas/**"
       ],
       "rules": {
-        // C: code-typescript-call-arguments lets a schema file nest constructor calls.
+        // C: code-typescript-call-arguments lets a schema or errors file nest constructor calls.
         "unicorn/max-nested-calls": "off"
       }
     },
@@ -77,36 +85,9 @@
         // C: same as `jsdoc/require-param-type`.
         "jsdoc/require-returns-type": "off",
         // C: same as `jsdoc/require-param-type`.
-        "jsdoc/require-yields-type": "off"
-      }
-    },
-    {
-      "files": [
-        "**/*.test.*",
-        "**/*.spec.*",
-        "**/test/**",
-        "**/tests/**",
-        "**/__tests__/**"
-      ],
-      "plugins": [
-        "vitest"
-      ],
-      "rules": {
-        "vitest/consistent-test-it": [
-          "error",
-          {
-            "fn": "test",
-            "withinDescribe": "test"
-          }
-        ],
-        // R: contradicts `vitest/prefer-importing-vitest-globals`, which stays on, so each test imports `{ test }` from the runner.
-        "vitest/no-importing-vitest-globals": "off",
-        // R: contradicts `vitest/prefer-called-times`, which stays on.
-        "vitest/prefer-called-once": "off",
-        // C, R: same as `vitest/prefer-to-be-truthy`.
-        "vitest/prefer-to-be-falsy": "off",
-        // C, R: contradicts `vitest/prefer-strict-boolean-matchers`; code-typescript-boolean-conditions bans truthiness tests.
-        "vitest/prefer-to-be-truthy": "off"
+        "jsdoc/require-yields-type": "off",
+        // Q: reports `process.env` in the settings module that code-environment-settings requires, a name the compiler resolves from its declared `types`; code-typescript-compiler-strictness's type check reports every undeclared name, and JavaScript files keep the rule.
+        "no-undef": "off"
       }
     }
   ],
@@ -286,7 +267,9 @@
       "error",
       {
         "allowSeparateTypeImports": false,
-        "includeExports": true
+        // Q: oxlint 1.80.0 reports each further name of one `export { log, LogEvent } from './log.ts'` statement as a duplicate,
+        // and code-typescript-entry-points writes an entry point's re-exports of one file that way.
+        "includeExports": false
       }
     ],
     "no-inner-declarations": [
@@ -614,6 +597,8 @@
         "onlyInlineLambdas": false
       }
     ],
+    // Q: code-typescript-effect-errors and code-typescript-effect-absent-values require tagged error classes, `Option`, and `Effect`, whose inherited fields and methods are not read-only, so it reports `function isTransient(error: ProviderBusy)` for a tagged error class `ProviderBusy`.
+    "typescript/prefer-readonly-parameter-types": "off",
     // C, R: same as `require-await`.
     "typescript/require-await": "off",
     "typescript/restrict-plus-operands": [

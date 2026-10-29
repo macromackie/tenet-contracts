@@ -1,17 +1,19 @@
+---
 # code-typescript-import-statements: import each declared namespace library only as one namespace named after its package.
 # TypeScript variant (.ts, .mts, .cts); it differs from the Tsx variant only in `id`, `language`, and this line.
 # Scan with this folder's sgconfig.yml from the repository root, such as
 # `ast-grep scan -c .contracts/NNN-code-typescript-import-statements/assets/ast-grep/sgconfig.yml`.
-id: namespace-library-imports-typescript
-language: TypeScript
-severity: error
-message: Import this library only as one namespace named in camelCase after its package without the scope, such as `import * as chartKit from '@acme/chart-kit'`, and read every name through it.
-note: |
+"id": "namespace-library-imports-typescript"
+"language": "TypeScript"
+"message": "Import this library only as one namespace named in camelCase after its package without the scope, such as `import * as chartKit from '@acme/chart-kit'`, and read every name through it."
+"note": |
   An import statement of a library on the `misimported-namespace-library` list in ../utils is checked.
   It passes only when it imports that library's namespace under the listed name, with or without `type`.
   A named import, a default import, and a namespace under another name, such as `v`, are rejected.
   A side-effect import, which names nothing, is not checked.
   The repository's lint rejects every other namespace import, and its duplicate-import rule rejects a second statement of the same library.
-rule:
-  kind: import_statement
-  matches: misimported-namespace-library
+"rule":
+  "kind": "import_statement"
+  "matches": "misimported-namespace-library"
+"severity": "error"
+...

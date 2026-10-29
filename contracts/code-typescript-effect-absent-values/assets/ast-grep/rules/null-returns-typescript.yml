@@ -1,42 +1,58 @@
+---
 # code-typescript-effect-absent-values: return `null` only where a declared type, such as a framework's node type, admits it.
 # TypeScript variant (.ts, .mts, .cts); null-returns-tsx.yml is identical except for `id`, `language`, and this line.
-id: null-returns-typescript
-language: TypeScript
-severity: error
-message: Return `Option.none()` from owned code, and return `null` only from a function whose declared type admits it, such as a component that renders nothing.
-note: |
+"id": "null-returns-typescript"
+"language": "TypeScript"
+"message": "Return `Option.none()` from owned code, and return `null` only from a function whose declared type admits it, such as a component that renders nothing."
+"note": |
   A `return null`, or an arrow whose expression body is `null`, is reported when its function declares no return type, or declares `unknown` or `any`, so no declared type decides it.
   A function that declares a return type, or a function bound to a typed constant or passed as an argument, is left to the compiler.
   The compiler then accepts `null` only where a declared type admits it, and `absent-literal-types` reports each type that writes `null` by hand.
-rule:
-  kind: "null"
-  any:
-    - inside: { kind: return_statement, stopBy: neighbor }
-    - inside: { kind: arrow_function, field: body, stopBy: neighbor }
-  inside:
-    stopBy:
-      any:
-        - kind: function_declaration
-        - kind: generator_function_declaration
-        - kind: function_expression
-        - kind: arrow_function
-        - kind: method_definition
-    any:
-      - all:
-          - any:
-              - kind: function_declaration
-              - kind: generator_function_declaration
-              - kind: method_definition
-          - not: { has: { field: return_type, kind: type_annotation } }
-      - all:
-          - any:
-              - kind: function_expression
-              - kind: arrow_function
-          - not: { has: { field: return_type, kind: type_annotation } }
-          - inside:
-              stopBy: neighbor
-              kind: variable_declarator
-              not: { has: { field: type, kind: type_annotation } }
-      - has:
-          field: return_type
-          regex: '^:\s*(unknown|any)$'
+"rule":
+  "any":
+    - "inside":
+        "kind": "return_statement"
+        "stopBy": "neighbor"
+    - "inside":
+        "field": "body"
+        "kind": "arrow_function"
+        "stopBy": "neighbor"
+  "inside":
+    "any":
+      - "all":
+          - "any":
+              - "kind": "function_declaration"
+              - "kind": "generator_function_declaration"
+              - "kind": "method_definition"
+          - "not":
+              "has":
+                "field": "return_type"
+                "kind": "type_annotation"
+      - "all":
+          - "any":
+              - "kind": "function_expression"
+              - "kind": "arrow_function"
+          - "not":
+              "has":
+                "field": "return_type"
+                "kind": "type_annotation"
+          - "inside":
+              "kind": "variable_declarator"
+              "not":
+                "has":
+                  "field": "type"
+                  "kind": "type_annotation"
+              "stopBy": "neighbor"
+      - "has":
+          "field": "return_type"
+          "regex": '^:\s*(unknown|any)$'
+    "stopBy":
+      "any":
+        - "kind": "function_declaration"
+        - "kind": "generator_function_declaration"
+        - "kind": "function_expression"
+        - "kind": "arrow_function"
+        - "kind": "method_definition"
+  "kind": "null"
+"severity": "error"
+...

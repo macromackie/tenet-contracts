@@ -11,6 +11,7 @@ Bound a wait with `Effect.timeout` or one of its variants, such as `Effect.timeo
 Retry with `Effect.retry` and a `Schedule`, and poll with `Effect.repeat`, a `Schedule`, and an `until` condition, never with a loop that sleeps between attempts.
 End each retry and poll after a declared number of attempts or a declared duration, through its `Schedule` or `Effect.timeout`, within the budget that `code-execution-lifecycle` gives its one owner.
 Work that repeats until its owner interrupts it, such as a queue consumer, may repeat on a `Schedule` without a bound.
+A retry or deadline that a later invocation resumes from storage, such as a job's next attempt time, is a durable job, not an `Effect.retry` or `Effect.timeout`.
 
 Run an Effect for each member of a collection with `Effect.forEach`, and pass it a numeric `concurrency` option, never `'unbounded'`.
 Pass `{ concurrency: 1 }` to run the members in order, so that every `Effect.forEach` states its concurrency.
@@ -26,6 +27,7 @@ Where a foreign API takes a promise, such as a worker's `waitUntil`, pass it the
 A function that a foreign API calls and awaits, such as a test body, is such an entry point, is `async`, and returns `await Effect.runPromise(program)` for its Effect.
 A user interface component that delays or repeats work, such as hiding a notice, runs the Effect with `Effect.runFork` when it mounts and interrupts that fiber in its cleanup.
 A deadline that a library enforces on its own resource, such as a connection pool's acquire timeout or a test's time limit, stays in that library's configuration.
+A retry that a library performs on its own requests, such as a model client's retry of a rate-limited call, stays in that library's configuration.
 Never sleep, retry, poll, or limit concurrency through a helper that does not use these operators, such as a promise retry or pool package.
 
 Configure the repository's lint to reject these promise forms, timers, deadline signals, `Effect.forEach` calls without a numeric concurrency, and loops that sleep, suppressing a finding only as `code-lint-suppressions` allows.
@@ -40,6 +42,7 @@ Allowed: `Effect.tryPromise({ catch: buildRequestDropped, try: readInvoice }).pi
 
 ## Checks
 
+From each package root, run the type check against effect 4.0.0 or later.
 Run the repository's lint from the repository root, and confirm that it rejects `new Promise`, `Promise.all`, `setTimeout`, `AbortSignal.timeout`, an `Effect.forEach` without a numeric `concurrency`, and a loop that sleeps.
 For each sleep, deadline, retry, poll, race, or concurrent step a change adds, including in tests and scripts, which Effect operator performs it?
 For each retry or poll a change adds, what ends its `Schedule`, and does that bound fit its one owner's budget under `code-execution-lifecycle`?

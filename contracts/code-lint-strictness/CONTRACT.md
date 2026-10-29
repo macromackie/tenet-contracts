@@ -8,7 +8,7 @@ requires-tenet: 0.11.0
 
 Run every lint, type checker, compiler, and formatter that the repository uses with every rule, rule group, and strictness option at error.
 Include each rule group that its tool calls unstable, experimental, preview, or opt-in.
-Run every checker that this contract ships a configuration for wherever the repository holds a file that checker reads.
+Run every checker that this contract ships a configuration for on each file it reads, except a file that a tool generates, such as a lockfile, which a path scope excludes with a comment naming that tool.
 Those checkers lint workflow, shell, configuration, and documentation files, audit workflows for security, check spelling, report unused files, exports, and dependencies, and reject disallowed dependencies.
 Run a framework's rule group only on the files that framework loads, such as a test runner's rules on test files.
 
@@ -27,7 +27,8 @@ Suppress a finding at one site only as `code-lint-suppressions` allows.
 
 This contract ships each checker's strictest configuration under `assets/`, in a folder named for the checker.
 Where a checker's strictest mode needs command options, run it with the command its shipped file's opening comment gives.
-Where a checker's configuration can extend another file, extend the shipped file, listing it before every other contract's shipped file.
+Where a checker's configuration can extend another file, extend each shipped file whose opening comment applies to the repository, listing them before every other contract's shipped file.
+Set each key that a checker does not read through an extended file, such as the runtimes whose globals the repository's files use, in the repository's own configuration.
 Where a checker reads only its own file, copy the shipped file to the path the checker reads.
 Where a checker reads its settings from a package manifest, copy the shipped tables into the repository's root manifest.
 Keep each copy equal to its shipped file apart from reasoned off entries and the repository's own entries in the lists and keys its opening comment names.
@@ -40,8 +41,8 @@ Allowed: the repository's lint configuration extends the shipped file first, whi
 ## Checks
 
 Run each shipped checker from the repository root with the options its shipped file's opening comment gives, and confirm that each fails on a finding.
-For each off entry or path scope a change adds, does the comment above it give the reason letters and their evidence?
-Does each checker's configuration extend its shipped file first, or match its shipped copy apart from reasoned off entries and the entries its opening comment names?
+For each off entry or path scope a change adds, does the comment above it give the reason letters and their evidence, or name the tool that generates the files it excludes?
+Does each checker's configuration extend its applicable shipped files first, or match its shipped copy apart from reasoned off entries and the entries its opening comment names?
 Does the repository pin each checker's exact version, with a dated nightly build only for a formatter whose option needs one?
 Does a change lower a severity, add a baseline file, or move a threshold away from its declared value?
 For each file type that a shipped configuration checks, does the repository's check run that checker on every such file?

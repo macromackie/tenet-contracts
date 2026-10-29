@@ -19,6 +19,8 @@
     "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    // Keep the check on dependency declarations. Where two packages in `types` declare the same global, such as a server runtime's and a worker runtime's types,
+    // give each runtime's files their own tsconfig whose `types` lists only that runtime's packages.
     "skipLibCheck": false,
     "strict": true,
     "verbatimModuleSyntax": true

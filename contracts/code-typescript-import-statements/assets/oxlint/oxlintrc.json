@@ -2,7 +2,6 @@
   "overrides": [
     {
       "files": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
-      "plugins": ["vitest"],
       "rules": {
         "no-restricted-globals": [
           "error",
@@ -37,6 +36,10 @@
               {
                 "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
                 "name": "assert/strict"
+              },
+              {
+                "message": "Import `test` and the other test runner functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`, never from the runtime's test module.",
+                "name": "node:test"
               }
             ],
             "patterns": [
@@ -47,9 +50,7 @@
               }
             ]
           }
-        ],
-        "vitest/no-import-node-test": "error",
-        "vitest/prefer-importing-vitest-globals": "error"
+        ]
       }
     }
   ],

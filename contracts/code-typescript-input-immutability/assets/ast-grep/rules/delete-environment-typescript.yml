@@ -1,14 +1,8 @@
+---
 # code-typescript-input-immutability: delete an environment variable only in a test file, to restore a variable the test set and that was absent before it.
 # TypeScript variant (.ts, .mts, .cts); delete-environment-tsx.yml differs only in `id`, `language`, and this line.
-id: delete-environment-typescript
-language: TypeScript
-severity: error
-message: "Delete an environment variable only in a test that restores it; elsewhere build a new environment object by rest destructuring, such as `const { TOKEN, ...inherited } = environment`."
-note: |
-  `delete process.env.NAME` and `delete process.env[name]` are reported outside test files.
-  A test that set a variable that was absent before it restores the absence with `delete`, because assigning `undefined` stores the string `'undefined'`.
-  Test files are exempt by the path patterns under `ignores`; replace them with the repository's declared paths.
-ignores:
+"id": "delete-environment-typescript"
+"ignores":
   # Test files, which restore the environment variables they set.
   - "**/*.test.*"
   - "**/*.spec.*"
@@ -16,7 +10,15 @@ ignores:
   - "**/tests/**"
   - "**/testing/**"
   - "**/__tests__/**"
-rule:
-  any:
-    - pattern: delete process.env.$NAME
-    - pattern: delete process.env[$NAME]
+"language": "TypeScript"
+"message": "Delete an environment variable only in a test that restores it; elsewhere build a new environment object by rest destructuring, such as `const { TOKEN, ...inherited } = environment`."
+"note": |
+  `delete process.env.NAME` and `delete process.env[name]` are reported outside test files.
+  A test that set a variable that was absent before it restores the absence with `delete`, because assigning `undefined` stores the string `'undefined'`.
+  Test files are exempt by the path patterns under `ignores`; replace them with the repository's declared paths.
+"rule":
+  "any":
+    - "pattern": "delete process.env.$NAME"
+    - "pattern": "delete process.env[$NAME]"
+"severity": "error"
+...

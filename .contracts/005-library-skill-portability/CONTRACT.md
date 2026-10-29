@@ -20,7 +20,7 @@ Name the minimum Tenet version a skill's commands need.
 
 ## Checks
 
-Run `python3 scripts/lint-contracts.py` from the repository root.
+Run `uv run --script scripts/lint-contracts.py` from the repository root.
 Follow every link in changed skills; does each resolve inside the library?
 Walk through a changed skill's main workflow in a fresh repository with only Tenet installed.
 Search changed skills for internal names, private commands, and absolute paths.

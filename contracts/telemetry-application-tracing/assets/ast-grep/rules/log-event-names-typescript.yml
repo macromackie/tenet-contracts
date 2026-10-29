@@ -1,27 +1,29 @@
+---
 # telemetry-application-tracing: give each value of the declared event set two lowercase snake case parts joined by one dot.
 # TypeScript variant (.ts, .mts, .cts); log-event-names-tsx.yml is identical except for `id`, `language`, and this line.
-id: log-event-names-typescript
-language: TypeScript
-severity: error
-message: "Write this event as two lowercase snake case parts joined by one dot, `<subject>.<what happened>`, such as `invoice.settle_failed`."
-note: |
+"id": "log-event-names-typescript"
+"language": "TypeScript"
+"message": "Write this event as two lowercase snake case parts joined by one dot, `<subject>.<what happened>`, such as `invoice.settle_failed`."
+"note": |
   The rule reads each string or template literal that is a pair's value, at any depth, in the object that the declaration named by the shared `log-event-set` rule holds.
   Each part starts with a lowercase letter and holds lowercase letters and digits, with single underscores between words, such as `oauth2.token_refreshed`.
-rule:
-  any:
-    - kind: string
-    - kind: template_string
-  not:
-    regex: ^['"`][a-z][a-z0-9]*(?:_[a-z0-9]+)*\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*['"`]$
-  inside:
-    kind: pair
-    field: value
-    inside:
-      kind: object
-      inside:
-        stopBy:
-          kind: variable_declarator
-        kind: variable_declarator
-        has:
-          field: name
-          matches: log-event-set
+"rule":
+  "any":
+    - "kind": "string"
+    - "kind": "template_string"
+  "inside":
+    "field": "value"
+    "inside":
+      "inside":
+        "has":
+          "field": "name"
+          "matches": "log-event-set"
+        "kind": "variable_declarator"
+        "stopBy":
+          "kind": "variable_declarator"
+      "kind": "object"
+    "kind": "pair"
+  "not":
+    "regex": '^[''"`][a-z][a-z0-9]*(?:_[a-z0-9]+)*\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*[''"`]$'
+"severity": "error"
+...

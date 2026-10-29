@@ -12,9 +12,9 @@ A call chain such as `invoices.listForAccount({ account }).findLatest()` is one 
 Inside a function, class, or embedded markup element written in the arguments, the rule starts afresh, so `orders.map((order) => computeTotal({ order }))` is allowed.
 A tagged template is a template, not a call: passing one is allowed, and a call in its placeholders counts as inside the arguments that hold it.
 
-A file with the schema role the repository declares under `code-module-file-roles` may nest calls, `new` expressions, and `await` inside arguments, such as `Schema.Struct({ tags: Schema.Array(Schema.String) })`.
-The configuration under `assets/` exempts files named `schemas`, the name the example in `code-module-file-roles` gives that role.
-A repository that declares another schema file name copies that configuration into its own lint configuration with the name it declares.
+A file with the schema or errors role the repository declares under `code-module-file-roles` may nest calls, `new` expressions, and `await` inside arguments, such as `Schema.Struct({ tags: Schema.Array(Schema.String) })` or the schema fields of a tagged error class.
+The configuration under `assets/` exempts files named `schemas` and `errors`, the names the example in `code-module-file-roles` gives those roles.
+A repository that declares another schema or errors file name copies that configuration into its own lint configuration with the name it declares.
 
 Each direct argument of `pipe(...)` or of a `.pipe(...)` method may itself be one call, such as `amount.pipe(map((price) => applyDiscount({ price })), tap((price) => recordPrice({ price })))`, but never a `new` expression or an `await`.
 The arguments of such a step follow the rules above, so `pipe(succeed(readAmount({ id })), map((price) => applyDiscount({ price })))` violates them.
@@ -44,7 +44,7 @@ Allowed: `const order = yield* readOrder({ id })`, then `order.total`, or `const
 ## Checks
 
 Run the repository's lint from the repository root and confirm that it rejects a nested call, a function in an argument object, and a member read from an `await`.
-For each call a change adds or edits, does an argument hold a call, `new`, or `await` that is neither a direct pipeline step nor in a schema file?
+For each call a change adds or edits, does an argument hold a call, `new`, or `await` that is neither a direct pipeline step nor in a schema or errors file?
 For each pipeline a change adds, does a step need an earlier step's result other than its input, or choose between paths, without bound statements?
 For each object or array a change passes to a call, is every function written in it bound to a name?
 For each member a change reads from an `await` or `yield*` expression, through parentheses or assertions, is the value bound to a name first?

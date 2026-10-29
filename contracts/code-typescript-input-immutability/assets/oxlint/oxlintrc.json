@@ -1,22 +1,6 @@
 {
-  "options": { "typeAware": true },
   "rules": {
     "no-unused-vars": ["error", { "ignoreRestSiblings": true }],
-    "typescript/array-type": ["error", { "default": "array", "readonly": "array" }],
-    // C, Q: code-typescript-module-state requires ReadonlyMap and ReadonlySet, which this rule reports for their methods, and AbortController, Request, Response, Uint8Array, and URL have no read-only form.
-    "typescript/prefer-readonly-parameter-types": [
-      "error",
-      {
-        "allow": [
-          {
-            "from": "lib",
-            "name": ["AbortController", "ReadonlyMap", "ReadonlySet", "Request", "Response", "Uint8Array", "URL"]
-          }
-        ],
-        "checkParameterProperties": true,
-        "ignoreInferredTypes": true,
-        "treatMethodsAsReadonly": false
-      }
-    ]
+    "typescript/array-type": ["error", { "default": "array", "readonly": "array" }]
   }
 }

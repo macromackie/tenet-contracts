@@ -1,68 +1,70 @@
+---
 # code-typescript-runtime-keyed-maps: never create a record as an empty object that code fills or replaces later.
 # TypeScript variant (.ts, .mts, .cts); empty-records-tsx.yml differs only in `id`, `language`, and this line.
-id: empty-records-typescript
-language: TypeScript
-severity: error
-message: "Hold a lookup that code fills in a `Map`, such as `const accountTotals = new Map<AccountId, number>()`, or create the record whole as one object literal."
-note: |
+"id": "empty-records-typescript"
+"language": "TypeScript"
+"message": "Hold a lookup that code fills in a `Map`, such as `const accountTotals = new Map<AccountId, number>()`, or create the record whole as one object literal."
+"note": |
   This reports a `const`, `let`, or `var` binding and a class field whose annotation is a record type and whose value is `{}`.
   It also reports `{}` asserted to a record type with `as` or `satisfies`, wherever it appears.
   A record type is `Record<...>`, `Partial<...>`, `Readonly<...>`, or `Required<...>` around one, an intersection with one, or an object type with an index signature or a mapped key, such as `{ [accountId: string]: number }`.
   A record type behind an alias, such as `const totals: Totals = {}`, a parameter default, and an empty object passed as an argument are not reported.
   A record created by `Object.create(null)` or by a double assertion such as `{} as unknown as Record<...>` is not reported.
-utils:
-  # A record type: `Record<K, V>`, a `Partial`, `Readonly`, or `Required` of one, an intersection with one, or an object type with an index signature or mapped key.
-  record-type:
-    any:
-      - kind: generic_type
-        has:
-          field: name
-          regex: ^Record$
-      - kind: generic_type
-        all:
-          - has:
-              field: name
-              regex: ^(Partial|Readonly|Required)$
-          - has:
-              kind: type_arguments
-              has:
-                matches: record-type
-      - kind: object_type
-        has:
-          kind: index_signature
-      - kind: intersection_type
-        has:
-          matches: record-type
+"rule":
+  "any":
+    - "all":
+        - "has":
+            "field": "type"
+            "has":
+              "matches": "record-type"
+        - "has":
+            "field": "value"
+            "matches": "empty-object"
+      "any":
+        - "kind": "variable_declarator"
+        - "kind": "public_field_definition"
+    - "all":
+        - "has":
+            "matches": "empty-object"
+            "nthChild": 1
+        - "has":
+            "matches": "record-type"
+            "nthChild": 2
+      "any":
+        - "kind": "as_expression"
+        - "kind": "satisfies_expression"
+"severity": "error"
+"utils":
   # The empty object literal `{}`.
-  empty-object:
-    kind: object
-    not:
-      has:
-        any:
-          - kind: pair
-          - kind: shorthand_property_identifier
-          - kind: spread_element
-          - kind: method_definition
-rule:
-  any:
-    - any:
-        - kind: variable_declarator
-        - kind: public_field_definition
-      all:
-        - has:
-            field: type
-            has:
-              matches: record-type
-        - has:
-            field: value
-            matches: empty-object
-    - any:
-        - kind: as_expression
-        - kind: satisfies_expression
-      all:
-        - has:
-            nthChild: 1
-            matches: empty-object
-        - has:
-            nthChild: 2
-            matches: record-type
+  "empty-object":
+    "kind": "object"
+    "not":
+      "has":
+        "any":
+          - "kind": "pair"
+          - "kind": "shorthand_property_identifier"
+          - "kind": "spread_element"
+          - "kind": "method_definition"
+  # A record type: `Record<K, V>`, a `Partial`, `Readonly`, or `Required` of one, an intersection with one, or an object type with an index signature or mapped key.
+  "record-type":
+    "any":
+      - "has":
+          "field": "name"
+          "regex": "^Record$"
+        "kind": "generic_type"
+      - "all":
+          - "has":
+              "field": "name"
+              "regex": "^(Partial|Readonly|Required)$"
+          - "has":
+              "has":
+                "matches": "record-type"
+              "kind": "type_arguments"
+        "kind": "generic_type"
+      - "has":
+          "kind": "index_signature"
+        "kind": "object_type"
+      - "has":
+          "matches": "record-type"
+        "kind": "intersection_type"
+...

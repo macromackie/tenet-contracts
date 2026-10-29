@@ -1,67 +1,69 @@
+---
 # ui-react-typescript-jsx-attributes: name each handler that a file declares and passes to an event attribute `on` followed by what it handles.
 # The rule sees a handler only when the same file declares it as a function, a function-valued constant, or a constant built from a call on a function, such as a memoizing hook.
-id: handler-names-tsx
-language: Tsx
-severity: error
-message: Name this handler `on` followed by what it handles, such as `onSave`, never `handleSave` or `save`.
-note: |
+"id": "handler-names-tsx"
+"language": "Tsx"
+"message": "Name this handler `on` followed by what it handles, such as `onSave`, never `handleSave` or `save`."
+"note": |
   A function that the component receives or imports, such as a prop or a state setter, passes under its own name and is not checked.
   A name that an enclosing function receives as a parameter is a received function, even when another function in the file declares the same name.
-utils:
-  declared-function:
-    any:
-      - kind: function_declaration
-        has:
-          field: name
-          pattern: $HANDLER
-      - kind: variable_declarator
-        all:
-          - has:
-              field: name
-              pattern: $HANDLER
-          - has:
-              field: value
-              any:
-                - kind: arrow_function
-                - kind: function_expression
-                - kind: call_expression
-                  has:
-                    field: arguments
-                    has:
-                      any:
-                        - kind: arrow_function
-                        - kind: function_expression
-rule:
-  kind: identifier
-  pattern: $HANDLER
-  not:
-    regex: ^on[A-Z]
-  inside:
-    kind: jsx_expression
-    inside:
-      kind: jsx_attribute
-      has:
-        kind: property_identifier
-        regex: ^on[A-Z]
-  all:
-    - not:
-        inside:
-          stopBy: end
-          any:
-            - kind: function_declaration
-            - kind: arrow_function
-            - kind: function_expression
-          has:
-            field: parameters
-            has:
-              stopBy: end
-              any:
-                - kind: shorthand_property_identifier_pattern
-                - kind: identifier
-              pattern: $HANDLER
-    - inside:
-        kind: program
-        stopBy: end
-        has:
-          stopBy: end
-          matches: declared-function
+"rule":
+  "all":
+    - "not":
+        "inside":
+          "any":
+            - "kind": "function_declaration"
+            - "kind": "arrow_function"
+            - "kind": "function_expression"
+          "has":
+            "field": "parameters"
+            "has":
+              "any":
+                - "kind": "shorthand_property_identifier_pattern"
+                - "kind": "identifier"
+              "pattern": "$HANDLER"
+              "stopBy": "end"
+          "stopBy": "end"
+    - "inside":
+        "has":
+          "matches": "declared-function"
+          "stopBy": "end"
+        "kind": "program"
+        "stopBy": "end"
+  "inside":
+    "inside":
+      "has":
+        "kind": "property_identifier"
+        "regex": "^on[A-Z]"
+      "kind": "jsx_attribute"
+    "kind": "jsx_expression"
+  "kind": "identifier"
+  "not":
+    "regex": "^on[A-Z]"
+  "pattern": "$HANDLER"
+"severity": "error"
+"utils":
+  "declared-function":
+    "any":
+      - "has":
+          "field": "name"
+          "pattern": "$HANDLER"
+        "kind": "function_declaration"
+      - "all":
+          - "has":
+              "field": "name"
+              "pattern": "$HANDLER"
+          - "has":
+              "any":
+                - "kind": "arrow_function"
+                - "kind": "function_expression"
+                - "has":
+                    "field": "arguments"
+                    "has":
+                      "any":
+                        - "kind": "arrow_function"
+                        - "kind": "function_expression"
+                  "kind": "call_expression"
+              "field": "value"
+        "kind": "variable_declarator"
+...

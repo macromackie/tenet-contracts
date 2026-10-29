@@ -1,3 +1,4 @@
+// Pin `eslint-plugin-unicorn` to 79.0.0, the version this file was checked with, in the package that holds `.contracts` or in one above it.
 {
   "jsPlugins": [{ "name": "unicorn-js", "specifier": "eslint-plugin-unicorn" }],
   "options": { "typeAware": true },
