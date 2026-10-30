@@ -28,7 +28,10 @@
                 "regex": '^#\[(tokio::)?test\b'
                 "stopBy":
                   "not":
-                    "kind": "attribute_item"
+                    "any":
+                      - "kind": "attribute_item"
+                      - "kind": "line_comment"
+                      - "kind": "block_comment"
     "field": "name"
   "kind": "identifier"
   "not":

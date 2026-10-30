@@ -52,7 +52,7 @@
   "not":
     "any":
       - "regex": '^/\*\*'
-      - "regex": '^(?:///?|/\*)\s*(?:@ts-|eslint-|oxlint-|biome-ignore|prettier-ignore|istanbul\s|c8\s|v8\s|#(?:end)?region\b|<reference\b|ast-grep-ignore\b)'
+      - "regex": '^(?:///?|/\*)\s*(?:@ts-|eslint-|oxlint-|biome-ignore|prettier-ignore|istanbul\s|c8\s|v8\s|#(?:end)?region\b|<reference\b|ast-grep-ignore\b|jscpd:ignore-(?:start|end)\b)'
       - "precedes":
           "regex": '^(?://|/\*)\s*ast-grep-ignore\b'
       - "inside":

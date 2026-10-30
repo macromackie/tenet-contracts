@@ -1,6 +1,6 @@
 {
   "filename": "source.ts",
   "rule": "eslint(capitalized-comments)",
-  "valid": "// Read the invoice.\nexport const invoice = 1;\n",
+  "valid": "// jscpd:ignore-start -- duplication -- Standalone checkers share this protocol.\nexport const invoice = 1;\n// jscpd:ignore-end\n\n// Read the invoice.\nexport const total = 2;\n",
   "invalid": "// read the invoice.\nexport const invoice = 1;\n"
 }

@@ -1,0 +1,13 @@
+---
+"id": "tracing-macro-calls-rust"
+"invalid":
+  - |
+      fn settle_invoice() { tracing::info!(event = "invoice.finished"); }
+  - |
+      fn settle_invoice() { tracing::info_span!("invoice.settle"); }
+"valid":
+  - |
+      fn settle_invoice() { telemetry::record_finished(); }
+  - |
+      fn settle_invoice() { assert!(is_settled()); }
+...

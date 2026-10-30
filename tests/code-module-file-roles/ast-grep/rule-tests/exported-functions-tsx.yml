@@ -1,9 +1,33 @@
 ---
 "id": "exported-functions-tsx"
 "invalid":
-  - "export function readOrder() {}\nexport function settleOrder() {}"
+  - "export function readOrder() {}
+
+    export function settleOrder() {}"
   - "export const readOrder = () => order, settleOrder = () => receipt;"
+  - "export const readInvoice = Effect.fn('invoice.read')(function* () { return invoice; });
+
+    export const settleInvoice = Effect.fn('invoice.settle')(function* () { return receipt; });"
+  - "export function readInvoice() { return invoice; }
+
+    export const settleInvoice = Effect.fn('invoice.settle')(function* () { return receipt; });"
+  - "export const readInvoice = Effect.fn('invoice.read')(function* () { return invoice; }), settleInvoice = Effect.fn('invoice.settle')(function* () { return receipt; });"
+  - "export const readInvoice = Effect.fn('invoice.read')(function* () { return invoice; });
+
+    export default Effect.fn('invoice.settle')(function* () { return receipt; });"
 "valid":
-  - "export function readOrder() {}\nfunction settleOrder() {}"
-  - "export function readOrder() {}\nexport function generateMetadata() {}"
+  - "export function readOrder() {}
+
+    function settleOrder() {}"
+  - "export function readOrder() {}
+
+    export function generateMetadata() {}"
+  - "export const readInvoice = Effect.fn('invoice.read')(function* () { return invoice; });
+
+    const settleInvoice = Effect.fn('invoice.settle')(function* () { return receipt; });"
+  - "export const readInvoice = Effect.fn('invoice.read')(function* () { return invoice; });
+
+    export const generateMetadata = Effect.fn('metadata.generate')(function* () { return metadata; });"
+  - "export default Effect.fn('invoice.read')(function* () { return invoice; });"
+  - "export const invoice = readInvoice(), receipt = readReceipt();"
 ...

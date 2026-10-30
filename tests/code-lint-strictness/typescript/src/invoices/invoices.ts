@@ -1,5 +1,5 @@
 import { type Cause, Context, Effect, Option } from "effect";
-import { INVOICE_URL, READ_DEADLINE, REMINDER_CONCURRENCY } from "./constants.ts";
+import { INVOICE_URL, READ_DEADLINE } from "./constants.ts";
 import { InvoiceNotFound, ProviderReplyInvalid, RequestDropped } from "./errors.ts";
 import { decodeInvoice, type Invoice } from "./schemas.ts";
 
@@ -18,8 +18,6 @@ type ReadProviderInvoiceInput = {
   readonly invoice: string;
   readonly signal: Readonly<AbortSignal>;
 };
-
-type RemindInvoicesInput = { readonly invoices: readonly Invoice[] };
 
 /** The store that holds this service's invoices. */
 export class InvoiceStore extends Context.Service<InvoiceStore, InvoiceStoreShape>()(
@@ -69,16 +67,3 @@ export function readInvoice({
     );
   });
 }
-
-/** Sends one reminder for each overdue invoice, a few at a time. */
-export const remindInvoices = Effect.fn("remindInvoices")(function* ({
-  invoices,
-}: RemindInvoicesInput) {
-  const store = yield* InvoiceStore;
-
-  yield* Effect.forEach(invoices, (invoice) => store.sendReminder({ invoice }), {
-    concurrency: REMINDER_CONCURRENCY,
-  });
-
-  yield* Effect.annotateCurrentSpan({ reminders: invoices.length });
-});

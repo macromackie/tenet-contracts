@@ -1,8 +1,11 @@
 ---
 "id": "declaration-comments-python"
 "invalid":
+  - "# reads the invoice.\ndef read_invoice():\n    pass"
   - "# Opens a connection that no workflow sleep may hold.\ndef open_connection(pool: Pool) -> Connection:\n    return pool.connect()"
 "valid":
+  - "# jscpd:ignore-start -- duplication -- Standalone checkers share this protocol.\ndef read_invoice():\n    pass"
+  - "def read_invoice():\n    pass\n# jscpd:ignore-end"
   - "def open_connection(pool: Pool) -> Connection:\n    \"\"\"Opens a connection that no workflow sleep may hold.\"\"\"\n    return pool.connect()"
   - "MAX_ATTEMPTS = 3\n\"\"\"The provider limits each job to three attempts.\"\"\""
 ...

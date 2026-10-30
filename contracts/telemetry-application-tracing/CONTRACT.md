@@ -12,6 +12,7 @@ Attach the deployed source revision and environment to every exported trace.
 Propagate trace correlation across outbound requests, internal service calls, and queued or durable jobs.
 Let the application that owns an operation name its spans and choose its sampling, export destinations, and deployment configuration; shared tracing libraries provide instrumentation, not that policy.
 
+Apply these log-line rules to a command-line program's opt-in trace stream too.
 Apply the log-line rules to every server and every process a host runs until it is stopped; a command-line program's lines for its user follow `cli-output-channels`.
 Write each log line as one JSON object by passing the logger module's function one object literal whose `event` field names a member of that module's closed set.
 Declare that set as `code-closed-value-sets` requires, such as `LogEvent`, with values of two snake case parts joined by a dot, and type the logger input's `event` field as it.

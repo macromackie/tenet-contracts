@@ -1,0 +1,15 @@
+---
+"id": "log-event-names-rust"
+"invalid":
+  - |
+      impl LogEvent { const fn name(self) -> &'static str { match self { Self::Failed => "invoiceSettleFailed" } } }
+  - |
+      impl LogEvent { fn name(self) -> &'static str { match self { Self::Failed => r"invoice.settle.failed" } } }
+"valid":
+  - |
+      impl LogEvent { const fn name(self) -> &'static str { match self { Self::Failed => "invoice.settle_failed" } } }
+  - |
+      impl LogEvent { fn name(self) -> &'static str { match self { Self::Failed => r#"oauth2.token_refreshed"# } } }
+  - |
+      impl Wait { fn name(self) -> &'static str { match self { Self::Permit => "permit" } } }
+...

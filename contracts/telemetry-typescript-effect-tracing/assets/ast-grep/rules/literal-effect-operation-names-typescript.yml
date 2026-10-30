@@ -1,0 +1,19 @@
+---
+"id": "literal-effect-operation-names-typescript"
+"language": "TypeScript"
+"message": "Name the traced function with a nonempty string literal at Effect.fn, such as Effect.fn('invoice.read')."
+"note": "The named overload takes its operation name first; the direct function overload is intentionally rejected so tracing names stay explicit."
+"rule":
+  "has":
+    "field": "function"
+    "pattern": "Effect.fn"
+  "kind": "call_expression"
+  "not":
+    "has":
+      "field": "arguments"
+      "has":
+        "kind": "string"
+        "nthChild": 1
+        "regex": "(?s)^[\"'].+[\"']$"
+"severity": "error"
+...

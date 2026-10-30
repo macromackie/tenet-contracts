@@ -1,0 +1,25 @@
+---
+"id": "literal-effect-span-names-typescript"
+"language": "TypeScript"
+"message": "Name this span with a nonempty string literal, such as Effect.withSpan(reading, 'invoice.read') or Effect.withSpan('invoice.read')."
+"note": "Effect4 declares both effect-first and curried withSpan and withSpanScoped; the literal name is respectively the second or first argument. Type checking verifies the selected overload."
+"rule":
+  "has":
+    "any":
+      - "pattern": "Effect.withSpan"
+      - "pattern": "Effect.withSpanScoped"
+    "field": "function"
+  "kind": "call_expression"
+  "not":
+    "has":
+      "field": "arguments"
+      "has":
+        "any":
+          - "kind": "string"
+            "nthChild": 1
+            "regex": "(?s)^[\"'].+[\"']$"
+          - "kind": "string"
+            "nthChild": 2
+            "regex": "(?s)^[\"'].+[\"']$"
+"severity": "error"
+...

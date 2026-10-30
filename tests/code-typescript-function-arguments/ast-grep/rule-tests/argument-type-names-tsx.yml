@@ -2,7 +2,15 @@
 "id": "argument-type-names-tsx"
 "invalid":
   - "function retryStep({ job }: RetryOptions) { return job; }"
+  - "const readInvoice = Effect.fn('invoice.read')(function* ({ id }: InvoiceOptions) { return id; });"
+  - "const readInvoice = Effect.fn('invoice.read')(function* ({ id }: Readonly<ReadInvoiceInput>) { return id; });"
+  - "const InvoiceRow = Effect.fn('invoice.row')(function* ({ invoice }: InvoiceRowInput) { return invoice; });"
 "valid":
   - "function retryStep({ job }: RetryStepInput) { return job; }"
   - "function InvoiceRow({ invoice }: InvoiceRowProps) { return invoice; }"
+  - "const readInvoice = Effect.fn('invoice.read')(function* ({ id }: ReadInvoiceInput) { return id; });"
+  - "const InvoiceRow = Effect.fn('invoice.row')(function* ({ invoice }: InvoiceRowProps) { return invoice; });"
+  - "const readInvoice = Effect.fn('invoice.read')(function* ({ id }: ReadInvoiceInput) { return id; }, (effect, { context }: ForeignContext) => effect);"
+  - "queue(function* ({ context }: ForeignContext) { return context; });"
+  - "const readInvoice = Other.fn('invoice.read')(function* ({ context }: ForeignContext) { return context; });"
 ...

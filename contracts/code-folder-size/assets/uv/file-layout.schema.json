@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "exclusions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "pattern": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "required": ["pattern", "reason"],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "extensionlessSources": {
+      "const": "shebang"
+    },
+    "maximumFilesPerExtension": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "maximumFolderDepth": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "maximumSourceLines": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "sourceFiles": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sourceRoots": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "sourceSuffixes": {
+      "items": {
+        "pattern": "^\\.[^. /]+$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "exclusions",
+    "extensionlessSources",
+    "maximumFilesPerExtension",
+    "maximumFolderDepth",
+    "maximumSourceLines",
+    "sourceFiles",
+    "sourceRoots",
+    "sourceSuffixes"
+  ],
+  "title": "Source layout policy",
+  "type": "object"
+}

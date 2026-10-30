@@ -20,7 +20,16 @@ yanked = "deny"
 [bans]
 allow = []
 allow-wildcard-paths = false
-deny = []
+# telemetry-rust-tracing permits exporters only in application binary packages.
+# Fill each wrappers list with those packages' exact Cargo names; leave it empty when unused.
+# cargo-deny checks direct dependents, not target kinds: confirm every wrapper is a binary-only
+# package whose application entry point installs the exporter, never a library package.
+deny = [
+  { crate = "opentelemetry_sdk", reason = "Only application binaries install telemetry exporters.", wrappers = [
+  ] },
+  { crate = "tracing-subscriber", reason = "Only application binaries install telemetry subscribers.", wrappers = [
+  ] },
+]
 external-default-features = "deny"
 highlight = "all"
 multiple-versions = "deny"

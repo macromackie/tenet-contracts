@@ -1,6 +1,7 @@
 ---
 name: code-duplicated-blocks
 message: Fail checks on every copied block that the repository's copy detector reports, and remove the copy by calling one declaration.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -16,6 +17,7 @@ A copy at or above the minimum size that keeps the same steps under renamed iden
 Suppress a clone only with the start and end markers that `code-lint-suppressions` requires for a finding that spans a block.
 The reason in a start marker states why both copies must stay, such as two shipped migrations that must keep the steps they ran.
 Repeated code shorter than the declared minimum size, repeated configuration files, and copies between repositories, which `code-cross-repository-copies` covers, are outside this contract.
+A repository may use the checker under `assets/`, whose policy declares the detector version, thresholds, source paths, file formats, and justified exclusions.
 
 Violation: a second smoke script adds a 9-line copy of the first script's worker startup instead of calling it.
 Allowed: both smoke scripts call `startWorker({ log, port })` from the module that declares it.
@@ -24,5 +26,6 @@ Allowed: both smoke scripts call `startWorker({ log, port })` from the module th
 
 From each directory that holds a root check command, run the copy detector with its configuration, and confirm that it reads files of every length and fails on a single clone.
 From the same directory, run the repository's checks, and confirm that they fail on a start marker without a reason, on markers around a whole file, and on markers around a block that no longer has a copy.
+For the shipped checker, follow its usage instructions under `assets/`, declare the repository's policy, and run it from the repository root.
 Does the change add a skip pattern, raise the minimum size, or set any other detector option that narrows which clones the detector reports?
 For each block the change adds, does it repeat the steps of an existing block under renamed identifiers?

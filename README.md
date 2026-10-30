@@ -53,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 168 contracts.
+The library has 170 contracts.
 
 Coverage describes the available checks: `tool-checked` means the contract ships tool configuration;
 `judged with eval` means development cases exercise model judgments; `judged and unmeasured` means neither is
@@ -109,12 +109,12 @@ These labels do not establish whole-contract compliance or general model accurac
 | `code-dependency-boundaries`                 | Declare which packages each package may depend on once, in configuration that checks enforce, and keep that declaration acyclic and exact.                                                                                                        | judged with eval      |
 | `code-diagnostic-messages`                   | Write each diagnostic as one clause that starts with a lowercase word, names the failed operation and its input, quotes every value it interpolates, and ends without a period.                                                                   | tool-checked          |
 | `code-domain-vocabulary`                     | Name each domain concept with its one glossary word in code, output, documentation, and interface text, and never with a word it replaced.                                                                                                        | judged and unmeasured |
-| `code-duplicated-blocks`                     | Fail checks on every copied block that the repository's copy detector reports, and remove the copy by calling one declaration.                                                                                                                    | judged with eval      |
+| `code-duplicated-blocks`                     | Fail checks on every copied block that the repository's copy detector reports, and remove the copy by calling one declaration.                                                                                                                    | tool-checked          |
 | `code-environment-settings`                  | Read a program's environment only in its settings module, decode it once there, and pass decoded settings to the code that needs them.                                                                                                            | judged with eval      |
 | `code-execution-lifecycle`                   | Bound work and preserve authoritative results through failure and interruption.                                                                                                                                                                   | judged and unmeasured |
 | `code-exhaustive-branches`                   | Write an `else if` chain of equality tests on one value as a `switch`, and name every member of a declared closed set instead of a default or wildcard.                                                                                           | tool-checked          |
 | `code-export-consumers`                      | Give every export, source file, and dependency a production consumer, and let the repository's dead-code check prove it.                                                                                                                          | judged with eval      |
-| `code-folder-size`                           | Keep every source folder within lint-enforced limits on its file count and depth, and name and justify each exempt folder in the lint configuration.                                                                                              | judged with eval      |
+| `code-folder-size`                           | Keep every source folder within lint-enforced limits on its file count and depth, and name and justify each exempt folder in the lint configuration.                                                                                              | tool-checked          |
 | `code-function-size`                         | Keep every function within lint-enforced length, nesting, callback, markup depth, and complexity limits, and give each case of a branch on a closed set its own function.                                                                         | tool-checked          |
 | `code-guard-clauses`                         | Leave a block early with a guard instead of nesting its remaining work, and never write an `else` after a branch that leaves.                                                                                                                     | judged with eval      |
 | `code-key-order`                             | Write the keys of every object, struct, and configuration map in code point order, and keep another order only where order is behavior.                                                                                                           | judged and unmeasured |
@@ -134,7 +134,7 @@ These labels do not establish whole-contract compliance or general model accurac
 | `code-python-none-guards`                    | Trust non-optional Python annotations, and check for None only where the checked value's type includes None.                                                                                                                                      | judged and unmeasured |
 | `code-python-uv-scripts`                     | Run each Python repository script with `uv run --script`, and declare its dependencies in its own PEP 723 inline metadata block.                                                                                                                  | judged and unmeasured |
 | `code-rust-doc-comment-coverage`             | Give every public item of a Rust library crate a doc comment, and fail checks when one is missing.                                                                                                                                                | tool-checked          |
-| `code-rust-module-boundaries`                | Keep a Rust crate's top-level modules acyclic and its child modules private.                                                                                                                                                                      | judged with eval      |
+| `code-rust-module-boundaries`                | Keep a Rust crate's top-level modules acyclic and its child modules private.                                                                                                                                                                      | tool-checked          |
 | `code-rust-module-files`                     | Declare each Rust module that has child modules in a file named for it beside its folder, never in a mod.rs file under src.                                                                                                                       | judged with eval      |
 | `code-rust-numeric-conversions`              | Convert Rust numbers with From and TryFrom instead of as, and declare each limit, count, or size in the type its consumers take.                                                                                                                  | judged with eval      |
 | `code-rust-source-structure`                 | Keep Rust entry points thin, alternatives as enums, and errors as derived types that callers match by variant, propagated with context and never unwrapped in production.                                                                         | tool-checked          |
@@ -275,9 +275,11 @@ These labels do not establish whole-contract compliance or general model accurac
 
 #### telemetry
 
-| Contract                        | Requirement                                                                                                                                        | Coverage     |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| `telemetry-application-tracing` | Trace operations and write each log line as one JSON object with a declared event, without exposing secrets or letting diagnostics change results. | tool-checked |
+| Contract                              | Requirement                                                                                                                                        | Coverage     |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| `telemetry-application-tracing`       | Trace operations and write each log line as one JSON object with a declared event, without exposing secrets or letting diagnostics change results. | tool-checked |
+| `telemetry-rust-tracing`              | Centralize Rust tracing, keep entered spans out of suspended futures, and install exporters only in application binaries.                          | tool-checked |
+| `telemetry-typescript-effect-tracing` | Name traced TypeScript Effects with literal operation names and compose telemetry once at the application entry point.                             | tool-checked |
 
 #### test
 

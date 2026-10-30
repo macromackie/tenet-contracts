@@ -1,0 +1,20 @@
+---
+# telemetry-rust-tracing: instrument no function arguments by default.
+"id": "instrument-without-skip-all-rust"
+"language": "Rust"
+"message": "Write `#[instrument(skip_all)]` and name each permitted field explicitly, so arguments cannot enter exported telemetry."
+"note": |
+  The rule reads `#[instrument]` and `#[tracing::instrument(...)]` attributes.
+  Only a top-level `skip_all` argument is accepted; a `skip(...)` list or a string that contains the word does not qualify.
+"rule":
+  "kind": "attribute"
+  "not":
+    "has":
+      "field": "arguments"
+      "has":
+        "kind": "identifier"
+        "regex": "^skip_all$"
+      "kind": "token_tree"
+  "regex": '^(?:(?:::)?tracing::)?instrument(?:\(|$)'
+"severity": "error"
+...

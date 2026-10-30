@@ -1,0 +1,32 @@
+---
+# telemetry-rust-tracing: serialize each event as two snake case parts joined by one dot.
+"id": "log-event-names-rust"
+"language": "Rust"
+"message": "Write this event as two lowercase snake case parts joined by one dot, such as `invoice.settle_failed`."
+"note": |
+  The rule reads a literal returned directly by a match arm in `LogEvent`'s `name` method.
+  Normal and raw string literals are checked. Each part starts with a lowercase letter and holds lowercase letters and digits, with single underscores between words.
+  A repository that renames its set or serialization method edits the corresponding regex below.
+"rule":
+  "any":
+    - "kind": "string_literal"
+    - "kind": "raw_string_literal"
+  "inside":
+    "field": "value"
+    "inside":
+      "has":
+        "field": "name"
+        "regex": "^name$"
+      "inside":
+        "has":
+          "field": "type"
+          "regex": "^LogEvent$"
+        "kind": "impl_item"
+        "stopBy": "end"
+      "kind": "function_item"
+      "stopBy": "end"
+    "kind": "match_arm"
+  "not":
+    "regex": '^(?:r#*)?"[a-z][a-z0-9]*(?:_[a-z0-9]+)*\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*"#*$'
+"severity": "error"
+...

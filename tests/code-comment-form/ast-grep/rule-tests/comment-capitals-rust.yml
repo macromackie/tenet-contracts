@@ -3,5 +3,7 @@
 "invalid":
   - "fn read_invoice() {\n    // read the stored invoice.\n    read_record();\n}\n"
 "valid":
+  - "// jscpd:ignore-start -- duplication -- Standalone checkers share this protocol.\nfn read_invoice() {}\n"
+  - "// jscpd:ignore-end\nfn read_invoice() {}\n"
   - "fn read_invoice() {\n    // Read the stored invoice.\n    read_record();\n}\n"
 ...

@@ -9,6 +9,7 @@
 "message": "Start this function's name with a verb from the declared list, such as `readInvoice` rather than `invoice`."
 "note": |
   A function declaration, a method, a method or abstract method signature, a property signature whose type is a function type, and a constant or class field whose value is a function are checked.
+  A constant or field initialized with `Effect.fn('operation')(function* (...) { ... })` is checked by its binding's name too.
   The first word is the name's leading lowercase run, after any `#`, `_`, or `$`, so `settleInvoice` starts with `settle`.
   Names that start in capitals, such as components and classes, accessors such as `get total()`, a method whose body only returns a field of `this`, `constructor`, the runtime's conversion methods, and `main` are not checked.
   Suppress a name that an interface or framework outside the repository fixes, with a reason that names that system.
@@ -80,12 +81,29 @@
   "function-value":
     "any":
       - "matches": "bare-function"
+      - "matches": "traced-function"
       - "has":
-          "matches": "bare-function"
+          "any":
+            - "matches": "bare-function"
+            - "matches": "traced-function"
           "stopBy":
             "not":
               "matches": "value-wrapper"
         "matches": "value-wrapper"
+  # A named Effect function keeps the repository-owned function inside its builder.
+  "traced-function":
+    "all":
+      - "has":
+          "field": "function"
+          "has":
+            "field": "function"
+            "pattern": "Effect.fn"
+          "kind": "call_expression"
+      - "has":
+          "field": "arguments"
+          "has":
+            "matches": "bare-function"
+    "kind": "call_expression"
   # A node that wraps a value without changing it, such as `(value)` or `value satisfies Loader`.
   "value-wrapper":
     "any":

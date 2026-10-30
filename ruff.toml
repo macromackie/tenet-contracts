@@ -1,7 +1,7 @@
 # The library's scripts, the scripts its skills ship, and the guidance check that contract-maintenance ships take the
 # strictest ruff settings that code-lint-strictness ships.
 extend = "contracts/code-lint-strictness/assets/ruff/ruff.toml"
-include = ["scripts/*.py", "skills/*/scripts/*.py", "contracts/*/assets/uv/*.py"]
+include = ["scripts/*.py", "skills/*/scripts/*.py", "contracts/*/assets/uv/**/*.py"]
 line-length = 100
 src = ["scripts"]
 target-version = "py314"

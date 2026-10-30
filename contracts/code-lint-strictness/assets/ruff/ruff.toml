@@ -34,6 +34,8 @@ preview = true
 quote-style = "double"
 
 [lint]
+# Q: the copy detector requires directives with this prefix, which are not commented-out code.
+task-tags = ["jscpd"]
 # Only `_` marks a value the code never reads, as code-spelled-out-names allows.
 dummy-variable-rgx = "^_$"
 # Names the docstring form code-comment-form chooses; `ALL` also selects it once multi-line-summary-first-line is off.

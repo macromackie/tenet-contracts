@@ -4,6 +4,8 @@
   - "# retry_after is absent on a rate limit.\npass"
   - "def read_total() -> int:\n    \"\"\"returns the invoice total.\"\"\"\n    return 0"
 "valid":
+  - "# jscpd:ignore-start -- duplication -- Standalone checkers share this protocol.\npass"
+  - "# jscpd:ignore-end\npass"
   - "# `retry_after` is absent on a rate limit.\npass"
   - "# The provider omits the retry deadline.\n# retry_after therefore comes from the job.\npass"
 ...

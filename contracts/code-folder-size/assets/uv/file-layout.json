@@ -1,0 +1,36 @@
+{
+  "exclusions": [
+    {
+      "pattern": "**/node_modules/**",
+      "reason": "Installed dependencies are third-party source."
+    },
+    {
+      "pattern": "**/target/**",
+      "reason": "The compiler generates build artifacts here."
+    },
+    {
+      "pattern": "**/__pycache__/**",
+      "reason": "The interpreter generates bytecode caches here."
+    }
+  ],
+  "extensionlessSources": "shebang",
+  "maximumFilesPerExtension": 20,
+  "maximumFolderDepth": 4,
+  "maximumSourceLines": 300,
+  "sourceFiles": [],
+  "sourceRoots": ["src"],
+  "sourceSuffixes": [
+    ".cjs",
+    ".css",
+    ".cts",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".mts",
+    ".py",
+    ".rs",
+    ".sh",
+    ".ts",
+    ".tsx"
+  ]
+}

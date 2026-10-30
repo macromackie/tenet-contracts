@@ -3,7 +3,13 @@
 "invalid":
   - "function invoice() { return invoiceId; }"
   - "const invoice = () => invoiceId;"
+  - "const invoice = Effect.fn('invoice.read')(function* ({ id }: ReadInvoiceInput) { return id; });"
+  - "const invoice = (Effect.fn('invoice.read')(function* ({ id }: ReadInvoiceInput) { return id; }));"
+  - "class InvoiceStore { invoice = Effect.fn('invoice.read')(function* ({ id }: ReadInvoiceInput) { return id; }); }"
 "valid":
   - "function readInvoice() { return invoiceId; }"
   - "class Invoice { get total() { return amount; } }"
+  - "const readInvoice = Effect.fn('invoice.read')(function* ({ id }: ReadInvoiceInput) { return id; });"
+  - "const readInvoice = (Effect.fn('invoice.read')(function* ({ id }: ReadInvoiceInput) { return id; })) satisfies ReadInvoice;"
+  - "const invoice = { amount };"
 ...

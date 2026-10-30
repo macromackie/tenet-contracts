@@ -9,14 +9,14 @@
   A comment that opens with no letter is not reported, so a backticked identifier, a shebang, a coding line, a script metadata block, and a number pass.
   A comment that opens with a link, such as `# https://...`, is not reported.
   A comment directly after another comment continues its sentence, so it is not reported.
-  A tool's directive is not reported: `ast-grep-ignore`, a check's `-allow` directive, `noqa`, `type:`, `pragma:`, `fmt:`, `isort:`, `ruff:`, `ty:`, `pyright:`, `mypy:`, `pylint:`, `coding:`, and `vim:`.
+  A tool's directive is not reported: `ast-grep-ignore`, `jscpd:ignore-start`, `jscpd:ignore-end`, a check's `-allow` directive, `noqa`, `type:`, `pragma:`, `fmt:`, `isort:`, `ruff:`, `ty:`, `pyright:`, `mypy:`, `pylint:`, `coding:`, and `vim:`.
   A repository adds the directive words of its other tools to that list in its copy of this rule.
 "rule":
   "any":
     - "kind": "comment"
       "not":
         "any":
-          - "regex": '^#[ \t]*(?:ast-grep-ignore|[a-z0-9]+(?:-[a-z0-9]+)*-allow\b|noqa\b|type:|pragma:|fmt:|isort:|ruff:|ty:|pyright:|mypy:|pylint:|coding[:=]|vim:|[a-z][a-z0-9+.-]*://)'
+          - "regex": '^#[ \t]*(?:ast-grep-ignore|jscpd:ignore-(?:start|end)\b|[a-z0-9]+(?:-[a-z0-9]+)*-allow\b|noqa\b|type:|pragma:|fmt:|isort:|ruff:|ty:|pyright:|mypy:|pylint:|coding[:=]|vim:|[a-z][a-z0-9+.-]*://)'
           - "follows":
               "immediate": true
               "kind": "comment"

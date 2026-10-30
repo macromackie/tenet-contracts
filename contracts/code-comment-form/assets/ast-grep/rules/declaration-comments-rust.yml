@@ -29,7 +29,7 @@
   "matches": "plain-comment"
   "not":
     "any":
-      - "regex": '^(?://|/\*)\s*(?:SAFETY:|ast-grep-ignore\b)'
+      - "regex": '^(?://|/\*)\s*(?:SAFETY:|ast-grep-ignore\b|jscpd:ignore-(?:start|end)\b)'
       - "precedes":
           "regex": '^(?://|/\*)\s*ast-grep-ignore\b'
       - "inside":

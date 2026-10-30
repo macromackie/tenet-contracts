@@ -31,6 +31,11 @@ allowed-prefixes = []
 allowed-scripts = ["Latin"]
 arithmetic-side-effects-allowed = []
 avoid-breaking-exported-api = false
+# telemetry-rust-tracing attaches spans to futures instead of holding entered guards across an await.
+await-holding-invalid-types = [
+  { path = "tracing::span::Entered", reason = "Attach the span with Instrument::instrument instead of holding its entered guard across an await." },
+  { path = "tracing::span::EnteredSpan", reason = "Attach the span with Instrument::instrument instead of holding its entered guard across an await." },
+]
 check-grouped-late-init = true
 check-incompatible-msrv-in-tests = true
 check-inconsistent-struct-field-initializers = true

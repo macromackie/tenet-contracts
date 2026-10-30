@@ -11,10 +11,11 @@
   Each exported function after the first in a file is reported.
   A function declaration, a function expression, an arrow function, and a generator count, whether named or default.
   A function value counts inside parentheses and type assertions such as `as` and `satisfies`.
+  A named `Effect.fn('operation')(function* (...) { ... })` binding counts as a function too.
   Overload signatures and ambient declarations are not functions.
   A function exported under a name that a route framework requires, such as `loader` or `generateMetadata`, is not counted.
   Review covers a function that an export list such as `export { a, b }` or a default export such as `export default main` names.
-  Review also covers a function that a call returns, that `exports.name =` or `module.exports` binds, or that an exported `namespace` block holds.
+  Review also covers a function that another call returns, that `exports.name =` or `module.exports` binds, or that an exported `namespace` block holds.
   A file that an entry point re-exports under one namespace, such as `export * as Uuid from './uuid.ts'`, is exempt through its declared path pattern.
 "rule":
   "any":
@@ -82,12 +83,29 @@
   "function-value":
     "any":
       - "matches": "bare-function"
+      - "matches": "traced-function"
       - "has":
-          "matches": "bare-function"
+          "any":
+            - "matches": "bare-function"
+            - "matches": "traced-function"
           "stopBy":
             "not":
               "matches": "value-wrapper"
         "matches": "value-wrapper"
+  # A named Effect function keeps the repository-owned function inside its builder.
+  "traced-function":
+    "all":
+      - "has":
+          "field": "function"
+          "has":
+            "field": "function"
+            "pattern": "Effect.fn"
+          "kind": "call_expression"
+      - "has":
+          "field": "arguments"
+          "has":
+            "matches": "bare-function"
+    "kind": "call_expression"
   # A node that wraps a value without changing it, such as `(value)` or `value satisfies Loader`.
   "value-wrapper":
     "any":

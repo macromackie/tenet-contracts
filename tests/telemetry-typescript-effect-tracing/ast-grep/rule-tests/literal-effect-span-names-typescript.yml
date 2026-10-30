@@ -1,0 +1,20 @@
+---
+"id": "literal-effect-span-names-typescript"
+"invalid":
+  - "const traced = Effect.withSpan(reading, operationName);"
+  - "const traced = reading.pipe(Effect.withSpan(operationName));"
+  - "const traced = Effect.withSpan(reading, `invoice.${id}`);"
+  - "const traced = Effect.withSpan(reading, '');"
+  - "const traced = reading.pipe(Effect.withSpanScoped(operationName));"
+  - "const traced = Effect.withSpanScoped(reading, operationName);"
+  - "const traced = reading.pipe(Effect.withSpan(''));"
+  - "const traced = Effect.withSpan(reading, `invoice.read`);"
+"valid":
+  - "const traced = Effect.withSpan(reading, 'invoice.read');"
+  - "const traced = reading.pipe(Effect.withSpan('invoice.read'));"
+  - "const traced = Effect.withSpan(reading, 'invoice.read', options);"
+  - "const traced = reading.pipe(Effect.withSpan('invoice.read', options));"
+  - "const traced = Effect.withSpanScoped(reading, 'invoice.read');"
+  - "const traced = reading.pipe(Effect.withSpanScoped('invoice.read'));"
+  - "const traced = reading.pipe(Effect.withSpan('invoice.read', options, traceOptions));"
+...

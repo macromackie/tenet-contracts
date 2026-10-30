@@ -7,6 +7,7 @@
  * and confirms that a value passed as an argument and an empty value change nothing.
  */
 import { Effect } from "effect";
+import { completeAction } from "../complete-action.mts";
 import { ExitStatus, OutputChannel, report } from "../output.mts";
 import type { CheckFailed, StepFailed } from "./errors.mts";
 import { runScenarios } from "./run-scenarios.mts";
@@ -40,25 +41,15 @@ async function main(): Promise<void> {
 
       return ExitStatus.Done;
     }),
-    Effect.catch((error) =>
-      Effect.sync(() => {
-        const text = describeCheckFailure({ error });
-
-        report({ channel: OutputChannel.Diagnostic, text });
-
-        return ExitStatus.Failed;
-      }),
-    ),
-    Effect.catchDefect(() =>
-      Effect.sync(() => {
-        report({ channel: OutputChannel.Diagnostic, text: DEFECT_LINE });
-
-        return ExitStatus.Failed;
-      }),
-    ),
   );
 
-  process.exitCode = await Effect.runPromise(checking);
+  const completing = completeAction({
+    action: checking,
+    defectLine: DEFECT_LINE,
+    describeFailure: describeCheckFailure,
+  });
+
+  process.exitCode = await Effect.runPromise(completing);
 }
 
 await main();

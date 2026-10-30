@@ -1,6 +1,7 @@
 import { Effect, pipe, Schedule } from "effect";
 import { ProviderBusy } from "./errors.ts";
-import { Account } from "./schemas.ts";
+import { readStoredAccount } from "./read-stored-account.ts";
+import type { Account } from "./schemas.ts";
 
 type ReadAccountInput = { readonly account: string };
 
@@ -24,10 +25,6 @@ function buildTimeoutFailure(): Effect.Effect<never, ProviderBusy> {
   });
 }
 
-function readStoredAccount({ account }: ReadAccountInput): Effect.Effect<Account, ProviderBusy> {
-  return Effect.sync(() => new Account({ id: account }));
-}
-
 /** Reads one account, retrying a busy provider a few times within a deadline. */
 export function readAccount({ account }: ReadAccountInput): Effect.Effect<Account, ProviderBusy> {
   const reading = readStoredAccount({ account });
@@ -39,14 +36,3 @@ export function readAccount({ account }: ReadAccountInput): Effect.Effect<Accoun
     Effect.withSpan("account.read"),
   );
 }
-
-/** Reads two accounts together. */
-export const readAccountPair = Effect.fn("readAccountPair")(function* ({
-  account,
-}: ReadAccountInput) {
-  const first = readStoredAccount({ account });
-  const second = readStoredAccount({ account });
-  const { left, right } = yield* Effect.all({ left: first, right: second });
-
-  return [left, right] as const;
-});

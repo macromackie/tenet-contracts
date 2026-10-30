@@ -43,7 +43,7 @@
   "kind": "comment"
   "not":
     "any":
-      - "regex": '^#(?:!|\s*-\*-|\s*///|\s*(?:noqa|type:|pragma|ruff:|fmt:|pyright:|mypy:|pylint:|isort:|ast-grep-ignore\b))'
+      - "regex": '^#(?:!|\s*-\*-|\s*///|\s*(?:noqa|type:|pragma|ruff:|fmt:|pyright:|mypy:|pylint:|isort:|ast-grep-ignore\b|jscpd:ignore-(?:start|end)\b))'
       - "precedes":
           "regex": '^#\s*ast-grep-ignore\b'
       - "inside":

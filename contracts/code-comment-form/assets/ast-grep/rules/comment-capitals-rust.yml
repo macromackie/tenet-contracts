@@ -9,7 +9,7 @@
   A comment that opens with no letter is not reported, so a backticked identifier and a number pass.
   A comment that opens with a link, such as `// https://...`, is not reported.
   A comment directly after another comment continues its sentence, so it is not reported.
-  A tool's directive is not reported: `ast-grep-ignore` and a check's `-allow` directive.
+  A tool's directive is not reported: `ast-grep-ignore`, `jscpd:ignore-start`, `jscpd:ignore-end`, and a check's `-allow` directive.
   A repository adds the directive words of its other tools to that list in its copy of this rule.
 "rule":
   "any":
@@ -17,7 +17,7 @@
     - "kind": "block_comment"
   "not":
     "any":
-      - "regex": '^(?://[/!]?|/\*[*!]?)[\s*]*(?:ast-grep-ignore|[a-z0-9]+(?:-[a-z0-9]+)*-allow\b|[a-z][a-z0-9+.-]*://)'
+      - "regex": '^(?://[/!]?|/\*[*!]?)[\s*]*(?:ast-grep-ignore|jscpd:ignore-(?:start|end)\b|[a-z0-9]+(?:-[a-z0-9]+)*-allow\b|[a-z][a-z0-9+.-]*://)'
       - "follows":
           "any":
             - "kind": "line_comment"

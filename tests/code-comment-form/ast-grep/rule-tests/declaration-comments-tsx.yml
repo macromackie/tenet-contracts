@@ -1,8 +1,11 @@
 ---
 "id": "declaration-comments-tsx"
 "invalid":
+  - "// the order identifier.\nconst ORDER_ID = \"order\";"
   - "// The order identifier.\nconst ORDER_ID = \"order\";"
 "valid":
+  - "// jscpd:ignore-start -- duplication -- Standalone checkers share this protocol.\nconst ORDER_ID = \"order\";"
+  - "const ORDER_ID = \"order\";\n// jscpd:ignore-end"
   - "/** The order identifier. */\nconst ORDER_ID = \"order\";"
   - "function readOrder() { // Keep the original order.\nreturn order; }"
 ...

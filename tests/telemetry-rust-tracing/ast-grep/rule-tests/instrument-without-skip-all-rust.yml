@@ -1,0 +1,20 @@
+---
+"id": "instrument-without-skip-all-rust"
+"invalid":
+  - |
+      #[tracing::instrument]
+      async fn settle_invoice(invoice: Invoice) {}
+  - |
+      #[instrument(skip(invoice))]
+      fn settle_invoice(invoice: Invoice) {}
+  - |
+      #[instrument(name = "skip_all")]
+      fn settle_invoice(invoice: Invoice) {}
+"valid":
+  - |
+      #[tracing::instrument(skip_all)]
+      async fn settle_invoice(invoice: Invoice) {}
+  - |
+      #[instrument(skip_all, fields(invoice_id))]
+      fn settle_invoice(invoice: Invoice) {}
+...

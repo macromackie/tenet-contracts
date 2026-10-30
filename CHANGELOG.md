@@ -7,6 +7,59 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 because `tenet contracts update` without `--ref` moves straight to the newest release. Tenet 0.11.0 installs every
 release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v13.0.0
+
+### Upgrading
+
+Raise Tenet to 0.11.0 first. With `.tenet.lock` and installed copies committed, run
+`tenet contracts update --ref v13.0.0`.
+
+- No rule moved between existing contracts. Add `telemetry-typescript-effect-tracing` to Effect code and
+  `telemetry-rust-tracing` to Rust code with `tenet contracts add tenet/NAME@v13.0.0` at the scope each governs.
+- New assets: `code-folder-size` ships a source layout checker, its policy schema, and example limits.
+  Replace local copies of that checker with a call to the installed asset, and keep source roots and justified exclusions in the repository policy.
+- New assets: `code-rust-module-boundaries` ships a module graph checker and an explicit crate-root policy.
+  Replace local copies with a call to the installed asset and include each production crate root in the repository policy.
+- New assets: `code-duplicated-blocks` ships a pinned detector adapter that checks source scope and validates each suppression's reason, extent, and remaining clone.
+- New assets: both telemetry contracts ship structural rules and their configuration. Effect operation and span
+  names must be literal strings; Rust instrumentation skips all arguments by default, event values have two dotted
+  snake case parts, and qualified tracing macros belong in the telemetry module.
+- Changed assets: `code-lint-strictness` adds the entered-span await restrictions and exporter dependency bans.
+  Replace identical local span-guard entries with the shipped entries. Fill each exporter ban's wrapper list with
+  the exact names of application binary packages that need it; each listed package must expose no library target.
+  Keep the lists empty when no package uses the exporter. Move span and event constructors into the telemetry module
+  before enabling its structural rule, and review imported or renamed macros separately.
+- The function-name, exported-function, and argument-type rules now inspect named `Effect.fn` bindings, including
+  their anonymous generator bodies. They keep their existing declaration requirements.
+- Roll back with `tenet contracts update --ref v12.1.0`. Remove newly added telemetry contracts with
+  `tenet contracts remove PATH`; an installed asset absent from the older release leaves the lock and makes update
+  exit 1, so inspect and remove that unowned file before rerunning checks.
+
+### Tightened
+
+- `code-lint-strictness`: reject entered span guards held across awaits and restrict telemetry exporter dependencies
+  to explicitly named application binary packages.
+- `telemetry-application-tracing`: apply its log-line rules to a command-line program's opt-in trace stream.
+
+### Added
+
+- `telemetry-typescript-effect-tracing`: literal names for traced Effect operations and child spans, with logger and
+  tracer composition owned by each runtime's application entry point.
+- `telemetry-rust-tracing`: telemetry module ownership, future-bound spans, explicit instrumentation fields, event
+  serialization, and binary-owned exporters.
+
+### Clarified
+
+- `code-folder-size`: ship a shared source layout checker, an explicit policy schema, and declared defaults for folder count, depth, and source file length.
+- `code-rust-module-boundaries`: ship the shared syntax-tree checker and explicit crate-root policy for module cycles and child visibility.
+- `code-duplicated-blocks`: ship the pinned clone detector adapter, policy schema, and example configuration without changing the clone or suppression requirements.
+- `code-lint-strictness`: recognize the copy detector's required end marker as a tool directive in the shared lint configuration.
+- `env-curation`: share the command and self-check's failure reporting without changing their diagnostic text or exit status.
+- `code-module-structure-and-control-flow`: recognize test attributes across Rust comments when exempting test names from the function verb check.
+- `code-comment-form`: recognize the copy detector's required block markers as tool directives in the shared structural and comment checks.
+- `code-module-file-roles`, `code-module-structure-and-control-flow`, and `code-typescript-function-arguments`:
+  recognize named `Effect.fn` bindings as functions when checking exports, verbs, and argument type names.
+
 ## v12.1.0
 
 ### Loosened

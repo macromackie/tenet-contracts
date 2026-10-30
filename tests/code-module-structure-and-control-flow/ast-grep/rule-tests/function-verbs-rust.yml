@@ -2,6 +2,23 @@
 "id": "function-verbs-rust"
 "invalid":
   - "fn invoice() {}\n"
+  - |
+    #[expect(clippy::too_many_lines)]
+    // A comment does not make this a test.
+    /* The ordinary function still needs a verb. */
+    fn invoice_title() {}
 "valid":
   - "fn read_invoice() {}\n"
+  - |
+    #[test]
+    // The attribute still belongs to this function.
+    #[expect(clippy::too_many_lines)]
+    /* A second comment can separate the final attribute. */
+    fn invoice_title() {}
+  - |
+    #[tokio::test]
+    /* The asynchronous test runner also owns this function. */
+    #[expect(clippy::too_many_lines)]
+    // Comments do not alter Rust attribute ownership.
+    async fn invoice_title() {}
 ...

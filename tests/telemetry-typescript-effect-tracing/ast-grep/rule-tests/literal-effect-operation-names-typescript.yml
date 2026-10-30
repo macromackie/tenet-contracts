@@ -1,0 +1,11 @@
+---
+"id": "literal-effect-operation-names-typescript"
+"invalid":
+  - "const readInvoice = Effect.fn(operationName)(function* () { return yield* reading; });"
+  - "const readInvoice = Effect.fn(`invoice.read`)(function* () { return yield* reading; });"
+  - "const readInvoice = Effect.fn('')(function* () { return yield* reading; });"
+  - "const readInvoice = Effect.fn(function* () { return yield* reading; });"
+"valid":
+  - "const readInvoice = Effect.fn('invoice.read')(function* ({ id }: ReadInvoiceInput) { return yield* store.read({ id }); });"
+  - "const readInvoice = Effect.fn(\"invoice.read\", options)(function* () { return yield* reading; });"
+...

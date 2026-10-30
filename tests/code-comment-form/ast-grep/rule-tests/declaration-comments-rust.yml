@@ -1,7 +1,10 @@
 ---
 "id": "declaration-comments-rust"
 "invalid":
+  - "// read the stored invoice.\nfn read_invoice() {}\n"
   - "// Read the stored invoice.\nfn read_invoice() {}\n"
 "valid":
+  - "// jscpd:ignore-start -- duplication -- Standalone checkers share this protocol.\nfn read_invoice() {}\n"
+  - "fn read_invoice() {}\n// jscpd:ignore-end\n"
   - "/// Read the stored invoice.\nfn read_invoice() {}\n"
 ...

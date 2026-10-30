@@ -6,6 +6,7 @@
  * `set` reads the value from the named variable, a hidden terminal prompt, or one line of piped input.
  */
 import { Effect } from "effect";
+import { completeAction } from "./complete-action.mts";
 import { describeFailure } from "./describe-failure.mts";
 import { editEnv } from "./edit-env.mts";
 import { ExitStatus, OutputChannel, report } from "./output.mts";
@@ -22,25 +23,15 @@ async function main(): Promise<void> {
 
       return ExitStatus.Done;
     }),
-    Effect.catch((error) =>
-      Effect.sync(() => {
-        const text = describeFailure({ error });
-
-        report({ channel: OutputChannel.Diagnostic, text });
-
-        return ExitStatus.Failed;
-      }),
-    ),
-    Effect.catchDefect(() =>
-      Effect.sync(() => {
-        report({ channel: OutputChannel.Diagnostic, text: DEFECT_LINE });
-
-        return ExitStatus.Failed;
-      }),
-    ),
   );
 
-  process.exitCode = await Effect.runPromise(editing);
+  const completing = completeAction({
+    action: editing,
+    defectLine: DEFECT_LINE,
+    describeFailure,
+  });
+
+  process.exitCode = await Effect.runPromise(completing);
 }
 
 await main();

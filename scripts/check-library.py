@@ -1,7 +1,12 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.14"
-# dependencies = ["pyyaml==6.0.3", "ruamel-yaml==0.18.16"]
+# dependencies = [
+#   "pyyaml==6.0.3",
+#   "ruamel-yaml==0.18.16",
+#   "tree-sitter==0.25.2",
+#   "tree-sitter-rust==0.24.2",
+# ]
 # ///
 """
 Check that the library's assets load and pass in their pinned tools, and that a release installs.
@@ -47,7 +52,13 @@ RELEASE_SCRIPTS = "skills/cargo-dist-release/scripts"
 """The release workflow script that the cargo-dist-release skill ships."""
 GUIDANCE_CHECK = "contracts/contract-maintenance/assets/uv"
 """The guidance check that contract-maintenance ships, with its packages locked beside it."""
-PYTHON_RESOURCES = (RELEASE_SCRIPTS, GUIDANCE_CHECK)
+LAYOUT_CHECK = "contracts/code-folder-size/assets/uv"
+"""The source layout checker that code-folder-size ships with its policy schema."""
+RUST_MODULE_CHECK = "contracts/code-rust-module-boundaries/assets/uv"
+"""The syntax-tree module checker that code-rust-module-boundaries ships."""
+CLONE_CHECK = "contracts/code-duplicated-blocks/assets/uv"
+"""The pinned clone detector adapter that code-duplicated-blocks ships."""
+PYTHON_RESOURCES = (RELEASE_SCRIPTS, GUIDANCE_CHECK, LAYOUT_CHECK, RUST_MODULE_CHECK, CLONE_CHECK)
 """The Python scripts that a skill or a contract ships."""
 VERSION_COMMANDS = {
     "aqua:ast-grep/ast-grep": ("ast-grep", "--version"),
@@ -109,6 +120,17 @@ LIBRARY_CHECKS = (
     ("ruff", "check", "--no-cache", "scripts", *PYTHON_RESOURCES),
     ("ruff", "format", "--no-cache", "--check", "scripts", *PYTHON_RESOURCES),
     (
+        "uv",
+        "run",
+        "--locked",
+        "--script",
+        f"{CLONE_CHECK}/check-clones.py",
+        "--root",
+        ".",
+        "--config",
+        "copy-detector.json",
+    ),
+    (
         "ty",
         "check",
         "--config-file",
@@ -117,9 +139,18 @@ LIBRARY_CHECKS = (
         sys.executable,
         "--extra-search-path",
         "scripts",
+        "--extra-search-path",
+        LAYOUT_CHECK,
+        "--extra-search-path",
+        RUST_MODULE_CHECK,
+        "--extra-search-path",
+        CLONE_CHECK,
         "scripts",
         # The guidance check imports packages that only its own environment installs.
         RELEASE_SCRIPTS,
+        LAYOUT_CHECK,
+        RUST_MODULE_CHECK,
+        CLONE_CHECK,
     ),
 )
 """The shipped checkers that run on the library's own files, from the library root."""

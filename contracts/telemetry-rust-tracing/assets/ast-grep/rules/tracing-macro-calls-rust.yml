@@ -1,0 +1,18 @@
+---
+# telemetry-rust-tracing: centralize tracing event and span macros in the owning telemetry module.
+"id": "tracing-macro-calls-rust"
+"ignores":
+  - "**/telemetry.rs"
+"language": "Rust"
+"message": "Construct spans and record events through the telemetry module's functions instead of calling a tracing macro here."
+"note": |
+  The rule reads calls of tracing's event, span, and level-specific macros with a `tracing::` path.
+  The telemetry module is exempt by its filename under ignores; a repository that renames it updates that allowance.
+  Structural lint cannot resolve imported or renamed macros. Review macro imports and aliases to confirm they do not bypass the module's ownership.
+"rule":
+  "has":
+    "field": "macro"
+    "regex": "^(?:::)?tracing::(?:debug|debug_span|error|error_span|event|info|info_span|span|trace|trace_span|warn|warn_span)$"
+  "kind": "macro_invocation"
+"severity": "error"
+...
