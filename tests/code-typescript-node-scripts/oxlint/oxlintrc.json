@@ -1,0 +1,6 @@
+{
+  "filename": "source.mts",
+  "invalid": "import { readFileSync } from \"node:fs\";\nexport const invoice = readFileSync(\"invoice.json\", \"utf8\");\n",
+  "rule": "node(no-sync)",
+  "valid": "import { readFile } from \"node:fs/promises\";\nexport const readInvoice = readFile;\n"
+}

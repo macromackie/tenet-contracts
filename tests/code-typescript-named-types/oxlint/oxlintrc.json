@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "invalid": "export interface Invoice { id: string }\n",
+  "rule": "typescript(consistent-type-definitions)",
+  "valid": "export type Invoice = { id: string };\n"
+}

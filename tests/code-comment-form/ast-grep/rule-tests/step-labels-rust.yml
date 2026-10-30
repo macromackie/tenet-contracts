@@ -1,0 +1,7 @@
+---
+"id": "step-labels-rust"
+"invalid":
+  - "fn read_invoice() {\n    // 1. Read the stored invoice.\n    read_record();\n}\n"
+"valid":
+  - "fn read_invoice() {\n    // Read the stored invoice.\n    read_record();\n}\n"
+...

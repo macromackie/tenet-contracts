@@ -32,7 +32,15 @@
       ],
       "rules": {
         // C: code-typescript-input-immutability lets a test file delete an environment variable it changes.
-        "typescript/no-dynamic-delete": "off"
+        "typescript/no-dynamic-delete": "off",
+        // Q: node:assert equality assertions compare runtime values even when their vendor type predicates already match; tests keep unnecessary-condition checks without interpreting assertion signatures as redundant guards.
+        "typescript/no-unnecessary-condition": [
+          "error",
+          {
+            "allowConstantLoopConditions": "never",
+            "checkTypePredicates": false
+          }
+        ]
       }
     },
     {

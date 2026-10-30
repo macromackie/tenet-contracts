@@ -1,0 +1,7 @@
+---
+"id": "diagnostic-case-rust"
+"invalid":
+  - "fn read_invoice() { bail!(\"Invoice was not found\"); }\n"
+"valid":
+  - "fn read_invoice() { bail!(\"invoice was not found\"); }\n"
+...

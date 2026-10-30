@@ -1,0 +1,9 @@
+---
+"id": "log-event-names-typescript"
+"invalid":
+  - "const LogEvent = { InvoiceSettled: 'invoice-settled' };"
+  - "const LogEvent = { InvoiceSettled: 'invoice.settle.failed' };"
+"valid":
+  - "const LogEvent = { InvoiceSettled: 'invoice.settled' };"
+  - "const LogEvent = { TokenRefreshed: 'oauth2.token_refreshed' };"
+...

@@ -1,0 +1,9 @@
+---
+"id": "state-pairs-javascript"
+"invalid":
+  - "const [notes, updateNotes] = useState('');"
+  - "const [revision] = useState(order.revision);"
+"valid":
+  - "const [notes, setNotes] = useState('');"
+  - "const [revision] = useState(() => order.revision);"
+...

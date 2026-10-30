@@ -1,0 +1,8 @@
+---
+"id": "body-doc-comments-tsx"
+"invalid":
+  - "function readOrder() { /** Read the order. */ return order; }"
+"valid":
+  - "/** Read the order. */\nfunction readOrder() { return order; }"
+  - "function readOrder() { // Read the order.\nreturn order; }"
+...

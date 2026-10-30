@@ -1,0 +1,8 @@
+---
+"id": "sleep-loops-tsx"
+"invalid":
+  - "while (pending) { yield* readJob(); yield* Effect.sleep(POLL_INTERVAL); }"
+"valid":
+  - "readJob().pipe(Effect.repeat({ schedule: pollSchedule, until: isFinished }));"
+  - "while (pending) { const wait = () => Effect.sleep(POLL_INTERVAL); enqueue(wait); }"
+...

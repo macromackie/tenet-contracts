@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "eslint(no-magic-numbers)",
+  "valid": "const TAX_RATE = 23;\nexport function readTax(amount: number): number { return amount * TAX_RATE; }\n",
+  "invalid": "export function readTax(amount: number): number { return amount * 23; }\n"
+}

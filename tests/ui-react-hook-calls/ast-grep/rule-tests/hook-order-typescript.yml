@@ -1,0 +1,7 @@
+---
+"id": "hook-order-typescript"
+"invalid":
+  - "function useInvoice() { const receipt = useMemo(() => invoice, [invoice]); const [draft, setDraft] = useState(\"\"); return draft; }"
+"valid":
+  - "function useInvoice() { const [draft, setDraft] = useState(\"\"); const receipt = useMemo(() => invoice, [invoice]); return draft; }"
+...

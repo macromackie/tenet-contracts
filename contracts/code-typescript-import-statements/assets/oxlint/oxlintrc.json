@@ -1,7 +1,13 @@
 {
   "overrides": [
     {
-      "files": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+      "files": [
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/test/**",
+        "**/tests/**",
+        "**/__tests__/**"
+      ],
       "rules": {
         "no-restricted-globals": [
           "error",
@@ -16,45 +22,14 @@
           "it",
           "test",
           "vi"
-        ],
-        "no-restricted-imports": [
-          "error",
-          {
-            "paths": [
-              {
-                "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
-                "name": "node:assert"
-              },
-              {
-                "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
-                "name": "node:assert/strict"
-              },
-              {
-                "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
-                "name": "assert"
-              },
-              {
-                "message": "Import `expect` and the other assertion functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`.",
-                "name": "assert/strict"
-              },
-              {
-                "message": "Import `test` and the other test runner functions by name from the test runner's module, such as `import { expect, test } from 'vitest'`, never from the runtime's test module.",
-                "name": "node:test"
-              }
-            ],
-            "patterns": [
-              {
-                "importNames": ["default"],
-                "message": "Import a runtime built-in module's names by name, such as `import { readFile } from 'node:fs/promises'`; its default export is the whole module.",
-                "regex": "^node:"
-              }
-            ]
-          }
         ]
       }
     }
   ],
-  "plugins": ["typescript", "import"],
+  "plugins": [
+    "typescript",
+    "import"
+  ],
   "rules": {
     "import/first": "error",
     "import/no-duplicates": [
@@ -75,7 +50,9 @@
       {
         "paths": [
           {
-            "allowImportNames": ["strict"],
+            "allowImportNames": [
+              "strict"
+            ],
             "allowTypeImports": true,
             "message": "Import the strict assertion function as `import { strict as assert } from 'node:assert'`.",
             "name": "node:assert"
@@ -95,7 +72,9 @@
         ],
         "patterns": [
           {
-            "importNames": ["default"],
+            "importNames": [
+              "default"
+            ],
             "message": "Import a runtime built-in module's names by name, such as `import { readFile } from 'node:fs/promises'`; its default export is the whole module.",
             "regex": "^node:"
           }

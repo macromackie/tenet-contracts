@@ -1,0 +1,7 @@
+---
+"id": "module-literals-tsx"
+"invalid":
+  - "const labels = { paid: \"Paid\" };"
+"valid":
+  - "const labels = { paid: \"Paid\" } as const;"
+...

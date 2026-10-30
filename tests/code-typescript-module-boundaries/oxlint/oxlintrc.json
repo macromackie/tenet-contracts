@@ -1,0 +1,10 @@
+{
+  "filename": "src/invoices/invoices.ts",
+  "files": {
+    "src/accounts/index.ts": "export { account } from \"./account\";\n",
+    "src/accounts/account.ts": "export const account = \"invoice\";\n"
+  },
+  "invalid": "import { account } from \"../accounts/account\";\nexport { account };\n",
+  "rule": "boundaries(dependencies)",
+  "valid": "import { account } from \"../accounts/index\";\nexport { account };\n"
+}

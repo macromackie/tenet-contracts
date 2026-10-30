@@ -1,0 +1,9 @@
+---
+"id": "member-chains-python"
+"invalid":
+  - "is_ended = state == 'stopped' or state == 'failed'"
+  - "is_active = state != 'stopped' and state != 'failed'"
+"valid":
+  - "ENDED_STATES = frozenset((SandboxState.STOPPED, SandboxState.FAILED))\nis_ended = state in ENDED_STATES"
+  - "is_matching = invoice.status == expected.status or invoice.owner == expected.owner"
+...

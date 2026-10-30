@@ -1,0 +1,6 @@
+{
+  "filename": "source.tsx",
+  "invalid": "export function InvoiceHeading() { return <h1>Invoice</h1>; }\n",
+  "rule": "react(jsx-no-literals)",
+  "valid": "export function InvoiceHeading({ title }: { title: string }) { return <h1>{title}</h1>; }\n"
+}

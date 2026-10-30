@@ -1,0 +1,7 @@
+---
+"id": "prose-doc-comments-javascript"
+"invalid":
+  - "/** @returns The receipt. */\nfunction settleInvoice() { return receipt; }"
+"valid":
+  - "/** Returns the receipt after settling the invoice. */\nfunction settleInvoice() { return receipt; }"
+...

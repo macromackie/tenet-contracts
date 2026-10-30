@@ -1,0 +1,9 @@
+{
+  "filename": "test/assertions.ts",
+  "files": {
+    "node-assert.d.ts": "declare module \"node:assert\" {\n  export namespace strict {\n    function strictEqual<T>(actual: unknown, expected: T, message?: string | Error): asserts actual is T;\n  }\n}\n"
+  },
+  "invalid": "import { strict as assert } from \"node:assert\";\n\ninterface CheckInvoiceInput { readonly actual: string; readonly expected: string }\n\n/** Compare the runtime invoice labels. */\nexport const checkInvoice = ({ actual, expected }: CheckInvoiceInput): void => {\n  if (actual !== undefined) {\n    assert.strictEqual(actual, expected);\n  }\n};\n",
+  "rule": "typescript(no-unnecessary-condition)",
+  "valid": "import { strict as assert } from \"node:assert\";\n\ninterface CheckInvoiceInput { readonly actual: string; readonly expected: string }\n\n/** Compare the runtime invoice labels. */\nexport const checkInvoice = ({ actual, expected }: CheckInvoiceInput): void => {\n  assert.strictEqual(actual, expected);\n};\n"
+}

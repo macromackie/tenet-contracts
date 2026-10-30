@@ -1,0 +1,6 @@
+---
+"ruleDirs":
+  - "../../../contracts/test-assertion-integrity/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+...

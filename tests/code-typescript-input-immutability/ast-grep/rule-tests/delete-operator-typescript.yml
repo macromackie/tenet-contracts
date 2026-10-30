@@ -1,0 +1,7 @@
+---
+"id": "delete-operator-typescript"
+"invalid":
+  - "delete record.secret;"
+"valid":
+  - "const { secret, ...publicRecord } = record;"
+...

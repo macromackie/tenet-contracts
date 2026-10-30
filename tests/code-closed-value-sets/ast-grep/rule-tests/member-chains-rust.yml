@@ -1,0 +1,7 @@
+---
+"id": "member-chains-rust"
+"invalid":
+  - "fn is_ended(state: State) -> bool { state == State::Stopped || state == State::Failed }\n"
+"valid":
+  - "const ENDED_STATES: &[State] = &[State::Stopped, State::Failed];\nfn is_ended(state: State) -> bool { ENDED_STATES.contains(&state) }\n"
+...

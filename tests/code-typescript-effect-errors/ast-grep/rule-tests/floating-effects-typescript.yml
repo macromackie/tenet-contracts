@@ -1,5 +1,4 @@
 ---
-# The invalid case comes from a Violation line of code-typescript-effect-errors; the valid case is the run call the rule's note allows.
 "id": "floating-effects-typescript"
 "invalid":
   - "Effect.fail(new InvoiceNotFound({ invoice }));"

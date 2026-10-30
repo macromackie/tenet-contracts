@@ -1,0 +1,8 @@
+---
+"id": "discarded-results-typescript"
+"invalid":
+  - "orders.map((order) => ship({ order }));"
+  - "void orders.filter((order) => order.isPaid);"
+"valid":
+  - "const paidOrders = orders.filter((order) => order.isPaid);"
+...

@@ -1,0 +1,7 @@
+---
+"id": "prose-doc-comments-rust"
+"invalid":
+  - "/// # Errors\n/// Fails when the invoice is missing.\nfn read_invoice() {}\n"
+"valid":
+  - "/// Fails when the invoice is missing.\nfn read_invoice() {}\n"
+...

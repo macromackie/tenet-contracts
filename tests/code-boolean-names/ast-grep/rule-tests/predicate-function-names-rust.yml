@@ -1,0 +1,7 @@
+---
+"id": "predicate-function-names-rust"
+"invalid":
+  - "fn overdue() -> bool { true }\n"
+"valid":
+  - "fn is_overdue() -> bool { true }\n"
+...

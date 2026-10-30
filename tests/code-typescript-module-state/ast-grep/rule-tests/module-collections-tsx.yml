@@ -1,0 +1,7 @@
+---
+"id": "module-collections-tsx"
+"invalid":
+  - "const roles = new Set([Role.Admin]);"
+"valid":
+  - "const roles: ReadonlySet<Role> = new Set([Role.Admin]);"
+...

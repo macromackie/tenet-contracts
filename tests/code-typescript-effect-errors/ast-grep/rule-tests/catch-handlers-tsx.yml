@@ -1,0 +1,9 @@
+---
+"id": "catch-handlers-tsx"
+"invalid":
+  - "try { readInvoice(); } catch (cause) { rejectInvoice({ cause }); }"
+  - "readInvoice().catch((cause) => rejectInvoice({ cause }));"
+"valid":
+  - "const request = Effect.tryPromise({ catch: buildInvoiceUnreadable, try: readInvoice });"
+  - "try { await readInvoice(); } finally { releaseInvoice(); }"
+...

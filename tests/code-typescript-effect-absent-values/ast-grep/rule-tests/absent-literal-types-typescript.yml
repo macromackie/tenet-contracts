@@ -1,0 +1,9 @@
+---
+"id": "absent-literal-types-typescript"
+"invalid":
+  - "type Invoice = { account: string | null };"
+  - "function readInvoice(): Invoice | undefined { return lookupInvoice(); }"
+"valid":
+  - "type Invoice = { account: Option.Option<string> };"
+  - "type ReadInvoiceInput = { account?: string };"
+...

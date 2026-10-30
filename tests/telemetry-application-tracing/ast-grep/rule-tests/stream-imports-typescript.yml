@@ -1,0 +1,9 @@
+---
+"id": "stream-imports-typescript"
+"invalid":
+  - "import { stderr } from 'node:process';"
+  - "export { stdout as output } from 'process';"
+"valid":
+  - "import type { stderr } from 'node:process';"
+  - "import { log } from './logger/index.ts';"
+...

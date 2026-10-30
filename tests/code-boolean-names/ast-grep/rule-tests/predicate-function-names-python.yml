@@ -1,0 +1,9 @@
+---
+"id": "predicate-function-names-python"
+"invalid":
+  - "def check_overdue(invoice: Invoice) -> bool:\n    return invoice.due < today"
+  - "allow_retry: Callable[[Invoice], bool] = settle_invoice"
+"valid":
+  - "def is_overdue(invoice: Invoice) -> bool:\n    return invoice.due < today"
+  - "@property\ndef paid(self) -> bool:\n    return self.receipt is not None"
+...

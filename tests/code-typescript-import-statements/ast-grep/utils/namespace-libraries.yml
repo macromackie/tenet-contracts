@@ -1,0 +1,9 @@
+---
+"id": "misimported-namespace-library"
+"language": "TypeScript"
+"rule":
+  "all":
+    - "regex": "from ['\"]@acme/chart-kit['\"]"
+    - "not":
+        "regex": "^import (type )?\\* as chartKit from ['\"]@acme/chart-kit['\"]"
+...

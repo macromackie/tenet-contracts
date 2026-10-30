@@ -1,0 +1,7 @@
+---
+"id": "expect-has-assertions-typescript"
+"invalid":
+  - "test(\"reads invoice\", () => { expect.hasAssertions(); });"
+"valid":
+  - "test(\"reads invoice\", () => { expect.assertions(1); });"
+...

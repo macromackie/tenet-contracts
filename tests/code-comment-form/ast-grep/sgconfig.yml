@@ -1,0 +1,6 @@
+---
+"ruleDirs":
+  - "../../../contracts/code-comment-form/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+...

@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "eslint(no-use-before-define)",
+  "valid": "function readAmount(): number { return 1; }\nexport const amount = readAmount();\n",
+  "invalid": "export const amount = readAmount();\nfunction readAmount(): number { return 1; }\n"
+}

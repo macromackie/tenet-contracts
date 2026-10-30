@@ -1,0 +1,9 @@
+---
+"id": "acronym-names-python"
+"invalid":
+  - "class HTTPClient:\n    pass"
+  - "def parse_JSON(content: str) -> object:\n    return json.loads(content)"
+"valid":
+  - "class HttpClient:\n    pass"
+  - "MAX_URL_LENGTH = 2048"
+...

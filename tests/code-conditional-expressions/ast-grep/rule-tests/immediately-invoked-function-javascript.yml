@@ -1,0 +1,7 @@
+---
+"id": "immediately-invoked-function-javascript"
+"invalid":
+  - "const shippingDays = (() => { if (order.isRush) { return RUSH_DAYS; } return STANDARD_DAYS; })();"
+"valid":
+  - "const shippingDays = chooseShippingDays({ order });"
+...

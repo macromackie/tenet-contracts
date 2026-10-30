@@ -1,0 +1,8 @@
+---
+"id": "diagnostic-values-tsx"
+"invalid":
+  - "throw new InvoiceMissing({ message: `invoice ${invoiceId} was not found` });"
+"valid":
+  - "throw new InvoiceMissing({ message: `invoice ${JSON.stringify(invoiceId)} was not found` });"
+  - "throw new InvoiceMissing({ message: `read invoice: ${cause.message}` });"
+...

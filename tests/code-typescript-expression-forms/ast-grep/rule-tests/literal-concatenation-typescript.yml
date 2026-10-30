@@ -1,0 +1,7 @@
+---
+"id": "literal-concatenation-typescript"
+"invalid":
+  - "const message = \"invoice missing: \" +\n\"try another reference\";"
+"valid":
+  - "const message = `invoice missing:\ntry another reference`;"
+...

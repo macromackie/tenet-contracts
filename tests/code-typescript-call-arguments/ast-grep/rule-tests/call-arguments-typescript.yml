@@ -1,0 +1,9 @@
+---
+"id": "call-arguments-typescript"
+"invalid":
+  - "sendInvoice({ invoice: readInvoice({ id }) });"
+  - "sendInvoice(new Invoice());"
+"valid":
+  - "const invoice = readInvoice({ id }); sendInvoice({ invoice });"
+  - "pipe(source, Effect.map((value) => value.total));"
+...

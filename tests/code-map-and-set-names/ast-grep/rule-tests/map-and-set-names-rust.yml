@@ -1,0 +1,7 @@
+---
+"id": "map-and-set-names-rust"
+"invalid":
+  - "fn read_invoices() { let pending = HashMap::new(); }\n"
+"valid":
+  - "fn read_invoices() { let pending_jobs = HashMap::new(); }\n"
+...

@@ -1,0 +1,7 @@
+---
+"id": "let-reassignments-tsx"
+"invalid":
+  - "function readLabel() { let label = \"open\"; label = \"paid\"; return label; }"
+"valid":
+  - "function readTotal() { let total = 0; for (const invoice of invoices) { total += invoice.amount; } return total; }"
+...

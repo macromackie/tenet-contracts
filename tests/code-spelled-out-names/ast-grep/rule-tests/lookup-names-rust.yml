@@ -1,0 +1,7 @@
+---
+"id": "lookup-names-rust"
+"invalid":
+  - "fn fetch_invoice() {}\n"
+"valid":
+  - "fn read_invoice() {}\n"
+...

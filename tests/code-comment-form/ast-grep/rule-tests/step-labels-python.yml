@@ -1,0 +1,9 @@
+---
+"id": "step-labels-python"
+"invalid":
+  - "# (b) Copy the rows.\ncopy_rows(source=source, target=target)"
+  - "# 4. Copy the rows.\ncopy_rows(source=source, target=target)"
+"valid":
+  - "copy_rows(source=source, target=target)"
+  - "\"\"\"Copies the rows after validating their source.\"\"\""
+...

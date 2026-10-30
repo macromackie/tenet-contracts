@@ -1,0 +1,7 @@
+---
+"id": "satisfies-expressions-typescript"
+"invalid":
+  - "const reminder = { dueAt } satisfies Reminder;"
+"valid":
+  - "const reminder: Reminder = { dueAt };"
+...

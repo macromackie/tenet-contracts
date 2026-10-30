@@ -1,0 +1,7 @@
+---
+"id": "prop-gated-null-returns-javascript"
+"invalid":
+  - "function ShippingBanner({ isVisible, carrier }) { if (!isVisible) { return null; } return <span>{carrier}</span>; }"
+"valid":
+  - "function ShippingBanner({ carrier }) { return <span>{carrier}</span>; }\nconst banner = isVisible && <ShippingBanner carrier={carrier} />;"
+...

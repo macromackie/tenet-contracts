@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "typescript(strict-boolean-expressions)",
+  "valid": "export function hasInvoice(invoice: string): boolean { if (invoice.length > 0) { return true; } return false; }\n",
+  "invalid": "export function hasInvoice(invoice: string): boolean { if (invoice) { return true; } return false; }\n"
+}

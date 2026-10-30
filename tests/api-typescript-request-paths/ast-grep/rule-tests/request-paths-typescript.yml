@@ -1,0 +1,9 @@
+---
+"id": "request-paths-typescript"
+"invalid":
+  - "const path = `/orders/${orderId}`;"
+  - "const path = \"/orders/\" + orderId;"
+"valid":
+  - "const path = OrderPaths.read({ orderId });"
+  - "const path = `${origin}/orders/${orderId}`;"
+...

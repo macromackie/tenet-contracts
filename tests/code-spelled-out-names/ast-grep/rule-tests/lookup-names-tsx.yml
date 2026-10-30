@@ -1,0 +1,9 @@
+---
+"id": "lookup-names-tsx"
+"invalid":
+  - "function getInvoice() { return invoice; }"
+  - "const fetchInvoice = () => invoice;"
+"valid":
+  - "function readInvoice() { return invoice; }"
+  - "const { getSession } = auth;"
+...

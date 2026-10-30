@@ -1,0 +1,9 @@
+---
+"id": "number-parsing-tsx"
+"invalid":
+  - "const amount = parseFloat(text);"
+  - "const amount = Number.parseInt(text, 10);"
+"valid":
+  - "const amount = Number(text);"
+  - "const byte = Number.parseInt(text, HEX_RADIX);"
+...

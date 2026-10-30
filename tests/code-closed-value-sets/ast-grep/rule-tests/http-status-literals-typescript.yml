@@ -1,0 +1,9 @@
+---
+"id": "http-status-literals-typescript"
+"invalid":
+  - "const response = { status: 404 };"
+  - "type ErrorStatus = 404 | 410;"
+"valid":
+  - "const response = { status: HttpStatus.NotFound };"
+  - "const attempts = 4;"
+...

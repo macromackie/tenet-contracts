@@ -1,0 +1,7 @@
+---
+"id": "step-labels-javascript"
+"invalid":
+  - "// (b) Copy the rows.\ncopyRows({ source, target });"
+"valid":
+  - "copyRows({ source, target });"
+...

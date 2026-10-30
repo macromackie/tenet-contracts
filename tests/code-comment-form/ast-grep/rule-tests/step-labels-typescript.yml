@@ -1,0 +1,9 @@
+---
+"id": "step-labels-typescript"
+"invalid":
+  - "// 1. Read the order.\nreadOrder();"
+  - "// (ii) Settle the invoice.\nsettleInvoice();"
+"valid":
+  - "// Read the order before settling it.\nreadOrder();"
+  - "/** 1. Read the order. */\nfunction readOrder() {}"
+...

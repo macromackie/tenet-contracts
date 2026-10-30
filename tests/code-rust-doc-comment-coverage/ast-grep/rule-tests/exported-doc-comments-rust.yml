@@ -1,0 +1,7 @@
+---
+"id": "exported-doc-comments-rust"
+"invalid":
+  - "pub fn read_invoice() {}\n"
+"valid":
+  - "/// Read the stored invoice.\npub fn read_invoice() {}\n"
+...

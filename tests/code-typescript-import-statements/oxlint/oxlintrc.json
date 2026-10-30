@@ -1,0 +1,9 @@
+{
+  "filename": "source.ts",
+  "invalid": "import * as account from \"./account\";\nexport { account };\n",
+  "rule": "import(no-namespace)",
+  "valid": "import { account } from \"./account\";\nexport { account };\n",
+  "files": {
+    "account.ts": "export const account = \"account\";\n"
+  }
+}

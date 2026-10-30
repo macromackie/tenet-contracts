@@ -1,0 +1,11 @@
+---
+"id": "timer-waits-tsx"
+"invalid":
+  - "setTimeout(readJob, POLL_INTERVAL);"
+  - "import { setTimeout as sleep } from 'node:timers/promises';"
+  - "const signal = AbortSignal.timeout(JOB_DEADLINE);"
+"valid":
+  - "yield* Effect.sleep(POLL_INTERVAL);"
+  - "readJob().pipe(Effect.timeout(JOB_DEADLINE));"
+  - "import { setImmediate } from 'node:timers';"
+...

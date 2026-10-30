@@ -6,7 +6,7 @@
 import { Schema } from "effect";
 
 /** The variables `mise env --json` prints, each name with its value. */
-export const MiseEnvironment = Schema.Record(Schema.String, Schema.String);
+const MiseEnvironment = Schema.Record(Schema.String, Schema.String);
 
 /** Decodes the JSON text that `mise env --json` prints. */
 export const decodeMiseEnvironment = Schema.decodeUnknownEffect(

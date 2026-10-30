@@ -1,0 +1,9 @@
+---
+"id": "fields-after-literals-typescript"
+"invalid":
+  - "const invoice = { id }; invoice.account = account;"
+  - "const invoice = { count: 1 }; invoice.count += 1;"
+"valid":
+  - "const invoice = { id, account };"
+  - "const invoice = createInvoice(); invoice.account = account;"
+...

@@ -1,0 +1,7 @@
+---
+"id": "prose-doc-comments-python"
+"invalid":
+  - "def settle_invoice(invoice: Invoice) -> Receipt:\n    \"\"\"Settles the invoice.\n\n    Returns:\n        The receipt.\n    \"\"\"\n    return invoice.receipt"
+"valid":
+  - "def settle_invoice(invoice: Invoice) -> Receipt:\n    \"\"\"Returns the receipt, and raises InvoiceRefunded when a refund closed it.\"\"\"\n    return invoice.receipt"
+...

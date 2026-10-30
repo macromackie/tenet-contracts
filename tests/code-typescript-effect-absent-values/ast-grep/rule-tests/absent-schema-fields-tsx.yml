@@ -1,0 +1,9 @@
+---
+"id": "absent-schema-fields-tsx"
+"invalid":
+  - "const Invoice = Schema.Struct({ account: Schema.NullOr(Schema.String) });"
+  - "const Invoice = Schema.Struct({ account: Schema.optionalKey(Schema.String) });"
+"valid":
+  - "const Invoice = Schema.Struct({ account: Schema.OptionFromNullOr(Schema.String) });"
+  - "const Invoice = Schema.Struct({ account: Schema.OptionFromOptionalKey(Schema.String) });"
+...

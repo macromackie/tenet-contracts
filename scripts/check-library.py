@@ -77,8 +77,15 @@ LIBRARY_CHECKS = (
         f"{STRICTNESS}/yamllint/yamllint.yaml",
         "contracts",
         ".github",
+        "tests",
     ),
-    ("markdownlint-cli2", "--config", f"{STRICTNESS}/markdownlint/markdownlint.jsonc", "**/*.md"),
+    (
+        "markdownlint-cli2",
+        "--config",
+        f"{STRICTNESS}/markdownlint/markdownlint.jsonc",
+        "**/*.md",
+        "#**/node_modules/**",
+    ),
     ("oxfmt", "--check", "**/*.md"),
     (
         "oxfmt",
@@ -224,7 +231,7 @@ def check_library_files() -> list[str]:
         for path in sorted(ROOT.glob(RULE_SETS))
     ]
     tests = [
-        ("ast-grep", "test", "--config", str(path.relative_to(ROOT)))
+        ("ast-grep", "test", "--skip-snapshot-tests", "--config", str(path.relative_to(ROOT)))
         for path in sorted(ROOT.glob(RULE_TESTS))
     ]
 
@@ -233,6 +240,62 @@ def check_library_files() -> list[str]:
         for command in (*LIBRARY_CHECKS, taplo, *scans, *tests)
         for error in run_check(command=command, folder=ROOT)
     ]
+
+
+def check_rule_case(*, case: Path) -> list[str]:
+    """Check one shipped structural rule's violation and allowed examples."""
+    if not case.is_file():
+        return [f"{case.relative_to(ROOT)}: cover the shipped rule"]
+
+    document = yaml.safe_load(case.read_text(encoding="utf-8"))
+
+    match document:
+        case {"valid": [*valid], "invalid": [*invalid]} if valid and invalid:
+            return []
+        case _:
+            return [f"{case.relative_to(ROOT)}: declare valid and invalid examples"]
+
+
+def check_rule_registration(*, source: Path) -> list[str]:
+    """Require the contract's cases to run against its own shipped structural rules."""
+    config = ROOT / "tests" / source.parents[2].name / "ast-grep/sgconfig.yml"
+
+    if not config.is_file():
+        return [f"{config.relative_to(ROOT)}: register the shipped rule cases"]
+
+    document = yaml.safe_load(config.read_text(encoding="utf-8"))
+    rules = (source.parent / "rules").resolve()
+
+    match document:
+        case {
+            "ruleDirs": [str(rule_directory)],
+            "testConfigs": [{"testDir": str(test_directory)}],
+        } if (config.parent / rule_directory).resolve() == rules and (
+            config.parent / test_directory
+        ).resolve() == (config.parent / "rule-tests").resolve():
+            return []
+        case _:
+            return [
+                f"{config.relative_to(ROOT)}: register rule-tests and the shipped rule directory"
+            ]
+
+
+def check_rule_coverage() -> list[str]:
+    """Require registered violation and allowed cases for every shipped structural rule."""
+    registrations = [
+        error
+        for source in sorted(ROOT.glob(RULE_SETS))
+        for error in check_rule_registration(source=source)
+    ]
+    cases = [
+        error
+        for rule in sorted(ROOT.glob("contracts/*/assets/ast-grep/rules/*.yml"))
+        for error in check_rule_case(
+            case=ROOT / "tests" / rule.parents[3].name / "ast-grep/rule-tests" / rule.name,
+        )
+    ]
+
+    return [*registrations, *cases]
 
 
 def check_yaml_trees() -> list[str]:
@@ -545,6 +608,10 @@ def check_snapshot(*, scratch: Path) -> list[str]:
 
     return [
         *typescript_errors,
+        *run_check(
+            command=("uv", "run", "--script", "scripts/check-oxlint-cases.py"),
+            folder=snapshot,
+        ),
         *run_check(command=ACTIONLINT, folder=snapshot),
         *check_effect_names(snapshot=snapshot),
         *install_library(snapshot=snapshot, adopter=scratch / "adopter"),
@@ -569,6 +636,7 @@ def main() -> output.ExitStatus:
         errors = [
             *check_library_files(),
             *check_yaml_trees(),
+            *check_rule_coverage(),
             *check_release_version(),
             *check_oxlint_layers(),
             *check_snapshot(scratch=Path(scratch)),

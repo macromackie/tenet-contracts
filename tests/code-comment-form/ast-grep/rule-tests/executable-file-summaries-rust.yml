@@ -1,0 +1,7 @@
+---
+"id": "executable-file-summaries-rust"
+"invalid":
+  - "fn main() { run(); }\n"
+"valid":
+  - "//! Read invoices; run with `cargo run --bin invoices`.\nfn main() { run(); }\n"
+...

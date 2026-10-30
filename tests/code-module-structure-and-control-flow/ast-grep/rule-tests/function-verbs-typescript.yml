@@ -1,0 +1,9 @@
+---
+"id": "function-verbs-typescript"
+"invalid":
+  - "function invoice() { return invoiceId; }"
+  - "const invoice = () => invoiceId;"
+"valid":
+  - "function readInvoice() { return invoiceId; }"
+  - "class Invoice { get total() { return amount; } }"
+...

@@ -1,0 +1,7 @@
+---
+"id": "hook-order-javascript"
+"invalid":
+  - "function Invoice() { const order = useOrder({ orderId }); const [isOpen, setIsOpen] = useState(false); return order; }"
+"valid":
+  - "function Invoice() { const [isOpen, setIsOpen] = useState(false); const order = useOrder({ orderId }); useEffect(syncOrder); return order; }"
+...

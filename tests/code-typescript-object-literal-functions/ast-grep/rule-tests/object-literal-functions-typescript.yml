@@ -1,0 +1,7 @@
+---
+"id": "object-literal-functions-typescript"
+"invalid":
+  - "const actions = { settleInvoice: () => settle({ invoice }) };"
+"valid":
+  - "const settleInvoice = () => settle({ invoice }); const actions = { settleInvoice };"
+...

@@ -1,0 +1,7 @@
+---
+"id": "handler-names-tsx"
+"invalid":
+  - "const saveInvoice = () => persistInvoice({ invoice });\nconst receipt = <button onClick={saveInvoice}>Save</button>;"
+"valid":
+  - "const onSave = () => persistInvoice({ invoice });\nconst receipt = <button onClick={onSave}>Save</button>;"
+...

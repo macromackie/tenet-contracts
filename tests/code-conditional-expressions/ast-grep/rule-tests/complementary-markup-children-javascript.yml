@@ -1,0 +1,7 @@
+---
+"id": "complementary-markup-children-javascript"
+"invalid":
+  - "const action = <section>{isPaid && <Receipt />}{!isPaid && <PaymentForm />}</section>;"
+"valid":
+  - "function InvoiceAction({ isPaid }) { if (isPaid) { return <Receipt />; } return <PaymentForm />; }"
+...

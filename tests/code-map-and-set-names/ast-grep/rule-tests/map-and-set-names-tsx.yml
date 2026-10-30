@@ -1,0 +1,9 @@
+---
+"id": "map-and-set-names-tsx"
+"invalid":
+  - "const pending = new Set<OrderId>();"
+  - "const ordersById: ReadonlyMap<OrderId, Order> = source;"
+"valid":
+  - "const pendingOrderIds = new Set<OrderId>();"
+  - "const orders: ReadonlyMap<OrderId, Order> = source;"
+...

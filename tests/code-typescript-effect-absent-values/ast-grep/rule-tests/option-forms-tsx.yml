@@ -1,0 +1,9 @@
+---
+"id": "option-forms-tsx"
+"invalid":
+  - "const total = Option.match(invoice, { onNone: zero, onSome: readTotal });"
+  - "if (Option.isSome(invoice)) { sendInvoice(invoice.value); } else { showMissing(); }"
+"valid":
+  - "const total = Option.getOrElse(invoice, readDefaultInvoice);"
+  - "if (Option.isNone(invoice)) { return; } sendInvoice(invoice.value);"
+...

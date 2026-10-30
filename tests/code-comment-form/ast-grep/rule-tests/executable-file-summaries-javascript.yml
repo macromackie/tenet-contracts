@@ -1,0 +1,7 @@
+---
+"id": "executable-file-summaries-javascript"
+"invalid":
+  - "const invoices = readInvoices();"
+"valid":
+  - "/** Migrates invoices; run `node scripts/migrate-invoices.mjs`. */\nconst invoices = readInvoices();"
+...

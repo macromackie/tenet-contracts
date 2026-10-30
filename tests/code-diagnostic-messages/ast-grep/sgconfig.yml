@@ -1,0 +1,8 @@
+---
+"ruleDirs":
+  - "../../../contracts/code-diagnostic-messages/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+"utilDirs":
+  - "../../../contracts/code-diagnostic-messages/assets/ast-grep/utils"
+...

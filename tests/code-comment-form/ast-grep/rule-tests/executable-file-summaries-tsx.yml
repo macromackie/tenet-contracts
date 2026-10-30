@@ -1,0 +1,7 @@
+---
+"id": "executable-file-summaries-tsx"
+"invalid":
+  - "await main();"
+"valid":
+  - "/** Validate orders; run with mise run validate:orders. */\nawait main();"
+...

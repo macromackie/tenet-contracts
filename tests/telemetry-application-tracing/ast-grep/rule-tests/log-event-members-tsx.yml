@@ -1,0 +1,7 @@
+---
+"id": "log-event-members-tsx"
+"invalid":
+  - "log({ event: 'invoice.settled', invoiceId });"
+"valid":
+  - "log({ event: LogEvent.InvoiceSettled, invoiceId });"
+...

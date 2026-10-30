@@ -1,0 +1,6 @@
+{
+  "filename": "source.test.ts",
+  "invalid": "import { expect, test } from \"vitest\";\ntest(\"settles an invoice\", () => { expect(1).toBe(1); });\n",
+  "rule": "vitest(prefer-expect-assertions)",
+  "valid": "import { expect, test } from \"vitest\";\ntest(\"settles an invoice\", () => { expect.assertions(1); expect(1).toBe(1); });\n"
+}

@@ -1,6 +1,4 @@
 ---
-# Test cases for cli-output-channels's ast-grep rules; run from the library root:
-# ast-grep test -c tests/cli-output-channels/ast-grep/sgconfig.yml
 "ruleDirs":
   - "../../../contracts/cli-output-channels/assets/ast-grep/rules"
 "testConfigs":

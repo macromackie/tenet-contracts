@@ -1,0 +1,9 @@
+---
+"id": "executable-file-summaries-python"
+"invalid":
+  - "import sys\n"
+  - "# Migrate the invoice rows.\nimport sys\n"
+"valid":
+  - "\"\"\"Migrates invoice rows; run python scripts/migrate_invoices.py.\"\"\"\nimport sys\n"
+  - "#!/usr/bin/env python3\n\"\"\"Migrates invoice rows; run python scripts/migrate_invoices.py.\"\"\"\nimport sys\n"
+...

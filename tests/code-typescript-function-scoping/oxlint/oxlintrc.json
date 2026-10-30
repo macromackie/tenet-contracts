@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "invalid": "export function readAccount(): () => string { function readInvoice(): string { return \"invoice\"; } return readInvoice; }\n",
+  "rule": "unicorn(consistent-function-scoping)",
+  "valid": "function readInvoice(): string { return \"invoice\"; }\nexport function readAccount(): () => string { return readInvoice; }\n"
+}

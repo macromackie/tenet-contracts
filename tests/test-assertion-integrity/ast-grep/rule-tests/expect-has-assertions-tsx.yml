@@ -1,0 +1,7 @@
+---
+"id": "expect-has-assertions-tsx"
+"invalid":
+  - "test(\"reads invoice\", () => { expect.hasAssertions(); });"
+"valid":
+  - "test(\"reads invoice\", () => { expect.assertions(1); });"
+...

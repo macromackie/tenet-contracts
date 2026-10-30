@@ -1,0 +1,7 @@
+---
+"id": "story-attribute-spreads-tsx"
+"invalid":
+  - "const receipt = <Receipt {...attributes} />;"
+"valid":
+  - "const receipt = <Receipt {...args} {...stylex.props(styles.receipt)} />;"
+...

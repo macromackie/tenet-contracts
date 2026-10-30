@@ -7,6 +7,19 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 because `tenet contracts update` without `--ref` moves straight to the newest release. Tenet 0.11.0 installs every
 release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v12.1.0
+
+### Loosened
+
+- `code-lint-strictness`: check runtime assertion values without treating their declared type predicates as redundant in test code.
+- `code-typescript-import-statements`: use the repository’s declared test runner, including the runtime’s runner.
+  The optional `assets/oxlint/vitest.json` keeps separate-runner import restrictions scoped to repositories that use it.
+
+### Clarified
+
+- `env-curation`: keep the check-only environment codec private to its consumer.
+- Rule fixtures cover the shipped structural checks with a violation and an allowed form.
+
 ## v12.0.1
 
 ### Clarified

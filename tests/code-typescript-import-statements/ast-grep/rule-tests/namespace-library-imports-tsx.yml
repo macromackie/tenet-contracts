@@ -1,0 +1,7 @@
+---
+"id": "namespace-library-imports-tsx"
+"invalid":
+  - "import { createChart } from '@acme/chart-kit';"
+"valid":
+  - "import * as chartKit from '@acme/chart-kit';"
+...

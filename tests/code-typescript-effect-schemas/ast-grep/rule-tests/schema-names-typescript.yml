@@ -1,0 +1,9 @@
+---
+"id": "schema-names-typescript"
+"invalid":
+  - "const invoice = Schema.Struct({ id: Schema.String });"
+  - "const InvoiceSchema = Schema.Struct({ id: Schema.String });"
+"valid":
+  - "const Invoice = Schema.Struct({ id: Schema.String });"
+  - "const readInvoice = Schema.decodeUnknownEffect(Invoice, { onExcessProperty: 'error' });"
+...

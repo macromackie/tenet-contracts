@@ -1,0 +1,8 @@
+---
+"id": "license-notices-python"
+"invalid":
+  - "# SPDX-License-Identifier: MIT\npass"
+  - "\"\"\"Copyright 2026 Example Authors.\"\"\"\npass"
+"valid":
+  - "# The provider's response contains no retry deadline.\npass"
+...

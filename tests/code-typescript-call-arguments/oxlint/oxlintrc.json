@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "unicorn(no-await-expression-member)",
+  "valid": "export async function readInvoice(source: Promise<{ invoice: string }>): Promise<string> { const record = await source; return record.invoice; }\n",
+  "invalid": "export async function readInvoice(source: Promise<{ invoice: string }>): Promise<string> { return (await source).invoice; }\n"
+}

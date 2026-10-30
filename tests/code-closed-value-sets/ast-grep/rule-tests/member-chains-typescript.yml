@@ -1,0 +1,9 @@
+---
+"id": "member-chains-typescript"
+"invalid":
+  - "state === OrderState.Closed || state === OrderState.Cancelled;"
+  - "state !== OrderState.Closed && state !== OrderState.Cancelled;"
+"valid":
+  - "endedStates.has(state);"
+  - "state === activeState || state === pendingState;"
+...

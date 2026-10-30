@@ -1,0 +1,7 @@
+---
+"id": "attribute-spreads-tsx"
+"invalid":
+  - "const receipt = <Receipt {...attributes} />;"
+"valid":
+  - "const receipt = <Receipt {...stylex.props(styles.receipt)} invoice={invoice} />;"
+...

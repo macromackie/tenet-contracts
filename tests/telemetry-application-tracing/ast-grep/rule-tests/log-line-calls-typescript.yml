@@ -1,0 +1,9 @@
+---
+"id": "log-line-calls-typescript"
+"invalid":
+  - "log(line);"
+  - "log({ ...line });"
+"valid":
+  - "log({ event: LogEvent.InvoiceSettled, invoiceId });"
+  - "log({ event, invoiceId });"
+...

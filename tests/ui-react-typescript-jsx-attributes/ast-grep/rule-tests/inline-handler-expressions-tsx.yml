@@ -1,0 +1,7 @@
+---
+"id": "inline-handler-expressions-tsx"
+"invalid":
+  - "const receipt = <button onClick={() => { saveInvoice({ invoice }); }}>Save</button>;"
+"valid":
+  - "const receipt = <button onClick={() => saveInvoice({ invoice })}>Save</button>;"
+...

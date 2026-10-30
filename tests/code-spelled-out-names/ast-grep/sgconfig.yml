@@ -1,0 +1,6 @@
+---
+"ruleDirs":
+  - "../../../contracts/code-spelled-out-names/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+...

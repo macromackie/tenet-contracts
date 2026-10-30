@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "eslint(capitalized-comments)",
+  "valid": "// Read the invoice.\nexport const invoice = 1;\n",
+  "invalid": "// read the invoice.\nexport const invoice = 1;\n"
+}

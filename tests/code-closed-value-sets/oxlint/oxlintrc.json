@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "unicorn(prefer-set-has)",
+  "valid": "const accountKinds = new Set([\"active\", \"closed\"]);\nexport function isKnown(kind: string): boolean { return accountKinds.has(kind); }\n",
+  "invalid": "const accountKinds = [\"active\", \"closed\"];\nexport function isKnown(kind: string): boolean { return accountKinds.includes(kind); }\n"
+}

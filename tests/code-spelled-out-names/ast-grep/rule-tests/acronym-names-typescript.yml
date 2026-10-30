@@ -1,0 +1,9 @@
+---
+"id": "acronym-names-typescript"
+"invalid":
+  - "const callbackURL = origin;"
+  - "type URL = string;"
+"valid":
+  - "const callbackUrl = origin;"
+  - "const MAX_URL_LENGTH = 4;"
+...

@@ -1,0 +1,8 @@
+---
+"id": "readonly-array-types-tsx"
+"invalid":
+  - "function readInvoices(invoices: Invoice[]) { return invoices; }"
+"valid":
+  - "function readInvoices(invoices: readonly Invoice[]) { return invoices; }"
+  - "function collectInvoices() { const invoices: Invoice[] = []; return invoices; }"
+...

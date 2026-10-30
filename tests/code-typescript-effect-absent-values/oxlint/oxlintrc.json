@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "unicorn(no-useless-undefined)",
+  "valid": "declare function readInvoice(id?: string): void;\nreadInvoice();\n",
+  "invalid": "declare function readInvoice(id?: string): void;\nreadInvoice(undefined);\n"
+}

@@ -1,0 +1,9 @@
+---
+"id": "boolean-prop-names-typescript"
+"invalid":
+  - "type OrderProps = { visible: boolean };"
+  - "interface OrderProps { state: { disabled: boolean } }"
+"valid":
+  - "type OrderProps = { isVisible: boolean; disabled: boolean };"
+  - "type OrderProps = { state: { isDisabled: boolean } };"
+...

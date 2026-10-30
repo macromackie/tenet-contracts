@@ -1,0 +1,7 @@
+---
+"id": "declaration-comments-rust"
+"invalid":
+  - "// Read the stored invoice.\nfn read_invoice() {}\n"
+"valid":
+  - "/// Read the stored invoice.\nfn read_invoice() {}\n"
+...

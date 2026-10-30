@@ -1,0 +1,9 @@
+---
+"id": "license-notices-tsx"
+"invalid":
+  - "// Copyright 2026 Example"
+  - "/** SPDX-License-Identifier: MIT */"
+"valid":
+  - "/** Read the order. */"
+  - "// The copyright owner is recorded in LICENSE."
+...

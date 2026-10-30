@@ -1,0 +1,9 @@
+---
+"id": "membership-lists-typescript"
+"invalid":
+  - "[OrderState.Closed, OrderState.Cancelled].includes(state);"
+  - "new Set([OrderState.Closed, OrderState.Cancelled]).has(state);"
+"valid":
+  - "endedStates.has(state);"
+  - "[activeState, pendingState].includes(state);"
+...

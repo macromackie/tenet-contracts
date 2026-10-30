@@ -1,0 +1,9 @@
+---
+"id": "http-method-literals-typescript"
+"invalid":
+  - "const request = { method: \"POST\" };"
+  - "const request = { method: \"head\" };"
+"valid":
+  - "const request = { method: HttpMethod.Post };"
+  - "const revision = \"HEAD\";"
+...

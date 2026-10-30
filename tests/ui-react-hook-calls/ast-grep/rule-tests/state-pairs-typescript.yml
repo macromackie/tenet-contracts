@@ -1,0 +1,8 @@
+---
+"id": "state-pairs-typescript"
+"invalid":
+  - "const draft = useState(\"\");"
+"valid":
+  - "const [draft, setDraft] = useState(\"\");"
+  - "const [revision] = useState(() => order.revision);"
+...

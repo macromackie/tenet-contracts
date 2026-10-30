@@ -1,0 +1,7 @@
+---
+"id": "type-predicates-typescript"
+"invalid":
+  - "function isPaid(order: Order): order is PaidOrder { return true; }"
+"valid":
+  - "const paidOrders = orders.filter((order) => order.status === OrderStatus.Paid);"
+...

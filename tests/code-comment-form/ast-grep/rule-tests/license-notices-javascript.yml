@@ -1,0 +1,7 @@
+---
+"id": "license-notices-javascript"
+"invalid":
+  - "// SPDX-License-Identifier: MIT\nconst revision = 1;"
+"valid":
+  - "// The dependency validates its license before installation.\nconst revision = 1;"
+...

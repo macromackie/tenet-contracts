@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "eslint(no-ternary)",
+  "valid": "export function readAmount(isPaid: boolean): number { if (isPaid) { return 1; } return 0; }\n",
+  "invalid": "export function readAmount(isPaid: boolean): number { return isPaid ? 1 : 0; }\n"
+}

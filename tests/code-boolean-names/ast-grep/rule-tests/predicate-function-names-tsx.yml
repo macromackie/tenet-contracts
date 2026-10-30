@@ -1,0 +1,9 @@
+---
+"id": "predicate-function-names-tsx"
+"invalid":
+  - "function overdue(): boolean { return true; }"
+  - "const overdue = (): Effect.Effect<boolean> => Effect.succeed(true);"
+"valid":
+  - "function isOverdue(): boolean { return true; }"
+  - "const isOverdue = (): Effect.Effect<boolean> => Effect.succeed(true);"
+...

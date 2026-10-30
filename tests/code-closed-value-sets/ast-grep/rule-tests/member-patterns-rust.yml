@@ -1,0 +1,7 @@
+---
+"id": "member-patterns-rust"
+"invalid":
+  - "fn is_ended(state: State) -> bool { matches!(state, State::Stopped | State::Failed) }\n"
+"valid":
+  - "const ENDED_STATES: &[State] = &[State::Stopped, State::Failed];\nfn is_ended(state: State) -> bool { ENDED_STATES.contains(&state) }\n"
+...

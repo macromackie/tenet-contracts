@@ -1,0 +1,6 @@
+---
+"ruleDirs":
+  - "../../../contracts/code-typescript-const-bindings/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+...

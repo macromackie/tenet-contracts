@@ -1,0 +1,7 @@
+---
+"id": "acronym-names-javascript"
+"invalid":
+  - "const callbackURL = address;"
+"valid":
+  - "const callbackUrl = address;"
+...

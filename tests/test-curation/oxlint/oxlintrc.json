@@ -1,0 +1,6 @@
+{
+  "filename": "source.test.ts",
+  "invalid": "import { expect, test } from \"vitest\";\ntest(\"settles an invoice\", () => { expect(1).toBe(1); });\n",
+  "rule": "vitest(require-test-timeout)",
+  "valid": "import { expect, test } from \"vitest\";\ntest(\"settles an invoice\", () => { expect(1).toBe(1); }, 1000);\n"
+}

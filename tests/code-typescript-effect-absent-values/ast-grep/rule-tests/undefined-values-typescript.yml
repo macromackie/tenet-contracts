@@ -1,0 +1,9 @@
+---
+"id": "undefined-values-typescript"
+"invalid":
+  - "const invoice = undefined;"
+  - "function sendInvoice(): void { return undefined; }"
+"valid":
+  - "const invoice = Option.none();"
+  - "function sendInvoice(): void { return; }"
+...

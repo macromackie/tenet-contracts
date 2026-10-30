@@ -1,0 +1,8 @@
+---
+"ruleDirs":
+  - "../../../contracts/code-boolean-names/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+"utilDirs":
+  - "../../../contracts/code-boolean-names/assets/ast-grep/utils"
+...

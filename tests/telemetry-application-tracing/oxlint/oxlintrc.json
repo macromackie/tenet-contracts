@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "invalid": "console.log(\"invoice settled\");\n",
+  "rule": "eslint(no-console)",
+  "valid": "export const event = \"invoice.settled\";\n"
+}

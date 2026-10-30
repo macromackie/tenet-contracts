@@ -1,0 +1,8 @@
+---
+"id": "argument-type-names-typescript"
+"invalid":
+  - "function retryStep({ job }: RetryOptions) { return job; }"
+"valid":
+  - "function retryStep({ job }: RetryStepInput) { return job; }"
+  - "function InvoiceRow({ invoice }: InvoiceRowProps) { return invoice; }"
+...

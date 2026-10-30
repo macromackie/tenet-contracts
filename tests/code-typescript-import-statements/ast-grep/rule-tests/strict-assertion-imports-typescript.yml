@@ -1,0 +1,7 @@
+---
+"id": "strict-assertion-imports-typescript"
+"invalid":
+  - "import { strict } from 'node:assert';"
+"valid":
+  - "import { strict as assert } from 'node:assert';"
+...

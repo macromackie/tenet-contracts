@@ -1,0 +1,7 @@
+---
+"id": "object-from-entries-typescript"
+"invalid":
+  - "const totals = Object.fromEntries(entries);"
+"valid":
+  - "const totals = new Map(entries);"
+...

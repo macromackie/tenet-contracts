@@ -1,0 +1,7 @@
+---
+"id": "lookup-names-javascript"
+"invalid":
+  - "function getInvoice() { return invoice; }"
+"valid":
+  - "function readInvoice() { return invoice; }"
+...

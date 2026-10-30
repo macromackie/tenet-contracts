@@ -1,0 +1,7 @@
+---
+"id": "type-parameter-names-typescript"
+"invalid":
+  - "function readFirst<T>(rows: readonly T[]): T { return rows[0]; }"
+"valid":
+  - "function readFirst<Row>(rows: readonly Row[]): Row { return rows[0]; }"
+...

@@ -1,0 +1,10 @@
+---
+"id": "map-and-set-names-python"
+"invalid":
+  - "seen = set()"
+  - "pending: dict[str, Job] = {}"
+"valid":
+  - "seen_order_ids = set()"
+  - "pending_jobs: dict[str, Job] = {}"
+  - "request: dict[str, object] = {}"
+...

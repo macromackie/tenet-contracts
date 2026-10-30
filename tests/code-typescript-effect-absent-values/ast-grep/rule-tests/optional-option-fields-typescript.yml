@@ -1,0 +1,8 @@
+---
+"id": "optional-option-fields-typescript"
+"invalid":
+  - "type Invoice = { account?: Option.Option<string> };"
+"valid":
+  - "type Invoice = { account: Option.Option<string> };"
+  - "type ReadInvoiceInput = { account?: string };"
+...

@@ -1,0 +1,8 @@
+---
+"id": "diagnostic-case-tsx"
+"invalid":
+  - "throw new InvoiceMissing({ message: \"Invoice was not found\" });"
+"valid":
+  - "throw new InvoiceMissing({ message: \"invoice was not found\" });"
+  - "throw new InvoiceMissing({ message: \"GitHub refused the request\" });"
+...

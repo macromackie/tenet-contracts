@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "eslint(no-plusplus)",
+  "valid": "export function readAmount(amount: number): number { amount += 1; return amount; }\n",
+  "invalid": "export function readAmount(amount: number): number { amount++; return amount; }\n"
+}

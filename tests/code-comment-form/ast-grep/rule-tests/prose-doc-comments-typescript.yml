@@ -1,0 +1,7 @@
+---
+"id": "prose-doc-comments-typescript"
+"invalid":
+  - "/** @param order The order to settle. */\nfunction settleOrder(order: Order) {}"
+"valid":
+  - "/** Settle the order and return its receipt. */\nfunction settleOrder(order: Order) {}"
+...

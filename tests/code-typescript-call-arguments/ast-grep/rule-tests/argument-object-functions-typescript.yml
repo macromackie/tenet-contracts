@@ -1,0 +1,8 @@
+---
+"id": "argument-object-functions-typescript"
+"invalid":
+  - "queue({ onEvent: (event) => recordEvent({ event }) });"
+"valid":
+  - "const record: EventSink = (event) => recordEvent({ event }); queue({ onEvent: record });"
+  - "events.map((event) => recordEvent({ event }));"
+...

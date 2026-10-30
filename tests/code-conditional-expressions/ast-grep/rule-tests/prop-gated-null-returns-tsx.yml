@@ -1,0 +1,7 @@
+---
+"id": "prop-gated-null-returns-tsx"
+"invalid":
+  - "function Receipt({ visible }: ReceiptProps) { if (!visible) { return null; } return <section>Paid</section>; }"
+"valid":
+  - "function Invoice({ visible }: InvoiceProps) { return <section>{visible && <Receipt />}</section>; }"
+...

@@ -1,0 +1,9 @@
+---
+"id": "type-parameter-names-python"
+"invalid":
+  - "def read_first[T](rows: list[T]) -> T:\n    return rows[0]"
+  - "T = TypeVar('T')"
+"valid":
+  - "def read_first[Row](rows: list[Row]) -> Row:\n    return rows[0]"
+  - "Row = TypeVar('Row')"
+...

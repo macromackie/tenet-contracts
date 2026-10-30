@@ -1,0 +1,8 @@
+---
+"id": "lookup-names-python"
+"invalid":
+  - "def get_invoice(invoice_id: str) -> Invoice:\n    return invoices[invoice_id]"
+"valid":
+  - "def read_invoice(invoice_id: str) -> Invoice:\n    return invoices[invoice_id]"
+  - "invoice = invoices.get(invoice_id)"
+...

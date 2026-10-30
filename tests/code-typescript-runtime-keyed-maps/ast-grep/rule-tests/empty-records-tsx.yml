@@ -1,0 +1,7 @@
+---
+"id": "empty-records-tsx"
+"invalid":
+  - "const totals: Record<string, number> = {};"
+"valid":
+  - "const totals = new Map<string, number>();"
+...

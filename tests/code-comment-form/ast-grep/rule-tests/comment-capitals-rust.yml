@@ -1,0 +1,7 @@
+---
+"id": "comment-capitals-rust"
+"invalid":
+  - "fn read_invoice() {\n    // read the stored invoice.\n    read_record();\n}\n"
+"valid":
+  - "fn read_invoice() {\n    // Read the stored invoice.\n    read_record();\n}\n"
+...

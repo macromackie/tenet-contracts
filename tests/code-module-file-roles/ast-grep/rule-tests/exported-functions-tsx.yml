@@ -1,0 +1,9 @@
+---
+"id": "exported-functions-tsx"
+"invalid":
+  - "export function readOrder() {}\nexport function settleOrder() {}"
+  - "export const readOrder = () => order, settleOrder = () => receipt;"
+"valid":
+  - "export function readOrder() {}\nfunction settleOrder() {}"
+  - "export function readOrder() {}\nexport function generateMetadata() {}"
+...

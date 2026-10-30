@@ -1,0 +1,9 @@
+---
+"id": "promise-waits-typescript"
+"invalid":
+  - "const wait = new Promise(complete);"
+  - "const invoices = await Promise.all(requests);"
+"valid":
+  - "const wait = Effect.callback(complete);"
+  - "const invoices = yield* Effect.forEach(requests, readInvoice, { concurrency: REQUEST_CONCURRENCY });"
+...

@@ -1,0 +1,10 @@
+---
+"id": "effect-concurrency-tsx"
+"invalid":
+  - "const reminders = Effect.forEach(invoices, sendInvoice);"
+  - "const reminders = Effect.forEach(invoices, sendInvoice, { concurrency: 'unbounded' });"
+  - "const batch = Effect.all(reminders);"
+"valid":
+  - "const reminders = Effect.forEach(invoices, sendInvoice, { concurrency: REMINDER_CONCURRENCY });"
+  - "const details = Effect.all({ account, invoice });"
+...

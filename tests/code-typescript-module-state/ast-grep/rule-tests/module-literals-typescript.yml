@@ -1,0 +1,7 @@
+---
+"id": "module-literals-typescript"
+"invalid":
+  - "const labels = { paid: \"Paid\" };"
+"valid":
+  - "const labels = { paid: \"Paid\" } as const;"
+...

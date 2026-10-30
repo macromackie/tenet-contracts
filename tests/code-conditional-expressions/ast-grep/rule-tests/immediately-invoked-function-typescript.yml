@@ -1,0 +1,8 @@
+---
+"id": "immediately-invoked-function-typescript"
+"invalid":
+  - "const order = (() => readOrder())();"
+"valid":
+  - "const order = readOrder();"
+  - "(() => closeOrder())();"
+...

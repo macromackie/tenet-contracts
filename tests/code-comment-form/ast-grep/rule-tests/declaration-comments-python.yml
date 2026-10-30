@@ -1,0 +1,8 @@
+---
+"id": "declaration-comments-python"
+"invalid":
+  - "# Opens a connection that no workflow sleep may hold.\ndef open_connection(pool: Pool) -> Connection:\n    return pool.connect()"
+"valid":
+  - "def open_connection(pool: Pool) -> Connection:\n    \"\"\"Opens a connection that no workflow sleep may hold.\"\"\"\n    return pool.connect()"
+  - "MAX_ATTEMPTS = 3\n\"\"\"The provider limits each job to three attempts.\"\"\""
+...

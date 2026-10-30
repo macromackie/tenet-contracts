@@ -1,0 +1,8 @@
+---
+"id": "immediately-invoked-function-tsx"
+"invalid":
+  - "const order = (() => readOrder())();"
+"valid":
+  - "const order = readOrder();"
+  - "(() => closeOrder())();"
+...

@@ -1,0 +1,9 @@
+---
+"id": "diagnostic-case-python"
+"invalid":
+  - "raise ValueError('Cannot read \"invoices/7.json\"')"
+  - "sys.exit('Commit or stash every change first.')"
+"valid":
+  - "raise ValueError('read \"invoices/7.json\": no such file')"
+  - "raise ValueError('OrderStore.settle refused invoice \"7\": the invoice is closed')"
+...

@@ -1,0 +1,8 @@
+---
+"ruleDirs":
+  - "../../../contracts/telemetry-application-tracing/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+"utilDirs":
+  - "../../../contracts/telemetry-application-tracing/assets/ast-grep/utils"
+...

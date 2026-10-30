@@ -1,0 +1,7 @@
+---
+"id": "exported-functions-javascript"
+"invalid":
+  - "export function importInvoices() { return invoices; }\nexport function parseLines() { return lines; }"
+"valid":
+  - "export function importInvoices() { return parseLines(); }\nfunction parseLines() { return lines; }"
+...

@@ -1,0 +1,7 @@
+---
+"id": "function-verbs-rust"
+"invalid":
+  - "fn invoice() {}\n"
+"valid":
+  - "fn read_invoice() {}\n"
+...

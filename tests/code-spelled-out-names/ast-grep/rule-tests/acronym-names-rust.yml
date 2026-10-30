@@ -1,0 +1,7 @@
+---
+"id": "acronym-names-rust"
+"invalid":
+  - "struct HTTPClient;\n"
+"valid":
+  - "struct HttpClient;\n"
+...

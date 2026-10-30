@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "typescript(ban-ts-comment)",
+  "valid": "export const invoice = 1;\n",
+  "invalid": "// @ts-ignore\nexport const invoice = 1;\n"
+}

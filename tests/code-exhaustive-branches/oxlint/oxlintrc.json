@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "typescript(switch-exhaustiveness-check)",
+  "valid": "export function readAmount(kind: \"paid\" | \"pending\"): number {\n switch (kind) { case \"paid\": { return 1; } case \"pending\": { return 0; } }\n}\n",
+  "invalid": "export function readAmount(kind: \"paid\" | \"pending\"): number {\n switch (kind) { case \"paid\": { return 1; } }\n return 0;\n}\n"
+}

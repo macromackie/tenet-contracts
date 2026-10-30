@@ -1,0 +1,7 @@
+---
+"id": "computed-key-writes-typescript"
+"invalid":
+  - "function writeTotal({ record, key, value }: WriteTotalInput) { record[key] = value; }"
+"valid":
+  - "function writeTotal({ totals, key, value }: WriteTotalInput) { totals.set(key, value); }"
+...

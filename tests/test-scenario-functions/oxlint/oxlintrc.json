@@ -1,0 +1,6 @@
+{
+  "filename": "source.test.ts",
+  "invalid": "import { expect, test } from \"vitest\";\ntest(\"settles an invoice\", () => { expect(1).toBe(1); });\n",
+  "rule": "vitest(require-top-level-describe)",
+  "valid": "import { describe, expect, test } from \"vitest\";\ndescribe(\"invoice settlement\", () => { test(\"settles an invoice\", () => { expect(1).toBe(1); }); });\n"
+}

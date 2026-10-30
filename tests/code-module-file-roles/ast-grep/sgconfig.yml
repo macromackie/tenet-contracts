@@ -1,0 +1,8 @@
+---
+"ruleDirs":
+  - "../../../contracts/code-module-file-roles/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+"utilDirs":
+  - "../../../contracts/code-module-file-roles/assets/ast-grep/utils"
+...

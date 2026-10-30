@@ -1,0 +1,7 @@
+---
+"id": "license-notices-rust"
+"invalid":
+  - "// Copyright 2026 Example\nfn read_invoice() {}\n"
+"valid":
+  - "/// Read an invoice.\nfn read_invoice() {}\n"
+...

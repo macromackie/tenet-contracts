@@ -1,0 +1,9 @@
+---
+"id": "import-extensions-tsx"
+"invalid":
+  - "import { readInvoice } from './invoice';"
+  - "export { readInvoice } from './invoice.js';"
+"valid":
+  - "import { readInvoice } from './invoice.ts';"
+  - "import styles from './theme.css';"
+...

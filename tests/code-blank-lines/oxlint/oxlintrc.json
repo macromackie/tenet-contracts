@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "@stylistic(padding-line-between-statements)",
+  "valid": "export function readAmount(amount: number): number {\n  const total = amount;\n\n  return total;\n}\n",
+  "invalid": "export function readAmount(amount: number): number {\n  const total = amount;\n  return total;\n}\n"
+}

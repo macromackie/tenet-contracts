@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "invalid": "export function readInvoice() { return \"invoice\"; }\n",
+  "rule": "typescript(explicit-module-boundary-types)",
+  "valid": "export function readInvoice(): string { return \"invoice\"; }\n"
+}

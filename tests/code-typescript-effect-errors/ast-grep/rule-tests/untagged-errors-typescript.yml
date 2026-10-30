@@ -1,5 +1,4 @@
 ---
-# Each case comes from a Violation or Allowed line of code-typescript-effect-errors.
 "id": "untagged-errors-typescript"
 "invalid":
   - "throw new Error('the payment provider refused the refund');"

@@ -1,0 +1,7 @@
+---
+"id": "diagnostic-values-rust"
+"invalid":
+  - "fn read_invoice(invoice_id: &str) { bail!(\"invoice {invoice_id} was not found\"); }\n"
+"valid":
+  - "fn read_invoice(invoice_id: &str) { bail!(\"invoice {invoice_id:?} was not found\"); }\n"
+...

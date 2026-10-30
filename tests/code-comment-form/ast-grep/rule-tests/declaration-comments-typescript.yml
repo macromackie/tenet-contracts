@@ -1,0 +1,8 @@
+---
+"id": "declaration-comments-typescript"
+"invalid":
+  - "// The order identifier.\nconst ORDER_ID = \"order\";"
+"valid":
+  - "/** The order identifier. */\nconst ORDER_ID = \"order\";"
+  - "function readOrder() { // Keep the original order.\nreturn order; }"
+...

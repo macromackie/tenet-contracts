@@ -1,0 +1,7 @@
+---
+"id": "untagged-errors-tsx"
+"invalid":
+  - "throw new Error('the payment provider refused the refund');"
+"valid":
+  - "throw new InvoiceMissing({ invoice });"
+...

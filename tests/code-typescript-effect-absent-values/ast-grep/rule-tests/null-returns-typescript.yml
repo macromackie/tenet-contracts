@@ -1,0 +1,9 @@
+---
+"id": "null-returns-typescript"
+"invalid":
+  - "function readInvoice() { return null; }"
+  - "const readInvoice = () => null;"
+"valid":
+  - "function readInvoice() { return Option.none(); }"
+  - "function InvoiceView(): ReactNode { return null; }"
+...

@@ -1,0 +1,9 @@
+---
+"id": "body-field-defaults-tsx"
+"invalid":
+  - "function poll({ intervalMs }: PollInput) { return intervalMs ?? POLL_MS; }"
+  - "function poll(input: PollInput) { return input.intervalMs ?? POLL_MS; }"
+"valid":
+  - "function poll({ intervalMs = POLL_MS }: PollInput) { return intervalMs; }"
+  - "invoices.map((invoice) => invoice.note ?? \"untitled\");"
+...

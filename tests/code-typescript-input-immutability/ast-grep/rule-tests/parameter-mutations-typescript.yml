@@ -1,5 +1,4 @@
 ---
-# Each case comes from a Violation or Allowed line of code-typescript-input-immutability.
 "id": "parameter-mutations-typescript"
 "invalid":
   - "function addLine({ order, line }: AddLineInput) { order.lines.push(line); }"

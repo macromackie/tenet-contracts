@@ -1,0 +1,8 @@
+---
+"id": "array-generics-typescript"
+"invalid":
+  - "type Invoices = Array<Invoice>;"
+  - "type Invoices = ReadonlyArray<Invoice>;"
+"valid":
+  - "type Invoices = readonly Invoice[];"
+...

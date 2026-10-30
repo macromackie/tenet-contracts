@@ -1,0 +1,7 @@
+---
+"id": "complementary-markup-children-tsx"
+"invalid":
+  - "function InvoiceStatus({ paid }: InvoiceStatusProps) { return <section>{paid && <Receipt />}{!paid && <Payment />}</section>; }"
+"valid":
+  - "function InvoiceStatus({ paid }: InvoiceStatusProps) { if (paid) { return <Receipt />; } return <Payment />; }"
+...

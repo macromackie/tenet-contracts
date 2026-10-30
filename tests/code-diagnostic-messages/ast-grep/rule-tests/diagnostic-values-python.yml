@@ -1,0 +1,9 @@
+---
+"id": "diagnostic-values-python"
+"invalid":
+  - "raise ValueError(f\"read invoice {path}\")"
+  - "raise ValueError(f\"read invoice {path!s}\")"
+"valid":
+  - "raise ValueError(f\"read invoice {path!r}: {error!s}\")"
+  - "raise ValueError(f\"read invoice {path!r}\")"
+...

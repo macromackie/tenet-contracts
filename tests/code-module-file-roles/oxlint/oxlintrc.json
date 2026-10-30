@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "eslint(max-classes-per-file)",
+  "valid": "export class Invoice {}\n",
+  "invalid": "export class Invoice {}\nexport class Account {}\n"
+}

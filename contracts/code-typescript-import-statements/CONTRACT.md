@@ -29,7 +29,9 @@ Import each module specifier in exactly one statement, merging its type and valu
 Declare the namespace libraries in the repository's lint configuration, where the shipped list is empty, and list only a package whose own documentation imports it as one namespace.
 Write no namespace import of a module off that list, such as `import * as totals from './totals.ts'`, and import each name the file uses instead.
 Import a runtime built-in module's names by name too, never through its default export, which is the whole module, such as `import { readFile } from 'node:fs/promises'`.
-Import each test runner function a test calls, such as `expect`, by name from the runner's module, never as a global or from the runtime's test or assertion module.
+Import each test runner function a test calls, such as `expect` or `test`, by name from the runner the repository declares, never as a global.
+When the runtime supplies that runner, import its test functions by name and its strict assertion function as `import { strict as assert } from 'node:assert'`.
+When a separate runner supplies both test and assertion functions, import them from that runner and load the separate-runner configuration under `assets/` to reject the runtime's test and assertion modules.
 Outside tests, import the runtime's assertion module only as `import { strict as assert } from 'node:assert'`, so that each call names the strict module, such as `assert.equal(total, expectedTotal)`.
 Import a listed library only as one namespace, never by name, so that each call names its library, such as `chartKit.drawChart()`.
 Name that namespace the camelCase form of the package's name without its scope, such as `import * as chartKit from '@acme/chart-kit'`, and never give it another name.
@@ -49,7 +51,7 @@ Allowed: `orders/export.test.ts` opens by importing `describe`, `expect`, and `t
 Run the repository's formatter check from the repository root, and confirm that it fails on `./totals.ts` above `node:path` and on a blank line between groups.
 Run the repository's lint from the repository root, and confirm it fails on an unmarked type-only name, a statement of only inline `type` names, and a module imported twice.
 Run the lint and `assets/` rules from the repository root, confirming failures on an unlisted namespace import, a listed library imported by name, and a misnamed namespace.
-Run the lint and `assets/` rules from the repository root, confirming failures on a built-in default import, globals, `node:test`, and `node:assert` in tests, `node:assert/strict` in scripts, and late imports.
+Run the lint and `assets/` rules from the repository root, confirming failures on a built-in default import, globals, runtime test and assertion imports when a separate runner is declared, `node:assert/strict`, and late imports.
 For each side-effect import a change adds or moves, does it sit where its effect must run, first in its block when every other module depends on it?
 Does one blank line separate each file comment a change adds from the first import below it?
 For each library a change adds to the namespace list, does that library's own documentation import it as one namespace?

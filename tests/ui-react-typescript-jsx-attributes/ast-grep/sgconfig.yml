@@ -1,0 +1,8 @@
+---
+"ruleDirs":
+  - "../../../contracts/ui-react-typescript-jsx-attributes/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+"utilDirs":
+  - "../../../contracts/ui-react-typescript-jsx-attributes/assets/ast-grep/utils"
+...

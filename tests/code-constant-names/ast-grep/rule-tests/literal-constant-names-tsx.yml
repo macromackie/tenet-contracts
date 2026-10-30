@@ -1,0 +1,9 @@
+---
+"id": "literal-constant-names-tsx"
+"invalid":
+  - "const maxAttempts = 4;"
+  - "export const routeName = \"orders\";"
+"valid":
+  - "const MAX_ATTEMPTS = 4;"
+  - "function readLimit() { const maxAttempts = 4; return maxAttempts; }"
+...

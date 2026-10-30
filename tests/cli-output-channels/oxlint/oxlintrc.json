@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "eslint(no-console)",
+  "valid": "export function report(line: string): string { return line; }\n",
+  "invalid": "console.log(\"ready\");\n"
+}

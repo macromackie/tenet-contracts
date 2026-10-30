@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "jsdoc-js(require-jsdoc)",
+  "valid": "/** Read the invoice amount. */\nexport function readAmount(): number { return 1; }\n",
+  "invalid": "export function readAmount(): number { return 1; }\n"
+}

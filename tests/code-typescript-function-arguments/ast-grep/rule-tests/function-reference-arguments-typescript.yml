@@ -1,0 +1,9 @@
+---
+"id": "function-reference-arguments-typescript"
+"invalid":
+  - "orders.map(createReceipt);"
+  - "function sendReminder() {} retry(sendReminder);"
+"valid":
+  - "orders.map((order) => createReceipt({ order }));"
+  - "function sendReminder() {} retry(() => sendReminder());"
+...

@@ -1,0 +1,7 @@
+---
+"id": "error-implementations-rust"
+"invalid":
+  - "struct InvoiceError;\nimpl std::error::Error for InvoiceError {}\n"
+"valid":
+  - "#[derive(Debug, thiserror::Error)]\n#[error(\"invoice is closed\")]\nstruct InvoiceError;\n"
+...

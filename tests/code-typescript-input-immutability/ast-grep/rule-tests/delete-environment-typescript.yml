@@ -1,0 +1,7 @@
+---
+"id": "delete-environment-typescript"
+"invalid":
+  - "delete process.env.TOKEN;"
+"valid":
+  - "const { TOKEN, ...inherited } = environment;"
+...

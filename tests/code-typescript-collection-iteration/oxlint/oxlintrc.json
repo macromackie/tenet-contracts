@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "typescript(prefer-for-of)",
+  "valid": "export function readAmount(amounts: number[]): number { let total = 0; for (const amount of amounts) { total += amount; } return total; }\n",
+  "invalid": "export function readAmount(amounts: number[]): number { let total = 0; for (let index = 0; index < amounts.length; index += 1) { total += amounts[index]; } return total; }\n"
+}

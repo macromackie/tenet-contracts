@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "invalid": "export type Invoices = ReadonlyArray<string>;\n",
+  "rule": "typescript(array-type)",
+  "valid": "export type Invoices = readonly string[];\n"
+}

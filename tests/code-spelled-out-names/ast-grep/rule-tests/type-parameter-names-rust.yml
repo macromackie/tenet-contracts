@@ -1,0 +1,7 @@
+---
+"id": "type-parameter-names-rust"
+"invalid":
+  - "fn read_invoice<T>(invoice: T) {}\n"
+"valid":
+  - "fn read_invoice<Invoice>(invoice: Invoice) {}\n"
+...

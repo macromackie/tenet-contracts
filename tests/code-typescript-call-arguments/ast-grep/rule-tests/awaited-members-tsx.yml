@@ -1,0 +1,7 @@
+---
+"id": "awaited-members-tsx"
+"invalid":
+  - "function* readTotal() { return (yield* readInvoice({ id })).total; }"
+"valid":
+  - "function* readTotal() { const invoice = yield* readInvoice({ id }); return invoice.total; }"
+...

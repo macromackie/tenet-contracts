@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "invalid": "export function isEqual(value: unknown): boolean { return value == 1; }\n",
+  "rule": "eslint(eqeqeq)",
+  "valid": "export function isEqual(value: unknown): boolean { return value === 1; }\n"
+}

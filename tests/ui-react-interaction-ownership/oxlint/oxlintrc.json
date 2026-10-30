@@ -1,0 +1,6 @@
+{
+  "filename": "source.tsx",
+  "invalid": "export function InvoiceList({ invoices }: { invoices: readonly { id: string }[] }) { return <ul>{invoices.map((invoice, index) => <li key={index}>{invoice.id}</li>)}</ul>; }\n",
+  "rule": "react(no-array-index-key)",
+  "valid": "export function InvoiceList({ invoices }: { invoices: readonly { id: string }[] }) { return <ul>{invoices.map((invoice) => <li key={invoice.id}>{invoice.id}</li>)}</ul>; }\n"
+}

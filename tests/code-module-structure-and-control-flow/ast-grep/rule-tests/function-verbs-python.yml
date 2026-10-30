@@ -1,0 +1,8 @@
+---
+"id": "function-verbs-python"
+"invalid":
+  - "def total(invoice: Invoice) -> int:\n    return sum(line.amount for line in invoice.lines)"
+"valid":
+  - "def compute_total(invoice: Invoice) -> int:\n    return sum(line.amount for line in invoice.lines)"
+  - "@property\ndef total(self) -> int:\n    return self.amount"
+...

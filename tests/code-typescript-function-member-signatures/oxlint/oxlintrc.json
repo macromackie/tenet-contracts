@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "invalid": "export type Invoice = { settle(): void };\n",
+  "rule": "typescript(method-signature-style)",
+  "valid": "export type Invoice = { settle: () => void };\n"
+}

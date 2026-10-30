@@ -1,0 +1,7 @@
+---
+"id": "variant-style-comparisons-tsx"
+"invalid":
+  - "stylex.props(tone === 'positive' && styles.positive);"
+"valid":
+  - "stylex.props(toneStyles[tone]);"
+...

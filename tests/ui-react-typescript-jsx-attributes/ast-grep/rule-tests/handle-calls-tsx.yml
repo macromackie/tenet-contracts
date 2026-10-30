@@ -1,0 +1,7 @@
+---
+"id": "handle-calls-tsx"
+"invalid":
+  - "const receipt = <button onClick={() => handleSave({ invoice })}>Save</button>;"
+"valid":
+  - "const receipt = <button onClick={() => saveInvoice({ invoice })}>Save</button>;"
+...

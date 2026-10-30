@@ -1,0 +1,6 @@
+{
+  "filename": "source.test.ts",
+  "rule": "vitest(consistent-test-it)",
+  "valid": "import { expect, test } from 'vitest';\ntest('reads an invoice', () => { expect(true).toBe(true); });\n",
+  "invalid": "import { expect, it } from 'vitest';\nit('reads an invoice', () => { expect(true).toBe(true); });\n"
+}

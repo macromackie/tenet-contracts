@@ -92,6 +92,8 @@ UPGRADING_HEADING = "\n### Upgrading\n"
 ROLLBACK_COMMAND = "tenet contracts update --ref"
 RULE_FILES = "contracts/*/assets/ast-grep/*/*.yml"
 """The rule and utility files of each ast-grep rule set, which its sgconfig.yml loads."""
+GENERATED_DEPENDENCY_FOLDER = "node_modules"
+"""Installed third-party packages, excluded from library document checks."""
 RULE_TESTS = "*/ast-grep/rule-tests/*.yml"
 """The ast-grep case files of each contract's tests/ folder."""
 RULE_ID = re.compile(
@@ -170,6 +172,8 @@ def check_markdown_files(*, root: Path) -> list[str]:
     return [
         error
         for path in sorted(root.rglob("*.md"))
+        # Installed dependencies are generated third-party inputs, not library documents.
+        if GENERATED_DEPENDENCY_FOLDER not in path.relative_to(root).parts
         for number, line in enumerate(path.read_text(encoding="utf-8").split("\n"), start=1)
         for error in check_markdown_line(place=f"{path.relative_to(root)}:{number}", line=line)
     ]

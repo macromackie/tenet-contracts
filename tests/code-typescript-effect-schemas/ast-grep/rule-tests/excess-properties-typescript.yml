@@ -1,0 +1,9 @@
+---
+"id": "excess-properties-typescript"
+"invalid":
+  - "const readInvoice = Schema.decodeUnknownEffect(Invoice);"
+  - "const readInvoice = Schema.decodeUnknownEffect(Invoice, { onExcessProperty: 'ignore' });"
+"valid":
+  - "const readInvoice = Schema.decodeUnknownEffect(Invoice, { onExcessProperty: 'error' });"
+  - "const adapter = Schema.toStandardSchemaV1(Invoice, { parseOptions: { onExcessProperty: 'error' } });"
+...

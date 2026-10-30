@@ -1,0 +1,7 @@
+---
+"id": "key-loops-typescript"
+"invalid":
+  - "for (const currency in rates) { recordRate({ currency }); }"
+"valid":
+  - "for (const [currency, rate] of Object.entries(rates)) { recordRate({ currency, rate }); }"
+...

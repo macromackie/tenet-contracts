@@ -1,0 +1,7 @@
+---
+"id": "error-downcasts-rust"
+"invalid":
+  - "fn read_invoice(error: anyhow::Error) {\n    let invoice_error = error.downcast_ref::<InvoiceError>();\n}\n"
+"valid":
+  - "fn read_invoice(error: InvoiceError) {\n    match error { InvoiceError::Closed => close_invoice() }\n}\n"
+...

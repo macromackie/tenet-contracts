@@ -1,0 +1,6 @@
+{
+  "filename": "source.test.ts",
+  "invalid": "import { test } from \"node:test\";\nexport { test };\n",
+  "rule": "eslint(no-restricted-imports)",
+  "valid": "import { expect, test } from \"vitest\";\nexport { expect, test };\n"
+}

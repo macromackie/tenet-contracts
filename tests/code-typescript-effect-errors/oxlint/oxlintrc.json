@@ -1,0 +1,6 @@
+{
+  "filename": "source.ts",
+  "rule": "eslint(no-throw-literal)",
+  "valid": "export function rejectInvoice(): never { throw new Error(\"invoice missing\"); }\n",
+  "invalid": "export function rejectInvoice(): never { throw \"invoice missing\"; }\n"
+}

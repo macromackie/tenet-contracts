@@ -1,0 +1,7 @@
+---
+"id": "error-displays-rust"
+"invalid":
+  - "#[derive(Debug, thiserror::Error)]\nstruct InvoiceError;\nimpl std::fmt::Display for InvoiceError {\n    fn fmt(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {\n        write!(formatter, \"invoice is closed\")\n    }\n}\n"
+"valid":
+  - "#[derive(Debug, thiserror::Error)]\n#[error(\"invoice is closed\")]\nstruct InvoiceError;\n"
+...

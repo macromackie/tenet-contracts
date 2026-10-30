@@ -1,0 +1,9 @@
+---
+"id": "promise-chains-typescript"
+"invalid":
+  - "readInvoice().then(readTotal);"
+  - "readInvoice().finally(releaseInvoice);"
+"valid":
+  - "const invoice = await readInvoice();"
+  - "try { await readInvoice(); } finally { releaseInvoice(); }"
+...

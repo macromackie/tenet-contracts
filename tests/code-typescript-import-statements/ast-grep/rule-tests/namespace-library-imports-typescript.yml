@@ -1,0 +1,8 @@
+---
+"id": "namespace-library-imports-typescript"
+"invalid":
+  - "import { createChart } from '@acme/chart-kit';"
+"valid":
+  - "import { parseInvoice } from '@acme/invoices';"
+  - "import * as chartKit from '@acme/chart-kit';"
+...

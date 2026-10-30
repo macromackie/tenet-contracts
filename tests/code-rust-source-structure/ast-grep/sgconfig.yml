@@ -1,0 +1,6 @@
+---
+"ruleDirs":
+  - "../../../contracts/code-rust-source-structure/assets/ast-grep/rules"
+"testConfigs":
+  - "testDir": "rule-tests"
+...

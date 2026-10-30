@@ -1,0 +1,10 @@
+---
+"id": "schema-types-tsx"
+"invalid":
+  - "type InvoiceRecord = typeof Invoice.Type;"
+  - "function readInvoice(input: typeof Invoice.Type) { return input; }"
+  - "type Invoice = Schema.Schema.Type<typeof Invoice>;"
+"valid":
+  - "type Invoice = typeof Invoice.Type;"
+  - "function readInvoice(input: Invoice) { return input; }"
+...
