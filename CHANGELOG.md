@@ -7,6 +7,19 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 because `tenet contracts update` without `--ref` moves straight to the newest release. Tenet 0.11.0 installs every
 release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v13.0.1
+
+### Upgrading
+
+With installed copies committed, run `tenet contracts update --ref v13.0.1`. The package boundary checker ships
+with `code-dependency-boundaries`; follow its usage instructions to declare the repository's package inventory
+and run the existing dependency requirements as part of the repository's checks.
+
+### Clarified
+
+- `code-dependency-boundaries`: ship the package inventory and dependency checker with an explicit policy schema,
+  native workspace metadata, and resolved source imports. The dependency, cycle, and test-only requirements are unchanged.
+
 ## v13.0.0
 
 ### Upgrading

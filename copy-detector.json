@@ -2,7 +2,13 @@
   "detectorVersion": "5.4.2",
   "minTokens": 50,
   "minLines": 5,
-  "sourceRoots": ["contracts", "scripts", "skills", "tests/code-lint-strictness/typescript/src"],
+  "sourceRoots": [
+    "contracts",
+    "scripts",
+    "skills",
+    "tests/code-lint-strictness/typescript/src",
+    "tests/code-dependency-boundaries/uv"
+  ],
   "sourceFiles": [],
   "formats": {
     "bash": [".sh"],

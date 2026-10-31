@@ -1,6 +1,7 @@
 ---
 name: code-dependency-boundaries
 message: Declare which packages each package may depend on once, in configuration that checks enforce, and keep that declaration acyclic and exact.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -15,6 +16,7 @@ Keep the declaration acyclic, directly and through intermediate packages.
 Count every declared edge toward acyclicity except an edge through which only tests reach a test support package that `test-support-modules` requires.
 Mark each such edge as test-only in the declaration, so that checks fail when production code uses it.
 Allow a new internal dependency only by adding it to the declaration, never by suppressing a finding.
+A repository may use the checker under `assets/`, whose policy names the package inventory, each package's ownership, allowed edges, and test-only edges explicitly.
 
 Violation: the `ledger` package adds `invoices` to its manifest to reuse the `Amount` type, while the declaration lists `ledger` as a dependency of `invoices`.
 Allowed: `Amount` moves into `ledger`, which `invoices` already depends on, and the declaration is unchanged.
@@ -22,5 +24,6 @@ Allowed: `Amount` moves into `ledger`, which `invoices` already depends on, and 
 ## Checks
 
 Run the repository's checks from the workspace root, and confirm that they read the declared configuration file and fail on an undeclared internal dependency.
+For the shipped checker, follow its usage instructions under `assets/`, declare the repository's package policy, and run it from the repository root.
 For each edge a change adds to the declaration, does it point from the composing package to the package it builds on, as the ownership statements say?
 Should the change have moved the shared code into the lower package instead of adding the edge?

@@ -1,7 +1,12 @@
 # The library's scripts, the scripts its skills ship, and the guidance check that contract-maintenance ships take the
 # strictest ruff settings that code-lint-strictness ships.
 extend = "contracts/code-lint-strictness/assets/ruff/ruff.toml"
-include = ["scripts/*.py", "skills/*/scripts/*.py", "contracts/*/assets/uv/**/*.py"]
+include = [
+  "scripts/*.py",
+  "skills/*/scripts/*.py",
+  "contracts/*/assets/uv/**/*.py",
+  "tests/*/uv/*.py",
+]
 line-length = 100
 src = ["scripts"]
 target-version = "py314"
@@ -13,6 +18,8 @@ target-version = "py314"
 "skills/*/scripts/*.py" = ["implicit-namespace-package"]
 # C: same as the scripts above.
 "contracts/*/assets/uv/*.py" = ["implicit-namespace-package"]
+# C: these standalone test runners use the same script layout.
+"tests/*/uv/*.py" = ["implicit-namespace-package"]
 # Q: cli-output-channels has the output module write the standard streams and end the process.
 "scripts/output.py" = ["banned-api", "print"]
 # Q: same as `scripts/output.py`.

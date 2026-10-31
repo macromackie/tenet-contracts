@@ -58,7 +58,21 @@ RUST_MODULE_CHECK = "contracts/code-rust-module-boundaries/assets/uv"
 """The syntax-tree module checker that code-rust-module-boundaries ships."""
 CLONE_CHECK = "contracts/code-duplicated-blocks/assets/uv"
 """The pinned clone detector adapter that code-duplicated-blocks ships."""
-PYTHON_RESOURCES = (RELEASE_SCRIPTS, GUIDANCE_CHECK, LAYOUT_CHECK, RUST_MODULE_CHECK, CLONE_CHECK)
+PACKAGE_CHECK = "contracts/code-dependency-boundaries/assets/uv"
+"""The native package inventory and resolved dependency checker."""
+PACKAGE_TOOLS = "contracts/code-dependency-boundaries/assets/npm"
+"""The package checker's locked source resolver and syntax parser."""
+PACKAGE_CASES = "tests/code-dependency-boundaries/uv"
+"""The native package-boundary cases that protect the shared checker's failures."""
+PYTHON_RESOURCES = (
+    RELEASE_SCRIPTS,
+    GUIDANCE_CHECK,
+    LAYOUT_CHECK,
+    RUST_MODULE_CHECK,
+    CLONE_CHECK,
+    PACKAGE_CHECK,
+    PACKAGE_CASES,
+)
 """The Python scripts that a skill or a contract ships."""
 VERSION_COMMANDS = {
     "aqua:ast-grep/ast-grep": ("ast-grep", "--version"),
@@ -81,15 +95,6 @@ VERSION_COMMANDS = {
 """Each pinned tool's command and the arguments that make it print its version."""
 LIBRARY_CHECKS = (
     ("uv", "run", "--script", "scripts/lint-contracts.py"),
-    (
-        "yamllint",
-        "--strict",
-        "--config-file",
-        f"{STRICTNESS}/yamllint/yamllint.yaml",
-        "contracts",
-        ".github",
-        "tests",
-    ),
     (
         "markdownlint-cli2",
         "--config",
@@ -145,12 +150,18 @@ LIBRARY_CHECKS = (
         RUST_MODULE_CHECK,
         "--extra-search-path",
         CLONE_CHECK,
+        "--extra-search-path",
+        PACKAGE_CHECK,
+        "--extra-search-path",
+        PACKAGE_CASES,
         "scripts",
         # The guidance check imports packages that only its own environment installs.
         RELEASE_SCRIPTS,
         LAYOUT_CHECK,
         RUST_MODULE_CHECK,
         CLONE_CHECK,
+        PACKAGE_CHECK,
+        PACKAGE_CASES,
     ),
 )
 """The shipped checkers that run on the library's own files, from the library root."""
@@ -170,7 +181,9 @@ actionlint takes the nearest folder with `.git` and `.github/workflows` as the p
 RULE_SETS = "contracts/*/assets/ast-grep/sgconfig.yml"
 RULE_TESTS = "tests/*/ast-grep/sgconfig.yml"
 OXLINT_FILES = "contracts/*/assets/oxlint/*.json"
-YAML_FILES = ("contracts/**/*.y*ml", "tests/**/*.y*ml")
+YAML_FILES = (".github/**/*.y*ml", "contracts/**/*.y*ml", "tests/**/*.y*ml")
+DEPENDENCY_FOLDER = "node_modules"
+"""Installed third-party packages are checked through their lockfiles, not as library source."""
 OXLINT_LAYERS = "oxlint-layers.json"
 """The configuration this script writes in the snapshot to extend every shipped oxlint file."""
 LAYERING_SETTINGS = "contracts/code-typescript-module-boundaries/assets/oxlint/oxlintrc.json"
@@ -244,9 +257,30 @@ def run_check(*, command: tuple[str, ...], folder: Path, stdout: int | None = No
     return [f"{folder.name}: `{' '.join(command)}` exited with status {finished.returncode}"]
 
 
+def _read_yaml_paths() -> list[Path]:
+    return sorted(
+        path
+        for pattern in YAML_FILES
+        for path in ROOT.glob(pattern)
+        if DEPENDENCY_FOLDER not in path.relative_to(ROOT).parts
+    )
+
+
 def check_library_files() -> list[str]:
     """Run lint-contracts.py, the shipped checkers, and every ast-grep rule set on the library."""
-    toml_files = sorted(str(path.relative_to(ROOT)) for path in ROOT.glob("**/*.toml"))
+    toml_files = sorted(
+        str(path.relative_to(ROOT))
+        for path in ROOT.glob("**/*.toml")
+        if DEPENDENCY_FOLDER not in path.relative_to(ROOT).parts
+    )
+    yaml_files = tuple(str(path.relative_to(ROOT)) for path in _read_yaml_paths())
+    yamllint = (
+        "yamllint",
+        "--strict",
+        "--config-file",
+        f"{STRICTNESS}/yamllint/yamllint.yaml",
+        *yaml_files,
+    )
     taplo = ("taplo", "fmt", "--check", "--config", f"{STRICTNESS}/taplo/taplo.toml", *toml_files)
     scans = [
         (
@@ -268,7 +302,7 @@ def check_library_files() -> list[str]:
 
     return [
         error
-        for command in (*LIBRARY_CHECKS, taplo, *scans, *tests)
+        for command in (*LIBRARY_CHECKS, yamllint, taplo, *scans, *tests)
         for error in run_check(command=command, folder=ROOT)
     ]
 
@@ -332,7 +366,7 @@ def check_rule_coverage() -> list[str]:
 def check_yaml_trees() -> list[str]:
     """Check that each YAML asset and test reads as the same data in YAML 1.1 and YAML 1.2."""
     loader = YAML(typ="safe", pure=True)
-    paths = sorted(path for pattern in YAML_FILES for path in ROOT.glob(pattern))
+    paths = _read_yaml_paths()
 
     return [
         f"{path.relative_to(ROOT)}: quote each scalar that YAML 1.1 and 1.2 read differently"
@@ -440,7 +474,7 @@ def copy_snapshot(*, snapshot: Path) -> None:
     ):
         subprocess.run(command, check=True, cwd=snapshot)
 
-    for folder in (snapshot, snapshot / PROBE, snapshot / ENV_TOOL):
+    for folder in (snapshot, snapshot / PROBE, snapshot / ENV_TOOL, snapshot / PACKAGE_TOOLS):
         subprocess.run(NPM_CI, check=True, cwd=folder)
 
 
@@ -639,6 +673,23 @@ def check_snapshot(*, scratch: Path) -> list[str]:
 
     return [
         *typescript_errors,
+        *run_check(
+            command=(
+                "uv",
+                "run",
+                "--script",
+                f"{PACKAGE_CHECK}/check-package-boundaries.py",
+                "--root",
+                ".",
+                "--config",
+                "package-boundaries.json",
+            ),
+            folder=snapshot,
+        ),
+        *run_check(
+            command=("uv", "run", "--script", f"{PACKAGE_CASES}/check-package-boundaries.py"),
+            folder=snapshot,
+        ),
         *run_check(
             command=("uv", "run", "--script", "scripts/check-oxlint-cases.py"),
             folder=snapshot,
