@@ -1,0 +1,19 @@
+---
+"id": "numeric-exit-statuses-tsx"
+"invalid":
+  - "process.exit(2);"
+  - "exit(-1);"
+  - "process.exitCode = isPassed ? 0 : 1;"
+  - "finish({ status: 1 });"
+  - "async function main(): Promise<ExitStatus> { if (isRefused) { return 2; } return ExitStatus.Succeeded; }"
+  - "const main = (): ExitStatus => 2;"
+  - "function* main(): Generator<never, ExitStatus> { return 2; }"
+  - "const main = (): Effect.Effect<ExitStatus> => Effect.gen(function* () { return 2; });"
+"valid":
+  - "finish({ status: ExitStatus.Refused });"
+  - "export const ExitStatus = { Failed: 1, Refused: 2, Succeeded: 0 } as const;"
+  - "function main(): ExitStatus { const sizes = orders.map((order) => { return 3; }); return ExitStatus.Succeeded; }"
+  - "function main(): ExitStatus { function* countOrders(): Generator<never, number> { return 3; } return ExitStatus.Succeeded; }"
+  - "const main = (): Effect.Effect<ExitStatus> => Effect.gen(function* () { const total = yield* Effect.gen(function* (): Generator<never, number> { return 3; }); return ExitStatus.Succeeded; });"
+  - "reply({ status: 404 });"
+...

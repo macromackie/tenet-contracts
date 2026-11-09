@@ -9,7 +9,7 @@
   It reports one that sits directly above, or beside on the same line, a function, a class, a decorated definition, or an assignment.
   A comment after an assignment that sits above another statement, such as a `for` loop, is not reported.
   A shebang, a coding line, inline script metadata, and a directive that a tool reads, such as `# noqa`, `# type: ignore`, or `# ast-grep-ignore`, keep their own form and are not reported.
-  The reason line directly above a `# ast-grep-ignore` directive, which `code-lint-suppressions` requires, is not reported either.
+  The comment line directly above a `# ast-grep-ignore` directive is not reported either, although `code-lint-suppressions` now takes the reason inside the directive.
 "rule":
   "any":
     - "any":

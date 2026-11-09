@@ -1,0 +1,31 @@
+---
+# code-lint-suppressions: suppress only the reported site, and name each rule the suppression silences and a reason.
+# Tsx variant (.tsx); suppression-forms-typescript.yml is identical except for `id`, `language`, and this line.
+"id": "suppression-forms-tsx"
+"language": "Tsx"
+"message": "Suppress only the reported line, and name each rule and a reason after two hyphens, such as `// oxlint-disable-next-line max-lines-per-function -- the generator writes one case per status code that the provider documents`."
+"note": |
+  The rule reads each comment that starts with a lint directive, an `ast-grep-ignore` directive, or a repository check's directive, which is the check's name followed by `-allow`.
+  A lint directive passes as `oxlint-disable-next-line <rule>, <rule> -- <reason>`, or the same with `oxlint-disable-line`, or with `eslint-` in place of `oxlint-`.
+  A lint directive without `-line`, such as `oxlint-disable` or `oxlint-enable`, covers more than the reported line, so it never passes.
+  An `ast-grep-ignore` directive passes as `ast-grep-ignore: <rule>, <rule> -- <reason>`.
+  A repository check's directive passes as `<check>-allow <rule> -- <reason>`, such as `// layout-allow folder-size -- the generator writes one file per endpoint`.
+  Each directive may open a line comment or a block comment.
+  The compiler's expected-error comment is left to the lint file that `code-typescript-compiler-strictness` ships, and copied-block markers to the checker that `code-duplicated-blocks` ships.
+"rule":
+  "any":
+    - "all":
+        - "regex": '^(?://|/\*)\s*(?:oxlint|eslint)-(?:disable|enable)'
+        - "not":
+            "regex": '^(?://|/\*) (?:oxlint|eslint)-disable-(?:next-)?line [\w@/-]+(?:, [\w@/-]+)* -- \S'
+    - "all":
+        - "regex": '^(?://|/\*)\s*ast-grep-ignore'
+        - "not":
+            "regex": '^(?://|/\*) ast-grep-ignore: [\w-]+(?:, [\w-]+)* -- \S'
+    - "all":
+        - "regex": '^(?://|/\*)\s*[a-z0-9]+(?:-[a-z0-9]+)*-allow\b'
+        - "not":
+            "regex": '^(?://|/\*) [a-z0-9]+(?:-[a-z0-9]+)*-allow [a-z0-9]+(?:-[a-z0-9]+)* -- \S'
+  "kind": "comment"
+"severity": "error"
+...

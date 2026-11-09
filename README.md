@@ -119,7 +119,7 @@ These labels do not establish whole-contract compliance or general model accurac
 | `code-guard-clauses`                         | Leave a block early with a guard instead of nesting its remaining work, and never write an `else` after a branch that leaves.                                                                                                                     | judged with eval      |
 | `code-key-order`                             | Write the keys of every object, struct, and configuration map in code point order, and keep another order only where order is behavior.                                                                                                           | judged and unmeasured |
 | `code-lint-strictness`                       | Run every lint, type checker, compiler, and formatter at its strictest setting, and turn a rule off only for a listed reason named beside its entry.                                                                                              | tool-checked          |
-| `code-lint-suppressions`                     | Suppress a lint or check finding only at the one site it reports, with the rule's name and a reason, and fail checks on every suppression that suppresses nothing.                                                                                | judged with eval      |
+| `code-lint-suppressions`                     | Suppress a lint or check finding only at the one site it reports, with the rule's name and a reason, and fail checks on every suppression that suppresses nothing.                                                                                | tool-checked          |
 | `code-map-and-set-names`                     | End every map's and set's name with a plural noun of what it holds, such as `orders` or `endedStates`, never a participle or adjective.                                                                                                           | tool-checked          |
 | `code-measured-value-names`                  | End the name of every numeric limit, duration, and bound with a declared unit, counted noun, or unitless measure that the repository's lint enforces.                                                                                             | judged with eval      |
 | `code-mise-script-tasks`                     | Make every repository script a mise file task in the `mise-tasks/` folder of the root or package that owns it, and run repository work in CI only through `mise run`.                                                                             | judged and unmeasured |
@@ -352,9 +352,14 @@ releases. Run `uv run --locked --script scripts/check-library.py` before opening
 the tables above list each contract once, under its area, with its message. It then runs the shipped checkers on the
 library, compiles and lints the Effect probe and the env tool, runs the env tool's check with fake values, checks the
 release version, and installs every contract and skill. The Check workflow runs it on each pull request and before each
-release, and installs each contract without assets with Tenet 0.7.0. Test cases for a contract's tool files live in
-`tests/<contract>/<tool>/`, outside the folder that projects install. Accepted changes ship in the next tag and are
+release, and installs each contract without assets with Tenet 0.7.0. Accepted changes ship in the next tag and are
 credited in the changelog.
+
+Each contract ships its ast-grep rules' cases in `assets/ast-grep/rule-tests/`, which its `sgconfig.yml` registers. A
+project can run them with its own utilities by naming that folder under `testConfigs` in its own ast-grep configuration
+and running `ast-grep test --skip-snapshot-tests`. The cases ship without snapshots, and plain `ast-grep test` fails
+every case that has none. Cases for other tools, and cases that need a sample of a list a project declares, live in
+`tests/<contract>/<tool>/`, outside the folder that projects install.
 
 ## Releases
 

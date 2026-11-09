@@ -1,6 +1,7 @@
 ---
 name: code-lint-suppressions
 message: Suppress a lint or check finding only at the one site it reports, with the rule's name and a reason, and fail checks on every suppression that suppresses nothing.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -29,6 +30,7 @@ A path pattern that a contract declares in the lint configuration, such as a set
 Configure every tool to fail on a suppression that no longer suppresses a finding, wherever the tool supports it.
 Make every check that the repository owns fail on its own directive once that directive suppresses nothing.
 Configure the lint to reject a suppression that names no rule or gives no reason, in every directive spelling that the tool honors, wherever a lint rule can decide it.
+Where the repository's lint can load the configuration in this contract's `assets/` folder, load it from the repository's own lint configuration.
 
 Violation: `// lint-disable-next-line -- legacy` above a long function names no rule, and its reason does not say why that function needs the exception.
 Allowed: a directive above a generated function names the function-length rule and gives the reason after a space and two hyphens: `-- the generator writes one case per status code that the provider documents`.
@@ -36,6 +38,7 @@ Allowed: a directive above a generated function names the function-length rule a
 ## Checks
 
 From the repository root, run each lint and check with its unused-suppression setting, and confirm that a stale suppression fails.
+From the repository root, run the lint with this contract's `assets/` configuration, and confirm that it rejects a suppression without a rule's name or a reason.
 For each suppression a change adds, does it sit at the reported site, name each rule it silences, and give a reason that names the system or source that keeps the site from following the rule?
 For a tool that cannot report a stale suppression, does each suppression that a change keeps still cover a finding?
 For each configuration entry or path pattern a change adds or widens, does it name one path with a reason, or scope a rule as a contract declares?

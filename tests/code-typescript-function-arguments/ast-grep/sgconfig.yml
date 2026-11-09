@@ -1,6 +1,0 @@
----
-"ruleDirs":
-  - "../../../contracts/code-typescript-function-arguments/assets/ast-grep/rules"
-"testConfigs":
-  - "testDir": "rule-tests"
-...

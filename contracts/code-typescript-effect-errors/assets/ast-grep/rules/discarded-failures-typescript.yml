@@ -1,0 +1,25 @@
+---
+# code-typescript-effect-errors: pass an expected failure up in the error type or handle it by tag, never discard it.
+# TypeScript variant (.ts, .mts, .cts); discarded-failures-tsx.yml is identical except for `id`, `language`, and this line.
+"id": "discarded-failures-typescript"
+"language": "TypeScript"
+"message": "Pass this failure up in the error type, or handle it by tag with `Effect.catchTag`, instead of discarding it with `Effect.ignore`, `Effect.ignoreCause`, `Effect.option`, or `Effect.orElseSucceed`."
+"note": |
+  The rule reports each reference to `Effect.ignore`, `Effect.ignoreCause`, `Effect.option`, or `Effect.orElseSucceed`.
+  It reports a call, such as `Effect.option(readInvoice({ invoice }))`, and a pipeline step, such as `readInvoice({ invoice }).pipe(Effect.option)`.
+  Each one turns every failure in the error type into a success, so no caller can act on the failure, and `Effect.ignoreCause` drops defects too.
+  A handler that catches every failure, such as `Effect.catch`, is left to review, because the contract allows one that branches on each tag.
+  When a use discards no failure that a caller could act on, suppress the finding at its site, as `code-lint-suppressions` requires.
+  Write `// ast-grep-ignore: <rule id> -- <reason>` on the line above, and name in the reason the system whose failures no caller acts on.
+"rule":
+  "all":
+    - "has":
+        "field": "object"
+        "kind": "identifier"
+        "regex": "^Effect$"
+    - "has":
+        "field": "property"
+        "regex": "^(?:ignore|ignoreCause|option|orElseSucceed)$"
+  "kind": "member_expression"
+"severity": "error"
+...

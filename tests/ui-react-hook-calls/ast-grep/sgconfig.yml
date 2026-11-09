@@ -1,6 +1,0 @@
----
-"ruleDirs":
-  - "../../../contracts/ui-react-hook-calls/assets/ast-grep/rules"
-"testConfigs":
-  - "testDir": "rule-tests"
-...

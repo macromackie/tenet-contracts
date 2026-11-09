@@ -1,0 +1,8 @@
+---
+"id": "discarded-failures-typescript"
+"invalid":
+  - "const invoice = yield* Effect.option(readInvoice({ invoice: number }));"
+  - "yield* sendReceipt({ invoice }).pipe(Effect.ignore);"
+"valid":
+  - "const invoice = yield* readInvoice({ invoice: number }).pipe(Effect.catchTag('InvoiceNotFound', () => Effect.succeed(Option.none())));"
+...

@@ -1,6 +1,0 @@
----
-"ruleDirs":
-  - "../../../contracts/code-module-structure-and-control-flow/assets/ast-grep/rules"
-"testConfigs":
-  - "testDir": "rule-tests"
-...

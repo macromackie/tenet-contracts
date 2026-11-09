@@ -9,7 +9,7 @@
   It reports one that sits directly above such a declaration, member, or export, or beside one on the same line, such as `a: string; // the id`.
   A comment after a declaration that sits above a statement, such as `await main();` or a test registration, is not reported.
   A directive that a tool reads keeps its own form and is not reported, such as `// @ts-expect-error`, a lint suppression, `// ast-grep-ignore`, or a `/// <reference>` line; a license notice is reported by `license-notices-tsx`.
-  The reason line directly above an `// ast-grep-ignore` directive, which `code-lint-suppressions` requires, is not reported either.
+  The comment line directly above an `// ast-grep-ignore` directive is not reported either, although `code-lint-suppressions` now takes the reason inside the directive.
   A comment inside a function body, an object literal, or an array stays a plain line comment and is not reported.
   A comment inside the body of a namespace, a `declare module`, or a `declare global` block is read as at module level.
 "rule":

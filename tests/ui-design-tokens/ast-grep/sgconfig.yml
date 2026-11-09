@@ -1,6 +1,0 @@
----
-"ruleDirs":
-  - "../../../contracts/ui-design-tokens/assets/ast-grep/rules"
-"testConfigs":
-  - "testDir": "rule-tests"
-...

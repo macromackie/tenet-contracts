@@ -1,0 +1,16 @@
+---
+"id": "suppression-forms-python"
+"invalid":
+  - "run([NODE])  # noqa: S607 -- the task puts the pinned runtime first on the path"
+  - "# ruff: noqa"
+  - "# ruff: disable[start-process-with-partial-path] -- the task puts the pinned runtime first on the path"
+  - "run([NODE])  # ruff: ignore[start-process-with-partial-path]"
+  - "total: int = read_total()  # ty: ignore"
+  - "# ast-grep-ignore: predicate-function-names-python"
+  - "# layout-allow folder-size"
+"valid":
+  - "run([NODE])  # ruff: ignore[start-process-with-partial-path] -- the task puts the pinned runtime first on the path"
+  - "total: int = read_total()  # ty: ignore[invalid-assignment, unresolved-attribute] -- the parser's stub declares its result too widely"
+  - "# ast-grep-ignore: predicate-function-names-python -- the hook runner calls the function by this name"
+  - "# layout-allow folder-size -- the generator writes one file per endpoint"
+...

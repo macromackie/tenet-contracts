@@ -1,0 +1,31 @@
+---
+# code-lint-suppressions: suppress only the reported site, and name each rule the suppression silences and a reason.
+# Python variant (.py, .pyi); suppression-forms-typescript.yml and suppression-forms-tsx.yml check the same rules for those languages.
+"id": "suppression-forms-python"
+"language": "Python"
+"message": "Suppress only the reported line, and name each rule and a reason after two hyphens, such as `# ruff: ignore[too-many-statements] -- the generator writes one case per status code that the provider documents`."
+"note": |
+  The rule reads each comment that holds a lint or type-check directive, an `ast-grep-ignore` directive, or a repository check's directive, which is the check's name followed by `-allow`.
+  A lint directive passes as `# ruff: ignore[<rule>, <rule>] -- <reason>`, and a type-check directive as `# ty: ignore[<rule>, <rule>] -- <reason>`.
+  The lint honors `ruff: ignore` in its preview mode, which the lint file that `code-lint-strictness` ships turns on, and that file reports each `noqa` comment.
+  So `noqa` never passes, and neither does a directive that covers more than the reported line, such as `ruff: noqa`, `ruff: file-ignore[...]`, or `ruff: disable[...]`.
+  An `ast-grep-ignore` directive passes as `# ast-grep-ignore: <rule>, <rule> -- <reason>`.
+  A repository check's directive passes as `# <check>-allow <rule> -- <reason>`, such as `# layout-allow folder-size -- the generator writes one file per endpoint`.
+  A `type: ignore` comment is left to the type checker, which `code-lint-strictness` configures to disregard it, and copied-block markers to the checker that `code-duplicated-blocks` ships.
+"rule":
+  "any":
+    - "all":
+        - "regex": '(?i)#\s*noqa\b|#\s*(?:ruff|ty)\s*:'
+        - "not":
+            "regex": '^# (?:ruff|ty): ignore\[[a-z0-9-]+(?:, [a-z0-9-]+)*\] -- \S'
+    - "all":
+        - "regex": '^#\s*ast-grep-ignore'
+        - "not":
+            "regex": '^# ast-grep-ignore: [\w-]+(?:, [\w-]+)* -- \S'
+    - "all":
+        - "regex": '^#\s*[a-z0-9]+(?:-[a-z0-9]+)*-allow\b'
+        - "not":
+            "regex": '^# [a-z0-9]+(?:-[a-z0-9]+)*-allow [a-z0-9]+(?:-[a-z0-9]+)* -- \S'
+  "kind": "comment"
+"severity": "error"
+...

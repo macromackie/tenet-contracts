@@ -3,9 +3,101 @@
 Each release lists every changed contract or skill under one class. A Tightened or Removed entry makes a major
 release, an Added or Loosened entry a minor release, and Clarified entries alone a patch release.
 
-Each major release after v1.0.0 has an `### Upgrading` block. Take one major at a time with the `--ref` it names,
-because `tenet contracts update` without `--ref` moves straight to the newest release. Tenet 0.11.0 installs every
-release, including the tool files that v9.0.0 and later ship under `assets/`.
+Each major release after v1.0.0 has an `### Upgrading` block. Take one major at a time. From Tenet 0.12.0,
+`tenet contracts update` without `--ref` stops at the highest release of the next major, or at the newest release when
+no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
+names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
+
+## v14.0.0
+
+### Upgrading
+
+Use Tenet 0.11.0 or later. With `.tenet.lock` and installed copies committed, run
+`tenet contracts update --ref v14.0.0`.
+
+- No contract was added or removed, and no rule moved between contracts.
+- New assets: `cli-output-channels`, `code-lint-suppressions`, and `code-typescript-effect-errors` ship ast-grep rules
+  under `assets/ast-grep/rules/`. Name each folder under `ruleDirs` in the repository's ast-grep configuration, then
+  fix each report or suppress it with `ast-grep-ignore`, the rule's id, and a reason after `--`. Replace local copies of
+  the same rules with the shipped ones.
+- `code-lint-suppressions` now takes an `ast-grep-ignore` reason inside the directive, as
+  `// ast-grep-ignore: RULE -- REASON` or `# ast-grep-ignore: RULE -- REASON`. Move each reason line that sits above
+  such a directive into it. The `suppression-forms` rules report every directive left in the old form.
+- Moved cases: each contract's ast-grep cases now ship in `assets/ast-grep/rule-tests/`. Run them with
+  `ast-grep test --skip-snapshot-tests --config` and the contract's `sgconfig.yml`. Or name the folder under
+  `testConfigs` in the repository's own configuration and run `ast-grep test --skip-snapshot-tests`, because the cases
+  ship without snapshots and plain `ast-grep test` fails each of them.
+- A repository that writes its own contracts in the library's format moves each structural rule's cases beside the
+  rule, as `library-contract-format` now requires.
+- Roll back with `tenet contracts update --ref v13.0.1`. Each installed asset absent from the older release leaves the
+  lock and makes update exit 1. Remove those unowned files, which include every `assets/ast-grep/rule-tests/` folder
+  and the whole `assets/` folder of `code-lint-suppressions`. Then remove the `ruleDirs` and `testConfigs` entries this
+  release added before rerunning checks.
+
+### Tightened
+
+- `cli-output-channels`: the new `numeric-exit-statuses-typescript` and `numeric-exit-statuses-tsx` ast-grep rules
+  report a number literal written as an exit status. Examples are `process.exit(2)`,
+  `process.exitCode = isPassed ? 0 : 1`, `finish({ status: 1 })`, and `return 2` in a function or generator whose return
+  type names `ExitStatus`. A `function*` body without its own return type, such as an `Effect.gen` body, counts for the
+  function around it. The `ExitStatus` declaration and the output module, `output.ts` or `output.mts`, are exempt, and
+  the contract now names `finish` as the exit function. Before, only Rust code was checked, so a TypeScript program
+  could exit with a bare number. The contract's cases ship beside its rules in `assets/ast-grep/rule-tests/`.
+- `code-lint-suppressions`: the contract now ships its lint and requires Tenet 0.11.0. The new
+  `suppression-forms-typescript`, `suppression-forms-tsx`, and `suppression-forms-python` ast-grep rules report a lint,
+  type-check, `ast-grep-ignore`, or `<check>-allow` directive that names no rule or gives no reason after `--`. They
+  also report a directive that covers more than the reported line, such as `oxlint-disable` or `ruff: noqa`, and every
+  Python `noqa` comment, which the ruff file of `code-lint-strictness` already reports. A new rule loads this
+  configuration, and a new check runs it. Before, no shipped file checked a directive's form. The README now lists the
+  contract as tool-checked instead of judged with eval.
+- `code-typescript-effect-errors`: the new `discarded-failures-typescript` and `discarded-failures-tsx` ast-grep rules
+  report each `Effect.ignore`, `Effect.ignoreCause`, `Effect.option`, or `Effect.orElseSucceed`, as a call or as a
+  pipeline step. The rules already forbade discarding an expected failure, and `Effect.ignoreCause` joins their
+  examples. A justified use takes an `ast-grep-ignore` directive with the rule's id and a reason, as
+  `code-lint-suppressions` allows. The review check now asks about catch-all handlers and suppressed discards. The
+  contract's cases ship beside its rules in `assets/ast-grep/rule-tests/`.
+- `library-contract-format`: a contract ships each structural rule's violation and allowed cases beside the rule under
+  `assets/<tool>/`, registered in the configuration that loads the rule, so a repository can run them against its own
+  lists. Cases of every other tool, and cases that need a sample of a list a repository declares, stay under
+  `tests/<contract>/<tool>/`. Before, every case lived under `tests/`, outside the installed folder.
+  `scripts/lint-contracts.py` checks each shipped case's file name and id against its contract's rules.
+  `scripts/check-library.py` runs `ast-grep test` with each contract's `sgconfig.yml` and requires one case file for
+  every shipped rule, beside it or under `tests/`.
+
+### Added
+
+- `scripts/lint-contracts.py` enforces the cap that `library-contract-format` states: at most 25 rules and 7 checks
+  per contract. It counts each line under `## Rules` except the `Violation:` and `Allowed:` examples. Three contracts
+  exceed it and are held in `OVER_CAP_CONTRACTS`: `code-typescript-import-statements` with 27 rules,
+  `contract-maintenance` with 27 rules and 8 checks, and `telemetry-application-tracing` with 26 rules. This release
+  does not split them. A split moves rules that projects have installed, so a later major release carries it. The
+  script fails once a listed contract fits the cap or no longer exists, so the list only shrinks.
+
+### Clarified
+
+- `api-typescript-request-paths`, `code-boolean-names`, `code-closed-value-sets`, `code-comment-form`,
+  `code-conditional-expressions`, `code-constant-names`, `code-diagnostic-messages`, `code-map-and-set-names`,
+  `code-module-file-roles`, `code-module-structure-and-control-flow`, `code-rust-doc-comment-coverage`,
+  `code-rust-source-structure`, `code-spelled-out-names`, `code-typescript-call-arguments`,
+  `code-typescript-collection-iteration`, `code-typescript-const-bindings`, `code-typescript-effect-absent-values`,
+  `code-typescript-effect-scheduling`, `code-typescript-effect-schemas`, `code-typescript-expression-forms`,
+  `code-typescript-function-arguments`, `code-typescript-import-extensions`, `code-typescript-import-statements`,
+  `code-typescript-input-immutability`, `code-typescript-module-state`, `code-typescript-object-literal-functions`,
+  `code-typescript-runtime-keyed-maps`, `code-typescript-type-assertions`, `telemetry-application-tracing`,
+  `telemetry-rust-tracing`, `telemetry-typescript-effect-tracing`, `test-assertion-integrity`, `ui-design-tokens`,
+  `ui-react-hook-calls`, and `ui-react-typescript-jsx-attributes`: each contract now ships its ast-grep rules' cases,
+  206 files in all, in `assets/ast-grep/rule-tests/`, and its `sgconfig.yml` registers them under `testConfigs`. Run
+  `ast-grep test --skip-snapshot-tests --config` with that file. To run the cases with the repository's own utilities,
+  name the folder under `testConfigs` in its own ast-grep configuration instead. The cases ship without snapshots, so
+  `ast-grep test` needs `--skip-snapshot-tests`. The `namespace-library-imports` cases of
+  `code-typescript-import-statements` stay under `tests/`, because they need a sample library list. No rule or case
+  changed, so every rule reports the same code.
+- `code-comment-form`: the `declaration-comments` notes no longer say that `code-lint-suppressions` requires a reason
+  line above an `ast-grep-ignore` directive, since it now takes the reason inside the directive. The rules still skip
+  that line, so they report the same code.
+- The changelog's opening note states how `tenet contracts update` without `--ref` moves. From Tenet 0.12.0 it stops
+  at the highest release of the next major. Before, the note said it always moved straight to the newest release, as
+  Tenet 0.11.0 and earlier do.
 
 ## v13.0.1
 

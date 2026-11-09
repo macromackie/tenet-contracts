@@ -179,7 +179,11 @@ actionlint takes the nearest folder with `.git` and `.github/workflows` as the p
 `.github/actionlint.yaml` there, so it runs in the committed snapshot, whose project is the library.
 """
 RULE_SETS = "contracts/*/assets/ast-grep/sgconfig.yml"
-RULE_TESTS = "tests/*/ast-grep/sgconfig.yml"
+"""Each contract's ast-grep configuration, which loads its rules and the cases beside them."""
+SAMPLE_RULE_TESTS = "tests/*/ast-grep/sgconfig.yml"
+"""The cases that need a sample of a list a repository declares, outside the installed folder."""
+RULE_FILES = "contracts/*/assets/ast-grep/rules/*.yml"
+UTILITY_FILES = "contracts/*/assets/ast-grep/utils/*.yml"
 OXLINT_FILES = "contracts/*/assets/oxlint/*.json"
 YAML_FILES = (".github/**/*.y*ml", "contracts/**/*.y*ml", "tests/**/*.y*ml")
 DEPENDENCY_FOLDER = "node_modules"
@@ -297,7 +301,8 @@ def check_library_files() -> list[str]:
     ]
     tests = [
         ("ast-grep", "test", "--skip-snapshot-tests", "--config", str(path.relative_to(ROOT)))
-        for path in sorted(ROOT.glob(RULE_TESTS))
+        for pattern in (RULE_SETS, SAMPLE_RULE_TESTS)
+        for path in sorted(ROOT.glob(pattern))
     ]
 
     return [
@@ -307,12 +312,16 @@ def check_library_files() -> list[str]:
     ]
 
 
-def check_rule_case(*, case: Path) -> list[str]:
-    """Check one shipped structural rule's violation and allowed examples."""
-    if not case.is_file():
-        return [f"{case.relative_to(ROOT)}: cover the shipped rule"]
+def check_rule_case(*, rule: Path) -> list[str]:
+    """Check one shipped structural rule's violation and allowed cases, beside it or in tests/."""
+    shipped = rule.parents[1] / "rule-tests" / rule.name
+    sample = ROOT / "tests" / rule.parents[3].name / "ast-grep/rule-tests" / rule.name
 
-    document = yaml.safe_load(case.read_text(encoding="utf-8"))
+    match [case for case in (shipped, sample) if case.is_file()]:
+        case [case]:
+            document = yaml.safe_load(case.read_text(encoding="utf-8"))
+        case _:
+            return [f"{shipped.relative_to(ROOT)}: cover the shipped rule in one case file"]
 
     match document:
         case {"valid": [*valid], "invalid": [*invalid]} if valid and invalid:
@@ -321,21 +330,15 @@ def check_rule_case(*, case: Path) -> list[str]:
             return [f"{case.relative_to(ROOT)}: declare valid and invalid examples"]
 
 
-def check_rule_registration(*, source: Path) -> list[str]:
-    """Require the contract's cases to run against its own shipped structural rules."""
-    config = ROOT / "tests" / source.parents[2].name / "ast-grep/sgconfig.yml"
-
-    if not config.is_file():
-        return [f"{config.relative_to(ROOT)}: register the shipped rule cases"]
-
+def check_rule_registration(*, config: Path, rules: Path) -> list[str]:
+    """Require an ast-grep configuration to run the cases beside it on the shipped rules."""
     document = yaml.safe_load(config.read_text(encoding="utf-8"))
-    rules = (source.parent / "rules").resolve()
 
     match document:
         case {
             "ruleDirs": [str(rule_directory)],
             "testConfigs": [{"testDir": str(test_directory)}],
-        } if (config.parent / rule_directory).resolve() == rules and (
+        } if (config.parent / rule_directory).resolve() == rules.resolve() and (
             config.parent / test_directory
         ).resolve() == (config.parent / "rule-tests").resolve():
             return []
@@ -348,16 +351,22 @@ def check_rule_registration(*, source: Path) -> list[str]:
 def check_rule_coverage() -> list[str]:
     """Require registered violation and allowed cases for every shipped structural rule."""
     registrations = [
-        error
-        for source in sorted(ROOT.glob(RULE_SETS))
-        for error in check_rule_registration(source=source)
+        *(
+            error
+            for config in sorted(ROOT.glob(RULE_SETS))
+            for error in check_rule_registration(config=config, rules=config.parent / "rules")
+        ),
+        *(
+            error
+            for config in sorted(ROOT.glob(SAMPLE_RULE_TESTS))
+            for error in check_rule_registration(
+                config=config,
+                rules=ROOT / "contracts" / config.parents[1].name / "assets/ast-grep/rules",
+            )
+        ),
     ]
     cases = [
-        error
-        for rule in sorted(ROOT.glob("contracts/*/assets/ast-grep/rules/*.yml"))
-        for error in check_rule_case(
-            case=ROOT / "tests" / rule.parents[3].name / "ast-grep/rule-tests" / rule.name,
-        )
+        error for rule in sorted(ROOT.glob(RULE_FILES)) for error in check_rule_case(rule=rule)
     ]
 
     return [*registrations, *cases]
@@ -608,7 +617,8 @@ def check_effect_names(*, snapshot: Path) -> list[str]:
         },
         **{
             path: read_rule_references(path=path)
-            for path in ROOT.glob("contracts/*/assets/ast-grep/*/*.yml")
+            for pattern in (RULE_FILES, UTILITY_FILES)
+            for path in ROOT.glob(pattern)
         },
     }
 

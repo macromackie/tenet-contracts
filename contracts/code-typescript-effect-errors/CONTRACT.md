@@ -18,7 +18,7 @@ Never build or extend a bare runtime error, such as `new Error(message)` or `cla
 A test fake that stands in for a dependency may throw what that dependency throws, such as the `TypeError` of a failed network request.
 
 Pass an expected failure up in the error type, unchanged or wrapped in a higher-level tagged error, until the code that decides what happens next handles it by tag, such as with `Effect.catchTag`.
-Never return `null`, `undefined`, `false`, or an `{ ok: false }` object for an expected failure, and never discard one, such as with `Effect.ignore`, `Effect.option`, or `Effect.orElseSucceed`.
+Never return `null`, `undefined`, `false`, or `{ ok: false }` for an expected failure, and never discard one, such as with `Effect.ignore`, `Effect.ignoreCause`, `Effect.option`, or `Effect.orElseSucceed`.
 A handler that catches every failure at once, such as `Effect.catch`, is allowed when it branches on each tag, such as by passing the error to a function that switches on its `_tag` with a case for every tag.
 
 Wrap each foreign call that can throw or reject, such as `fetch`, JSON parsing, or a storage or library call, once where it is called, with `Effect.tryPromise` or `Effect.try`.
@@ -33,9 +33,9 @@ Give each entry point one defect handler that records the defect and ends its un
 Wrap each route of a user interface in an error boundary, and pass it the defects of that route's event handlers and asynchronous reads, which it cannot catch itself.
 Catch a defect only in an entry point's defect handler, and never log a failure or defect and then continue, whether in a component or anywhere else.
 
-Configure the repository's lint to reject bare runtime errors, thrown literals, `catch` clauses, inline `catch` handlers, the other promise forms above, and `Effect` calls written as bare statements, suppressing a finding only as `code-lint-suppressions` allows.
+Configure the repository's lint to reject bare runtime errors, thrown literals, `catch` clauses, inline `catch` handlers, the other promise forms above, bare `Effect` call statements, and the discarding functions above.
 Keep off any lint rule that reports a tagged error class's declaration, such as one requiring `new` before each call whose name ends in `Error`.
-Where the repository's lint can load the configuration in this contract's `assets/` folder, load it from the repository's own lint configuration.
+Where the repository's lint can load the configuration in this contract's `assets/` folder, load it from the repository's own lint configuration, and suppress a finding only as `code-lint-suppressions` allows.
 
 Violation: `if (!response.ok) { throw new Error('the payment provider refused the refund'); }` turns a provider refusal into an untyped exception.
 Violation: `Effect.orDie(refunding)` after `const refunding = refund({ invoice })` turns the provider's refusals and outages into defects.
@@ -54,6 +54,6 @@ Run the type check from each package root against effect 4.0.0 or later; an Effe
 Run the repository's lint with type information from the repository root, and confirm that it reports no type configuration error and rejects each form the lint rule names.
 For each failure a change adds, could any caller or user act differently because of it, and is it a tagged error if so and a tagged defect otherwise?
 For each tagged error a change adds, which code handles it by tag, and does every Effect between them pass it up in its error type?
-For each `Effect.ignore`, `Effect.option`, `Effect.orElseSucceed`, or catch-all handler a change adds, does it discard an expected failure or skip a tag?
+For each catch-all handler, or suppressed discarding function, that a change adds, does it skip a tag or discard a failure that a caller could act on?
 For each foreign call a change adds, is it wrapped once where it is called, with its failure mapped to a tagged class that keeps the cause?
 For each entry point a change adds, where is its one defect handler, and does the change run an Effect or catch a defect anywhere else?

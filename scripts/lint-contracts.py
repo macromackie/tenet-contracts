@@ -85,17 +85,37 @@ CONTRACT_ROW = re.compile(
 )
 COVERAGE_KINDS = frozenset({"tool-checked", "judged with eval", "judged and unmeasured"})
 CONTRACT_COUNT = re.compile(r"^The library has (?P<count>\d+) contracts\.$", flags=re.MULTILINE)
+RULE_CAP = 25
+CHECK_CAP = 7
+EXAMPLE_PREFIXES = ("Violation:", "Allowed:")
+"""The starts of lines under ## Rules that illustrate a rule, which the rule cap does not count."""
+OVER_CAP_CONTRACTS = {
+    "code-typescript-import-statements": "split in a major release",
+    "contract-maintenance": "split in a major release",
+    "telemetry-application-tracing": "split in a major release",
+}
+"""
+The contracts that exceeded the cap when it was first checked, each with its plan.
+
+Splitting one moves rules that adopters have installed, so it waits for a major release.
+The plan names no release, because the maintainer chooses which major release carries each split.
+The check fails once a listed contract fits the cap, so the list only shrinks.
+"""
 RELEASE_HEADING = re.compile(r"^## (?P<version>v\d+\.\d+\.\d+)$", flags=re.MULTILINE)
 """A release's changelog heading; the changelog lists releases newest first."""
 MAJOR_VERSION = re.compile(r"v\d+\.0\.0")
 UPGRADING_HEADING = "\n### Upgrading\n"
 ROLLBACK_COMMAND = "tenet contracts update --ref"
-RULE_FILES = "contracts/*/assets/ast-grep/*/*.yml"
+RULE_FILES = ("contracts/*/assets/ast-grep/rules/*.yml", "contracts/*/assets/ast-grep/utils/*.yml")
 """The rule and utility files of each ast-grep rule set, which its sgconfig.yml loads."""
 GENERATED_DEPENDENCY_FOLDER = "node_modules"
 """Installed third-party packages, excluded from library document checks."""
-RULE_TESTS = "*/ast-grep/rule-tests/*.yml"
-"""The ast-grep case files of each contract's tests/ folder."""
+RULE_TESTS = ("contracts/*/assets/ast-grep/rule-tests/*.yml", "tests/*/ast-grep/rule-tests/*.yml")
+"""
+The ast-grep case files that each contract ships beside its rules, and those of its tests/ folder.
+
+A case stays under tests/ only when it needs a sample of a list that a repository declares.
+"""
 RULE_ID = re.compile(
     r"""^(["']?)id\1:[ \t]*(["']?)(?P<id>[^"'\s]+)\2[ \t]*$""",
     flags=re.MULTILINE,
@@ -257,6 +277,35 @@ def check_required_tenet(*, name: str, requires: str | None, has_assets: bool) -
     return []
 
 
+def check_contract_size(*, name: str, document: re.Match[str]) -> list[str]:
+    """Check a contract's rules and checks against the cap and its OVER_CAP_CONTRACTS entry."""
+    rules = sum(
+        1
+        for line in document["rules"].splitlines()
+        if line.strip() and not line.startswith(EXAMPLE_PREFIXES)
+    )
+    checks = sum(1 for line in document["checks"].splitlines() if line.strip())
+    is_over_cap = rules > RULE_CAP or checks > CHECK_CAP
+
+    if is_over_cap and name not in OVER_CAP_CONTRACTS:
+        return [
+            (
+                f"{name}: keep at most {RULE_CAP} rules and {CHECK_CAP} checks, "
+                f"not {rules} rules and {checks} checks; split the contract"
+            )
+        ]
+
+    if not is_over_cap and name in OVER_CAP_CONTRACTS:
+        return [
+            (
+                f"{name}: {rules} rules and {checks} checks fit the cap; "
+                "remove the contract from OVER_CAP_CONTRACTS"
+            )
+        ]
+
+    return []
+
+
 def check_contract_document(*, contract: Contract, document: re.Match[str]) -> list[str]:
     """Check the frontmatter's name and message, the required Tenet, and one sentence per line."""
     errors = []
@@ -276,6 +325,7 @@ def check_contract_document(*, contract: Contract, document: re.Match[str]) -> l
             requires=document["requires"],
             has_assets=contract.has_assets,
         ),
+        *check_contract_size(name=contract.name, document=document),
         *(
             f"{contract.name}:{number}: write one sentence per line"
             for number, line in enumerate(contract.text.splitlines(), start=1)
@@ -393,8 +443,9 @@ def check_test_folder(*, root: Path, folder: Path) -> list[str]:
 
 
 def check_rule_test(*, root: Path, case: Path) -> list[str]:
-    """Check that an ast-grep case names a shipped rule, which `ast-grep test` does not check."""
-    rules = root / "contracts" / case.parents[2].name / "assets/ast-grep/rules"
+    """Check that an ast-grep case names a rule its contract ships; `ast-grep test` does not."""
+    # Both case folders, contracts/<contract>/ and tests/<contract>/, name the contract second.
+    rules = root / "contracts" / case.relative_to(root).parts[1] / "assets/ast-grep/rules"
     rule = RULE_ID.search(case.read_text(encoding="utf-8"))
 
     if (rules / case.name).is_file() and rule is not None and rule["id"] == case.stem:
@@ -409,7 +460,7 @@ def check_rule_test(*, root: Path, case: Path) -> list[str]:
 
 
 def check_tool_tests(*, root: Path) -> list[str]:
-    """Check the tool test cases in tests/<contract>/<tool>/, outside the folder Tenet installs."""
+    """Check the shipped ast-grep cases and the tool test cases in tests/<contract>/<tool>/."""
     return [
         *(
             error
@@ -418,7 +469,8 @@ def check_tool_tests(*, root: Path) -> list[str]:
         ),
         *(
             error
-            for case in sorted((root / "tests").glob(RULE_TESTS))
+            for pattern in RULE_TESTS
+            for case in sorted(root.glob(pattern))
             for error in check_rule_test(root=root, case=case)
         ),
     ]
@@ -471,7 +523,7 @@ def check_rule_ids(*, root: Path) -> list[str]:
     rule_paths: defaultdict[str, list[str]] = defaultdict(list)
     errors = []
 
-    for path in sorted(root.glob(RULE_FILES)):
+    for path in sorted(path for pattern in RULE_FILES for path in root.glob(pattern)):
         place = path.relative_to(root).as_posix()
 
         if rule := RULE_ID.search(path.read_text(encoding="utf-8")):
@@ -596,6 +648,10 @@ def check_contracts(*, root: Path, folders: list[Path], contracts: list[Contract
 
     return [
         *(error for folder in folders for error in check_contract_files(folder=folder)),
+        *(
+            f"{name}: remove the missing contract from OVER_CAP_CONTRACTS"
+            for name in sorted(OVER_CAP_CONTRACTS.keys() - {folder.name for folder in folders})
+        ),
         *(
             error
             for contract in contracts

@@ -9,7 +9,7 @@
   It reports one that sits directly above such an item, field, or variant, or beside one on the same line.
   A block doc comment, `/** */` or `/*! */`, is reported too, because a language with both doc comment forms writes the line form.
   A `// SAFETY:` comment, which a lint reads above an unsafe item, and an `// ast-grep-ignore` directive keep their own form and are not reported.
-  The reason line directly above an `// ast-grep-ignore` directive, which `code-lint-suppressions` requires, is not reported either.
+  The comment line directly above an `// ast-grep-ignore` directive is not reported either, although `code-lint-suppressions` now takes the reason inside the directive.
 "rule":
   "any":
     - "precedes":

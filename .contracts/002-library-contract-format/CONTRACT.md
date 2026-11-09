@@ -5,7 +5,7 @@ message: Write each library contract as a message, rules, and checks, one senten
 
 ## Rules
 
-Store each contract at `contracts/<name>/CONTRACT.md`, and keep nothing else in its folder except tool configuration and data files under `assets/<tool>/`.
+Store each contract at `contracts/<name>/CONTRACT.md`, and keep nothing else in its folder except tool configuration, test cases, and data files under `assets/<tool>/`.
 Start it with frontmatter holding `name`, `message`, and an optional `requires-tenet`, followed by `## Rules` and `## Checks` and no other headings.
 Set `requires-tenet` to the minimum Tenet version that installs the contract's files, at least 0.11.0, whenever its folder holds `assets/`.
 Write the message as one imperative sentence that states the requirement.
@@ -18,6 +18,8 @@ Give each rule one allowed form for each case it covers, never a choice between 
 Allow two forms only for disjoint cases, and state the observable condition that tells them apart, such as a file extension.
 Write a requirement in a form that a tool can check whenever such a form expresses the same decision.
 Where a tool can check a rule, ship that tool's configuration under `assets/<tool>/`, and give the contract a check that runs the tool.
+Ship each structural rule's violation and allowed cases beside it under `assets/<tool>/`, registered in the configuration that loads the rule, so a repository can run them against its own lists.
+Keep the cases of every other tool, and cases that need a sample of a list a repository declares, under `tests/<contract>/<tool>/`, outside the installed folder.
 Turn a rule off in a shipped file only for a reason `code-lint-strictness` lists, never to scope that file's own test cases.
 Leave a rule to review alone only when two reviewers would decide each case of it the same way.
 Write each violation example so it breaks only the rule it illustrates, and each allowed example so it breaks no library contract that would govern it.

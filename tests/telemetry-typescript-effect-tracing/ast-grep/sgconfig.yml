@@ -1,6 +1,0 @@
----
-"ruleDirs":
-  - "../../../contracts/telemetry-typescript-effect-tracing/assets/ast-grep/rules"
-"testConfigs":
-  - "testDir": "rule-tests"
-...

@@ -1,0 +1,90 @@
+---
+# cli-output-channels: write each exit status as a member of the program's one closed set, never as a number.
+# TypeScript variant (.ts, .mts, .cts); numeric-exit-statuses-tsx.yml is identical except for `id`, `language`, and this line.
+"id": "numeric-exit-statuses-typescript"
+# The output module, which may hold the exit-status declaration and pass a status to the process.
+"ignores":
+  - "**/output.mts"
+  - "**/output.ts"
+"language": "TypeScript"
+"message": "Pass a member of the program's exit-status set, such as `finish({ status: ExitStatus.Refused })`, instead of a number."
+"note": |
+  The rule reports a number literal, such as `2` or `-1`, written as an exit status.
+  That is a number passed to `exit` or `process.exit`, assigned to `process.exitCode`, or given as the `status` of the object that `finish` takes.
+  It is also a number returned from a function or generator whose declared return type names `ExitStatus`.
+  A `function*` expression without a return type, such as the body of `Effect.gen`, is read through, so its `return` counts for the function around it.
+  Give a nested generator that returns another value, such as a count, its own return type, or move it into a function that has one.
+  A number counts when it is the whole value or a branch of a conditional, such as `isPassed ? 0 : 1`.
+  A number nested in another expression, such as an argument or an index, does not count.
+  The exit-status declaration, such as `const ExitStatus = { Succeeded: 0, Refused: 2 } as const`, is none of these places, so it is not reported.
+  The output module is exempt by the paths under `ignores`.
+  A repository whose set, exit function, or output module has another name edits the `regex` values below or `ignores`.
+"rule":
+  "inside":
+    "any":
+      # `process.exit(2)` or `exit(2)`.
+      - "inside":
+          "has":
+            "field": "function"
+            "regex": '^(?:process\.)?exit$'
+          "kind": "call_expression"
+        "kind": "arguments"
+      # `process.exitCode = 1`.
+      - "has":
+          "field": "left"
+          "regex": '^(?:process\.)?exitCode$'
+        "kind": "assignment_expression"
+      # `finish({ status: 1 })`.
+      - "has":
+          "field": "key"
+          "regex": "^status$"
+        "inside":
+          "inside":
+            "inside":
+              "has":
+                "field": "function"
+                "regex": '^(?:[A-Za-z_$][\w$]*\.)?finish$'
+              "kind": "call_expression"
+            "kind": "arguments"
+          "kind": "object"
+        "kind": "pair"
+      # `return 2;` in a function that returns `ExitStatus`, the nearest function around it.
+      # A `function*` expression without a return type, such as the body of `Effect.gen`, is not a stop.
+      - "inside":
+          "any":
+            - "kind": "arrow_function"
+            - "kind": "function_declaration"
+            - "kind": "function_expression"
+            - "kind": "generator_function"
+            - "kind": "generator_function_declaration"
+            - "kind": "method_definition"
+          "has":
+            "field": "return_type"
+            "regex": '\bExitStatus\b'
+          "stopBy":
+            "any":
+              - "kind": "arrow_function"
+              - "kind": "function_declaration"
+              - "kind": "function_expression"
+              - "has":
+                  "field": "return_type"
+                  "kind": "type_annotation"
+                "kind": "generator_function"
+              - "kind": "generator_function_declaration"
+              - "kind": "method_definition"
+        "kind": "return_statement"
+      # `(): ExitStatus => 2`.
+      - "has":
+          "field": "return_type"
+          "regex": '\bExitStatus\b'
+        "kind": "arrow_function"
+    # The number is the whole value, or a branch of a conditional around it, such as `isPassed ? 0 : 1`.
+    "stopBy":
+      "not":
+        "any":
+          - "kind": "parenthesized_expression"
+          - "kind": "ternary_expression"
+          - "kind": "unary_expression"
+  "kind": "number"
+"severity": "error"
+...

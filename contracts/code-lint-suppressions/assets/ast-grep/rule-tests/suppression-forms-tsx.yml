@@ -1,0 +1,15 @@
+---
+"id": "suppression-forms-tsx"
+"invalid":
+  - "// oxlint-disable max-lines-per-function -- the generator writes one case per status code that the provider documents"
+  - "// oxlint-disable-next-line max-lines-per-function"
+  - "// eslint-disable-next-line -- the generator writes one case per status code that the provider documents"
+  - "// ast-grep-ignore: floating-effects-typescript"
+  - "// layout-allow folder-size"
+"valid":
+  - "// oxlint-disable-next-line max-lines-per-function -- the generator writes one case per status code that the provider documents"
+  - "const invoice_id = readInvoiceId(); // eslint-disable-line camelcase, typescript/naming-convention -- the payment provider names the wire field invoice_id"
+  - "// ast-grep-ignore: floating-effects-typescript -- the framework calls the handler by this name"
+  - "// layout-allow folder-size -- the generator writes one file per endpoint"
+  - "// Read the invoice before the oxlint-disable comment below applies."
+...
