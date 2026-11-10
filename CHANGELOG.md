@@ -15,8 +15,9 @@ names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0
 Use Tenet 0.11.0 or later. With `.tenet.lock` and installed copies committed, run
 `tenet contracts update --ref v15.0.0`.
 
-- No contract was removed, and no rule moved between contracts. Four contracts are new, and update installs none of
-  them.
+- No contract was removed, and no rule moved between contracts. Four contracts are new: `docs-package-readme`,
+  `code-tool-configuration-folder`, `code-package-shape`, and `code-source-comments`. Update installs none of them;
+  add each one a repository wants with `tenet contracts add`.
 - `code-lint-suppressions`: rewrite each `eslint-disable-next-line` as `oxlint-disable-next-line`, and move each
   `-disable-line` directive to the line above. The `suppression-forms` rules now also report an `ast-grep-ignore`
   directive in a doc comment that lacks its reason.
