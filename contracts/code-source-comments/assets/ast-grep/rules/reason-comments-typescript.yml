@@ -1,0 +1,28 @@
+---
+# code-source-comments: keep the reason comments of the whole scope within the declared maximum count.
+# TypeScript variant (.ts, .mts, .cts); the Tsx variant is identical except for `id`, `language`, and this line.
+"id": "reason-comments-typescript"
+"language": "TypeScript"
+"message": "This reason comment counts toward the declared maximum number of reason comments."
+"note": |
+  The rule reports each line comment that starts with `// Why: ` inside a function body, at the `info` severity, which fails no scan.
+  The checker that this contract ships counts these reports and fails when they exceed the maximum that the repository declares.
+"rule":
+  "matches": "reason-comment"
+"severity": "info"
+"utils":
+  "reason-comment":
+    "inside":
+      "inside":
+        "any":
+          - "kind": "function_declaration"
+          - "kind": "generator_function_declaration"
+          - "kind": "function_expression"
+          - "kind": "generator_function"
+          - "kind": "arrow_function"
+          - "kind": "method_definition"
+      "kind": "statement_block"
+      "stopBy": "end"
+    "kind": "comment"
+    "regex": '^// Why: \S'
+...

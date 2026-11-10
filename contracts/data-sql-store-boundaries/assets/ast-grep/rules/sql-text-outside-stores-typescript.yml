@@ -1,0 +1,22 @@
+---
+# data-sql-store-boundaries: write SQL text only in the store module of the database's owner.
+# TypeScript variant (.ts, .mts, .cts); sql-text-outside-stores-tsx.yml is identical except for `id`, `language`, and this line.
+"id": "sql-text-outside-stores-typescript"
+# The store module, which `data-store-ownership` marks by its path as a `store` file or a `store` folder.
+"ignores":
+  - "**/store.mts"
+  - "**/store.ts"
+  - "**/store/**"
+"language": "TypeScript"
+"message": "Move this statement into a function of the owner's store module, such as `cancelOrder({ order })`, and call that function here."
+"note": |
+  The rule reports a string or template literal whose text starts with a statement keyword in capitals, such as `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `CREATE`, `ALTER`, `DROP`, `WITH`, or `PRAGMA`, followed by white space.
+  It reads the keyword only in capitals, so a sentence such as `'Update the order'` is not reported, and neither is a statement written in lower case.
+  The store module, with its schema migration steps, is exempt by the paths under `ignores`.
+  A repository whose store modules and migration runner have other paths edits `ignores`.
+  The database client's calls are left to the repository's own lint, since each client names its methods differently.
+"rule":
+  "kind": "string_fragment"
+  "regex": '^\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|PRAGMA)\s'
+"severity": "error"
+...

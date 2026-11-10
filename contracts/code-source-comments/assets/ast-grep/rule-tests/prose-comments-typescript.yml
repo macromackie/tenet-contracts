@@ -1,0 +1,19 @@
+---
+"id": "prose-comments-typescript"
+"invalid":
+  - "// Settles the invoice.\nfunction settle(): void {}"
+  - "/** Settles the invoice. */\nfunction settle(): void {}"
+  - "/* Settles the invoice. */\nconst total = 1;"
+  - "// Why: the provider rejects a second capture within one second.\nconst total = 1;"
+  - "function settle(): void {\n  // The provider rejects a second capture within one second.\n  wait();\n}"
+  - "// oxlint-disable-next-line max-lines-per-function\nfunction settle(): void {}"
+  - "function settle(): void {\n  /* Why: the provider rejects a second capture. */\n  wait();\n}"
+"valid":
+  - "const total = 1;"
+  - "// oxlint-disable-next-line max-lines-per-function -- the generator writes one case per status code\nfunction settle(): void {}"
+  - "// ast-grep-ignore: numeric-exit-statuses-typescript -- the supervisor defines this status\nfinish({ status: 3 });"
+  - "// jscpd:ignore-start -- duplication -- the provider publishes both tables\nconst rates = [1, 2];\n// jscpd:ignore-end"
+  - "/// <reference types=\"node\" />\nconst total = 1;"
+  - "function settle(): void {\n  // Why: the provider rejects a second capture within one second.\n  wait();\n}"
+  - "const settle = (): void => {\n  if (isOpen) {\n    // Why: the provider rejects a second capture within one second.\n    wait();\n  }\n};"
+...

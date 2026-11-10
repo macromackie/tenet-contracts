@@ -8,6 +8,102 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v15.0.0
+
+### Upgrading
+
+Use Tenet 0.11.0 or later. With `.tenet.lock` and installed copies committed, run
+`tenet contracts update --ref v15.0.0`.
+
+- No contract was removed, and no rule moved between contracts. Four contracts are new, and update installs none of
+  them.
+- `code-lint-suppressions`: rewrite each `eslint-disable-next-line` as `oxlint-disable-next-line`, and move each
+  `-disable-line` directive to the line above. The `suppression-forms` rules now also report an `ast-grep-ignore`
+  directive in a doc comment that lacks its reason.
+- `cli-output-channels`: the exit function in `output.ts` or `output.mts` passes the status it was given. Name each
+  status at its declaration, or suppress the finding with a reason.
+- New assets: `security-server-secret-storage`, `data-sql-store-boundaries`, and `test-scenario-functions` ship
+  ast-grep rules under `assets/ast-grep/rules/`. Name each folder under `ruleDirs` in the repository's ast-grep
+  configuration, then fix each report or suppress it with a reason. Replace local copies of the same rules with the
+  shipped ones.
+- `telemetry-application-tracing`: three rules' cases left `assets/ast-grep/rule-tests/`. Update removes them from
+  the installed copy; no configuration changes.
+- `code-source-comments` conflicts with the doc comment coverage and comment form contracts. Adopt it only in a scope
+  that drops those six.
+- Roll back with `tenet contracts update --ref v14.0.0`. Each installed asset absent from the older release leaves the
+  lock and makes update exit 1. Remove those unowned files, then remove the `ruleDirs` entries this release added
+  before rerunning checks.
+
+### Tightened
+
+- `code-lint-suppressions`: the `suppression-forms` rules now read an `ast-grep-ignore` directive after any marks that
+  are not letters, such as `///`, `/**`, `//:`, `##`, or `#:`. ast-grep 0.51.0 honors the directive there, and the
+  rules read it only after `//`, `/*`, or `#`, so `/** ast-grep-ignore */` silenced every rule unreported. The
+  TypeScript and TSX rules also pass a lint directive only as `oxlint-disable-next-line`. Before, they passed
+  `oxlint-disable-line` and `eslint-` in place of `oxlint-`. A new rule states that one spelling. Rewrite each
+  `eslint-disable-next-line` as `oxlint-disable-next-line`, and move each `-disable-line` directive to the line above.
+- `cli-output-channels`: `numeric-exit-statuses-typescript` and `numeric-exit-statuses-tsx` no longer skip `output.ts`
+  and `output.mts`. The output module's exit function passes the status it was given, so a number written there is an
+  exit status outside its declaration.
+- `security-server-secret-storage`: a new rule passes a wrapped secret on and unwraps it only at the call that uses
+  it. The contract now requires Tenet 0.11.0 and ships the `redacted-value-reads-typescript` and
+  `redacted-value-reads-tsx` ast-grep rules, which report each way to reach the value of effect's `Redacted`. Each
+  component that uses a secret suppresses the finding at its one unwrap, or the repository lists those paths under
+  `ignores` in its own copy.
+- `data-sql-store-boundaries`: the contract now ships its lint and requires Tenet 0.11.0. The
+  `sql-text-outside-stores` rules report a literal that starts with a statement keyword in capitals outside a `store`
+  file or folder. The `assembled-sql-statements` rules report a statement built by a template substitution, a `+`, or
+  a `join`, and pass a tagged template, whose tag binds each value. Both ship for TypeScript and TSX. The client's
+  calls stay with the repository's own lint, because each client names its methods differently.
+- `test-scenario-functions`: the contract ships the sequence-marker lint that its checks already named. The
+  `check-name-sequence-markers-typescript` and `check-name-sequence-markers-tsx` ast-grep rules report a marker such
+  as `(a)`, `3.`, or `step 2:` at the start of a `name` field or of the first argument of `describe`, `it`, or `test`.
+  Before, the contract shipped only a Vitest suite rule.
+
+### Added
+
+- `docs-package-readme`: every workspace package and every folder that groups packages has a `README.md` in one fixed
+  form. A package README is a title, the manifest's `description` sentence, and the sections Layout, Use, and Never, in
+  at most 30 lines, with every Layout path existing. A group README is one sentence and a table of package and
+  description, in at most 15 lines. The uv checker `check-package-readmes.py` reads the members from
+  `pnpm-workspace.yaml`, a Cargo workspace, or a uv workspace.
+- `code-tool-configuration-folder`: a workspace keeps each tool's settings that a path flag can point at in one
+  `.config/` folder, lists at its root only what a tool must find there, and passes the settings path on every call of
+  a declared tool. The uv checker `check-tool-configuration.py` reads the allowed root entries and the tool and flag
+  pairs from a JSON policy. It reports an unlisted root entry, a call without its flag in a task file, a hook script,
+  or a workflow, and compiler settings in a package below a folder that already holds them.
+- `code-package-shape`: a package root holds only `README.md`, the manifest, and the source folder, plus declared
+  deploy entries, and its folder is named for the last segment of the manifest's name. A source root is either flat,
+  with at most 12 files, or holds folders with only entry files and role files beside them. The uv checker
+  `check-package-shape.py` reads the patterns, file names, and limit from a JSON policy.
+- `code-source-comments`: source carries no prose comment except a tool directive with its reason and a counted
+  allowance of `Why:` reason comments inside function bodies. It ships `prose-comments` and `reason-comments` ast-grep
+  rules for TypeScript, TSX, Python, and Rust, and the uv checker `check-source-comments.py`, which fails once the
+  reason comments pass the maximum that the repository declares. The contract conflicts with
+  `code-typescript-doc-comment-coverage`, `code-python-doc-comment-coverage`, `code-rust-doc-comment-coverage`,
+  `code-comment-form`, `code-comment-content`, and `code-comment-attribution`; a scope adopts this contract or that
+  family, never both. Those six contracts are unchanged.
+- `scripts/check-library.py` runs ruff, ty, and every other shipped ast-grep rule set on the four new checkers, and
+  runs their passing and failing example workspaces from `tests/<contract>/uv/`. It loads the `code-source-comments`
+  rule set only for its cases, because the library's own sources follow the doc comment contracts.
+- `scripts/check-library.py` runs ruff, ty, and every shipped ast-grep rule set but `code-source-comments` on the
+  checkers of `docs-prose-style` and `context-agent-instruction-files`, and runs their passing and failing examples
+  from `tests/<contract>/uv/`.
+
+### Clarified
+
+- `docs-prose-style`: the contract ships the uv checker `check-prose.py` and requires Tenet 0.11.0. It reports a
+  sentence over 30 words and a paragraph over 5 sentences, and takes other declared maximums as options. Using it is
+  optional, so no document's compliance changes.
+- `context-agent-instruction-files`: the contract ships the uv checker `check-doc-identifiers.py` and requires Tenet
+  0.11.0. It resolves each path, identifier, package, task, and rule name that a document gives in a code span. A path
+  with a folder must exist under the root, the document's folder, or a `--base` folder. Each `--tasks` entry pairs a
+  folder with its task file, wherever the repository keeps it. Using it is optional.
+- `telemetry-application-tracing`: the cases of `log-line-calls`, `log-event-members`, and `log-event-names` moved from
+  `assets/ast-grep/rule-tests/` to `tests/telemetry-application-tracing/ast-grep/`. They call the shipped `log` and
+  `LogEvent`, so a repository that renames either could not load the shipped folder. The `stream-imports` cases still
+  ship, and no rule changed.
+
 ## v14.0.0
 
 ### Upgrading

@@ -1,0 +1,27 @@
+{
+  "deployEntries": [],
+  "entryFiles": ["index.ts", "main.ts"],
+  "generatedEntries": [
+    {
+      "name": "node_modules",
+      "reason": "The package manager installs dependencies here."
+    },
+    {
+      "name": "dist",
+      "reason": "The build writes its output here."
+    },
+    {
+      "name": "target",
+      "reason": "The compiler generates build artifacts here."
+    },
+    {
+      "name": "__pycache__",
+      "reason": "The interpreter generates bytecode caches here."
+    }
+  ],
+  "manifest": "package.json",
+  "maximumFlatModules": 12,
+  "packagePatterns": ["packages/*"],
+  "roleFiles": ["constants.ts", "errors.ts", "schemas.ts", "settings.ts", "types.ts"],
+  "sourceFolder": "src"
+}

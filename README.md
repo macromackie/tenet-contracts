@@ -53,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 170 contracts.
+The library has 174 contracts.
 
 Coverage describes the available checks: `tool-checked` means the contract ships tool configuration;
 `judged with eval` means development cases exercise model judgments; `judged and unmeasured` means neither is
@@ -127,6 +127,7 @@ These labels do not establish whole-contract compliance or general model accurac
 | `code-module-structure-and-control-flow`     | Keep modules focused and named for their behavior, start every lowercase function name with a declared verb, and keep inputs, results, and control flow explicit.                                                                                 | tool-checked          |
 | `code-numeric-literals`                      | Give every number except -1, 0, and 1 a named constant that holds one literal, and build each derived constant from other constants' names.                                                                                                       | tool-checked          |
 | `code-ownership-and-boundaries`              | Give decisions and state one owner, with explicit dependency direction.                                                                                                                                                                           | judged and unmeasured |
+| `code-package-shape`                         | Give every package the same closed root and source root, so that a listing of either reads as a table of contents.                                                                                                                                | tool-checked          |
 | `code-python-client-injection`               | Construct stateful Python clients at composition roots and inject them into consumers as abstract types.                                                                                                                                          | judged with eval      |
 | `code-python-doc-comment-coverage`           | Give every public Python module, class, function, method, and `__init__` a docstring, and fail checks when one is missing.                                                                                                                        | judged and unmeasured |
 | `code-python-exception-propagation`          | Let Python exceptions propagate; catch one only to re-raise it, translate it with its cause, retry it, record a failed unit of work, or map it to an exit status in the entry point.                                                              | judged and unmeasured |
@@ -144,7 +145,9 @@ These labels do not establish whole-contract compliance or general model accurac
 | `code-script-entry-points`                   | Keep the top level of every file the repository executes directly to declarations and one statement that runs its main program.                                                                                                                   | judged with eval      |
 | `code-shared-definitions`                    | Declare each pattern, bound, and derivation that several modules must agree on once, and import it everywhere else.                                                                                                                               | judged with eval      |
 | `code-shared-utilities`                      | Keep domain-free helpers in the application's one shared utilities module, one per file, and use the declared utility library first.                                                                                                              | judged with eval      |
+| `code-source-comments`                       | Write no prose comment in source except a tool directive with its reason and a counted allowance of reason comments inside function bodies.                                                                                                       | tool-checked          |
 | `code-spelled-out-names`                     | Spell out every word of every declared name, case acronyms as words, map `get`, `fetch`, and `load` to `read`, and ban one-character names in every language's lint.                                                                              | tool-checked          |
+| `code-tool-configuration-folder`             | Keep every tool's settings that a path flag can point at in the workspace's one configuration folder, and pass that path on every call of the tool.                                                                                               | tool-checked          |
 | `code-typescript-boolean-conditions`         | Give every TypeScript condition a boolean or a nullable object, compare strings, numbers, and lengths explicitly, and supply defaults with `??`, never `\|\|`.                                                                                    | tool-checked          |
 | `code-typescript-call-arguments`             | Bind to a name each nested call, `new`, `await`, and function written in an argument object or array, and each awaited or `yield*` value before reading a member.                                                                                 | tool-checked          |
 | `code-typescript-class-declarations`         | Declare a TypeScript class only where a runtime or library requires one, write every other unit that holds dependencies or state as a factory function, and give each class field a readonly private name.                                        | judged with eval      |
@@ -205,10 +208,11 @@ These labels do not establish whole-contract compliance or general model accurac
 
 #### docs
 
-| Contract                | Requirement                                                                                                      | Coverage         |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------- |
-| `docs-prose-style`      | Write documentation in short, direct sentences that lead with what the reader does or needs.                     | judged with eval |
-| `docs-readme-structure` | Open each README with what the project is and how to start, link out for depth, and keep status and history out. | judged with eval |
+| Contract                | Requirement                                                                                                                                         | Coverage         |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `docs-package-readme`   | Give every workspace package and every folder that groups packages a short README in one fixed form that a check reads beside the package manifest. | tool-checked     |
+| `docs-prose-style`      | Write documentation in short, direct sentences that lead with what the reader does or needs.                                                        | judged with eval |
+| `docs-readme-structure` | Open each README with what the project is and how to start, link out for depth, and keep status and history out.                                    | judged with eval |
 
 #### eval
 

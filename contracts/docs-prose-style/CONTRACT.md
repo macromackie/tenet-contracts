@@ -1,12 +1,14 @@
 ---
 name: docs-prose-style
 message: Write documentation in short, direct sentences that lead with what the reader does or needs.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
 
 Apply these rules to the prose of READMEs, guides, and reference pages in the governed scope, and not to code comments.
 Declare a maximum sentence length in words and a maximum paragraph length in sentences, and keep prose within both.
+A repository may use the checker under `assets/`, which sets 30 words for a sentence and 5 sentences for a paragraph; a repository may pass other declared maximums.
 Lead each section and paragraph with the action, answer, or fact the reader needs, and follow it with the reason.
 Write each step a reader performs in the active voice and the imperative mood, such as "Run the check" instead of "The check can be run".
 Replace grading words, such as fast, easy, robust, simple, or significantly, with the measurement they stand for, or delete them.
@@ -22,5 +24,6 @@ Allowed: "Run the sync before the import; the import takes 4 minutes for 10,000 
 ## Checks
 
 Count the words in each changed sentence and the sentences in each changed paragraph, and compare them with the declared maximums.
+For the shipped checker, follow its usage instructions under `assets/`, and run it from the repository root over the governed documents.
 Does each changed paragraph's first sentence state what the reader does or needs?
 Search changed prose for grading words and filler phrases.

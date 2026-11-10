@@ -1,0 +1,18 @@
+---
+"id": "prose-comments-python"
+"invalid":
+  - "# Settles the invoice.\ntotal = 1"
+  - "def settle() -> None:\n    \"\"\"Settle the invoice.\"\"\"\n    wait()"
+  - "\"\"\"Settle invoices.\"\"\"\ntotal = 1"
+  - "# Why: the provider rejects a second capture within one second.\ntotal = 1"
+  - "def settle() -> None:\n    # The provider rejects a second capture within one second.\n    wait()"
+  - "# ruff: ignore[too-many-statements]\ndef settle() -> None:\n    wait()"
+  - "# /// script\n# dependencies = []\n# ///\n# Settles the invoice.\ntotal = 1"
+"valid":
+  - "total = 1"
+  - "#!/usr/bin/env -S uv run --script\n# /// script\n# requires-python = \">=3.14\"\n# dependencies = []\n# ///\ntotal = 1"
+  - "# ruff: ignore[too-many-statements] -- the generator writes one case per status code\ndef settle() -> None:\n    wait()"
+  - "# jscpd:ignore-start -- duplication -- the provider publishes both tables\nrates = [1, 2]\n# jscpd:ignore-end"
+  - "def settle() -> None:\n    # Why: the provider rejects a second capture within one second.\n    wait()"
+  - "message = \"Settles the invoice.\""
+...

@@ -1,0 +1,20 @@
+---
+# code-source-comments: keep the reason comments of the whole scope within the declared maximum count.
+# Python variant (.py, .pyi); it also reports a string that stands alone as a statement, which is how the language writes a doc comment.
+"id": "reason-comments-python"
+"language": "Python"
+"message": "This reason comment counts toward the declared maximum number of reason comments."
+"note": |
+  The rule reports each line comment that starts with `# Why: ` inside a function body, at the `info` severity, which fails no scan.
+  The checker that this contract ships counts these reports and fails when they exceed the maximum that the repository declares.
+"rule":
+  "matches": "reason-comment"
+"severity": "info"
+"utils":
+  "reason-comment":
+    "inside":
+      "kind": "function_definition"
+      "stopBy": "end"
+    "kind": "comment"
+    "regex": '^# Why: \S'
+...

@@ -1,0 +1,10 @@
+---
+"id": "sql-text-outside-stores-typescript"
+"invalid":
+  - "const statement = 'SELECT status FROM orders WHERE id = $1';"
+  - "await client.query(`UPDATE orders SET status = $1 WHERE id = $2`, [status, id]);"
+"valid":
+  - "const order = await readOrder({ id });"
+  - "const line = 'Update the order before the invoice.';"
+  - "const method = 'DELETE';"
+...

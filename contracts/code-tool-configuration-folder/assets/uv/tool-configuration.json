@@ -1,0 +1,48 @@
+{
+  "commandFiles": [
+    ".config/mise.toml",
+    ".config/mise/tasks/**/*",
+    ".github/workflows/*.yml",
+    ".claude/hooks/*",
+    ".config/hooks/*"
+  ],
+  "configurationFolder": ".config",
+  "generatedEntries": [
+    {
+      "name": ".git",
+      "reason": "The version control system keeps its own state here."
+    },
+    {
+      "name": "node_modules",
+      "reason": "The package manager installs dependencies here."
+    },
+    {
+      "name": "target",
+      "reason": "The compiler generates build artifacts here."
+    },
+    {
+      "name": ".venv",
+      "reason": "The package manager creates the virtual environment here."
+    }
+  ],
+  "rootEntries": [
+    ".config",
+    ".gitattributes",
+    ".github",
+    ".gitignore",
+    "README.md",
+    "package.json",
+    "packages",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml"
+  ],
+  "sharedSettings": ["tsconfig.json"],
+  "tools": [
+    { "command": "ast-grep", "flags": ["--config", "-c"] },
+    { "command": "knip", "flags": ["--config", "-c"] },
+    { "command": "oxfmt", "flags": ["--config", "-c"] },
+    { "command": "oxlint", "flags": ["--config", "-c"] },
+    { "command": "ruff", "flags": ["--config"] },
+    { "command": "typos", "flags": ["--config", "-c"] }
+  ]
+}

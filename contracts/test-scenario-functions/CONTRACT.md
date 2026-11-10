@@ -15,6 +15,7 @@ Run two scenarios concurrently only when neither one writes state in the shared 
 Name each reported check and test case for its guarantee alone, and never prefix it with a sequence letter, number, or step marker, such as `(a)`, `3.`, or `step 2:`.
 In every test file, end-to-end or not, whose runner declares suites by a call, put every case and hook in one top-level suite, such as `describe('order export', ...)`.
 Enforce the naming rule with the repository's lint over every check and test case name, and suppress a finding only as `code-lint-suppressions` allows.
+Load this contract's `assets/` configuration where the lint can; it reads a reported check's `name` field and the first argument of a `describe`, `it`, or `test` call, and a repository may rename these.
 
 Violation: a check is reported as `(c) a replayed order returns the same invoice`.
 Violation: one scenario function, `exportAndCancel({ stack })`, checks the export listing and also cancellation.

@@ -16,4 +16,5 @@
   - "function main(): ExitStatus { function* countOrders(): Generator<never, number> { return 3; } return ExitStatus.Succeeded; }"
   - "const main = (): Effect.Effect<ExitStatus> => Effect.gen(function* () { const total = yield* Effect.gen(function* (): Generator<never, number> { return 3; }); return ExitStatus.Succeeded; });"
   - "reply({ status: 404 });"
+  - "export function finish({ status }: { status: ExitStatus }): never { process.exit(status); }"
 ...

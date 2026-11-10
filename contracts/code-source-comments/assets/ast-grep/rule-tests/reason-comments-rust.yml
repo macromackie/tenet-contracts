@@ -1,0 +1,8 @@
+---
+"id": "reason-comments-rust"
+"invalid":
+  - "fn settle() {\n    // Why: the provider rejects a second capture within one second.\n    wait();\n}"
+"valid":
+  - "// Why: the provider rejects a second capture within one second.\nconst TOTAL: u32 = 1;"
+  - "const TOTAL: u32 = 1;"
+...

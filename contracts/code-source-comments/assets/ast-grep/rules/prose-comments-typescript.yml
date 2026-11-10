@@ -1,0 +1,35 @@
+---
+# code-source-comments: write no comment in source except a tool's directive and a counted reason comment inside a function body.
+# TypeScript variant (.ts, .mts, .cts); the Tsx variant is identical except for `id`, `language`, and this line.
+"id": "prose-comments-typescript"
+"language": "TypeScript"
+"message": "Delete this comment, and state the fact in a name, a type, the package README, or a contract; a reason that only this line can carry goes inside the function body as `// Why: <reason>`."
+"note": |
+  The rule reports every comment that is neither a tool's directive nor a reason comment.
+  A directive passes when it opens with `oxlint-disable-next-line`, `oxlint-disable-line`, the same with `eslint-`, `ast-grep-ignore:`, a repository check's `<check>-allow`, `@ts-expect-error`, or `jscpd:ignore-start`, and carries a reason after two hyphens.
+  A `jscpd:ignore-end` marker and a `/// <reference ... />` line pass without a reason, because their tools read no text there.
+  A reason comment is a line comment that starts with `// Why: ` inside a function body; `reason-comments-typescript` reports each one so that the shipped checker can count them.
+  For example, `// oxlint-disable-next-line max-lines-per-function -- the generator writes one case per status code that the provider documents` passes.
+"rule":
+  "kind": "comment"
+  "not":
+    "any":
+      - "regex": '^(?://|/\*) (?:(?:oxlint|eslint)-disable-(?:next-)?line|ast-grep-ignore:|[a-z0-9]+(?:-[a-z0-9]+)*-allow|@ts-expect-error|jscpd:ignore-start) .*-- \S|^(?://|/\*) jscpd:ignore-end(?: \*/)?$|^/// <reference [a-z]+="[^"]+" />$'
+      - "matches": "reason-comment"
+"severity": "error"
+"utils":
+  "reason-comment":
+    "inside":
+      "inside":
+        "any":
+          - "kind": "function_declaration"
+          - "kind": "generator_function_declaration"
+          - "kind": "function_expression"
+          - "kind": "generator_function"
+          - "kind": "arrow_function"
+          - "kind": "method_definition"
+      "kind": "statement_block"
+      "stopBy": "end"
+    "kind": "comment"
+    "regex": '^// Why: \S'
+...

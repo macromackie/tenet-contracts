@@ -1,0 +1,15 @@
+---
+"id": "check-name-sequence-markers-typescript"
+"invalid":
+  - "const check = { name: '(c) a replayed order returns the same invoice', verify };"
+  - "const check = { name: 'step 2: the export lists the order', verify };"
+  - "const check = { name: `b) the export lists the order`, verify };"
+  - "it('3. returns the same invoice', verify);"
+  - "describe.only('(a) order export', declare);"
+"valid":
+  - "const check = { name: 'a replayed order returns the same invoice', verify };"
+  - "it('returns the same invoice for a replayed order', verify);"
+  - "const heading = { title: '(a) first' };"
+  - "const check = { name: 'export: a cancelled order is left out', verify };"
+  - "list.push('3. third');"
+...

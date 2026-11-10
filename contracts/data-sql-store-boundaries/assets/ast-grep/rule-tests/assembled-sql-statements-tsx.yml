@@ -1,0 +1,12 @@
+---
+"id": "assembled-sql-statements-tsx"
+"invalid":
+  - "await client.query(`SELECT ${COLUMNS} FROM orders`);"
+  - "await client.query('SELECT ' + COLUMNS + ' FROM orders');"
+  - "const statement = ['SELECT status', 'FROM orders'].join(' ');"
+"valid":
+  - "await client.query('SELECT status FROM orders WHERE id = $1', [id]);"
+  - "const rows = await sql`SELECT status FROM orders WHERE id = ${id}`;"
+  - "const line = `order ${orderId} of ${total}`;"
+  - "const path = ['orders', orderId].join('/');"
+...

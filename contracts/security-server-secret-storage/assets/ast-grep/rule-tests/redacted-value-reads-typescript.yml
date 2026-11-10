@@ -1,0 +1,18 @@
+---
+"id": "redacted-value-reads-typescript"
+"invalid":
+  - "const headers = { authorization: `Bearer ${Redacted.value(apiKey)}` };"
+  - "const keys = secrets.map(Redacted.value);"
+  - "import { Redacted as Secret } from 'effect';"
+  - "const { value } = Redacted;"
+  - "const Secret = Redacted;"
+  - "const text = Redacted['value'](apiKey);"
+  - "import { value } from 'effect/Redacted';"
+"valid":
+  - "const apiKey = Redacted.make(text, { label: 'provider key' });"
+  - "const settings = { apiKey };"
+  - "const count = holder.value;"
+  - "import { Option, Redacted } from 'effect';"
+  - "import type { Redacted as Secret } from 'effect';"
+  - "type Input = { readonly apiKey: Redacted.Redacted };"
+...

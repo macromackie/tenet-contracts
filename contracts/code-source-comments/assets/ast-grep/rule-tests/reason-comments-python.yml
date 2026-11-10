@@ -1,0 +1,8 @@
+---
+"id": "reason-comments-python"
+"invalid":
+  - "def settle() -> None:\n    # Why: the provider rejects a second capture within one second.\n    wait()"
+"valid":
+  - "# Why: the provider rejects a second capture within one second.\ntotal = 1"
+  - "total = 1"
+...
