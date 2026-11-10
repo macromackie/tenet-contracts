@@ -1,0 +1,17 @@
+---
+"id": "prose-comments-rust"
+"invalid":
+  - "// Settles the invoice.\nfn settle() {}"
+  - "/// Settles the invoice.\nfn settle() {}"
+  - "//! Settles invoices.\nfn settle() {}"
+  - "/* Settles the invoice. */\nfn settle() {}"
+  - "// Why: the provider rejects a second capture within one second.\nconst TOTAL: u32 = 1;"
+  - "fn settle() {\n    // The provider rejects a second capture within one second.\n    wait();\n}"
+  - "// ast-grep-ignore: numeric-exit-statuses-rust\nconst STATUS: i32 = 3;"
+"valid":
+  - "const TOTAL: u32 = 1;"
+  - "// ast-grep-ignore: numeric-exit-statuses-rust -- the supervisor defines this status\nconst STATUS: i32 = 3;"
+  - "fn settle() {\n    // Why: the provider rejects a second capture within one second.\n    wait();\n}"
+  - "fn read(pointer: *const u8) -> u8 {\n    // SAFETY: the caller keeps the buffer alive for the whole call.\n    unsafe { *pointer }\n}"
+  - "// jscpd:ignore-start -- duplication -- the provider publishes both tables\nconst RATES: [u32; 2] = [1, 2];\n// jscpd:ignore-end"
+...

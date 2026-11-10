@@ -64,7 +64,42 @@ PACKAGE_TOOLS = "contracts/code-dependency-boundaries/assets/npm"
 """The package checker's locked source resolver and syntax parser."""
 PACKAGE_CASES = "tests/code-dependency-boundaries/uv"
 """The native package-boundary cases that protect the shared checker's failures."""
+WORKSPACE_CHECKS = (
+    "contracts/code-package-shape/assets/uv",
+    "contracts/code-source-comments/assets/uv",
+    "contracts/code-tool-configuration-folder/assets/uv",
+    "contracts/docs-package-readme/assets/uv",
+)
+"""The standalone checkers of the package, comment, and tool configuration contracts."""
+WORKSPACE_CASES = (
+    "tests/code-package-shape/uv/check-package-shape-cases.py",
+    "tests/code-source-comments/uv/check-source-comments-cases.py",
+    "tests/code-tool-configuration-folder/uv/check-tool-configuration-cases.py",
+    "tests/docs-package-readme/uv/check-package-readmes-cases.py",
+)
+"""The passing and failing example workspaces that run each of those checkers."""
+WORKSPACE_CASE_FOLDERS = tuple(str(Path(case).parent) for case in WORKSPACE_CASES)
+COMMENT_BAN_RULE_SET = "contracts/code-source-comments/assets/ast-grep/sgconfig.yml"
+"""
+The rule set that reports every doc comment, which code-source-comments ships.
+
+The library's own sources follow the doc comment contracts that it conflicts with, so no scan of
+them loads it; its cases still run.
+"""
+STANDALONE_CHECKS = (
+    "contracts/context-agent-instruction-files/assets/uv",
+    "contracts/docs-prose-style/assets/uv",
+)
+"""The single-file checkers that docs-prose-style and context-agent-instruction-files ship."""
+STANDALONE_CASES = (
+    "tests/context-agent-instruction-files/uv/check-doc-identifiers-cases.py",
+    "tests/docs-prose-style/uv/check-prose-cases.py",
+)
+"""The passing and failing examples that run each of those checkers."""
+STANDALONE_CASE_FOLDERS = tuple(str(Path(case).parent) for case in STANDALONE_CASES)
 PYTHON_RESOURCES = (
+    *STANDALONE_CHECKS,
+    *STANDALONE_CASE_FOLDERS,
     RELEASE_SCRIPTS,
     GUIDANCE_CHECK,
     LAYOUT_CHECK,
@@ -72,6 +107,8 @@ PYTHON_RESOURCES = (
     CLONE_CHECK,
     PACKAGE_CHECK,
     PACKAGE_CASES,
+    *WORKSPACE_CHECKS,
+    *WORKSPACE_CASE_FOLDERS,
 )
 """The Python scripts that a skill or a contract ships."""
 VERSION_COMMANDS = {
@@ -124,6 +161,7 @@ LIBRARY_CHECKS = (
     ),
     ("ruff", "check", "--no-cache", "scripts", *PYTHON_RESOURCES),
     ("ruff", "format", "--no-cache", "--check", "scripts", *PYTHON_RESOURCES),
+    *(("uv", "run", "--script", case) for case in STANDALONE_CASES),
     (
         "uv",
         "run",
@@ -155,6 +193,8 @@ LIBRARY_CHECKS = (
         "--extra-search-path",
         PACKAGE_CASES,
         "scripts",
+        *STANDALONE_CHECKS,
+        *STANDALONE_CASE_FOLDERS,
         # The guidance check imports packages that only its own environment installs.
         RELEASE_SCRIPTS,
         LAYOUT_CHECK,
@@ -162,7 +202,10 @@ LIBRARY_CHECKS = (
         CLONE_CHECK,
         PACKAGE_CHECK,
         PACKAGE_CASES,
+        *WORKSPACE_CHECKS,
+        *WORKSPACE_CASE_FOLDERS,
     ),
+    *(("uv", "run", "--script", case) for case in WORKSPACE_CASES),
 )
 """The shipped checkers that run on the library's own files, from the library root."""
 ACTIONLINT = (
@@ -298,6 +341,7 @@ def check_library_files() -> list[str]:
             *PYTHON_RESOURCES,
         )
         for path in sorted(ROOT.glob(RULE_SETS))
+        if path.relative_to(ROOT).as_posix() != COMMENT_BAN_RULE_SET
     ]
     tests = [
         ("ast-grep", "test", "--skip-snapshot-tests", "--config", str(path.relative_to(ROOT)))

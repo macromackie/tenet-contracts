@@ -1,0 +1,10 @@
+---
+"id": "reason-comments-tsx"
+"invalid":
+  - "function settle(): void {\n  // Why: the provider rejects a second capture within one second.\n  wait();\n}"
+  - "const settle = (): void => {\n  if (isOpen) {\n    // Why: the provider rejects a second capture within one second.\n    wait();\n  }\n};"
+"valid":
+  - "// Why: the provider rejects a second capture within one second.\nconst total = 1;"
+  - "function settle(): void {\n  /* Why: the provider rejects a second capture. */\n  wait();\n}"
+  - "const total = 1;"
+...

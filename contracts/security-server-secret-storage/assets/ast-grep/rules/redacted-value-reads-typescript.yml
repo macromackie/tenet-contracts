@@ -1,0 +1,49 @@
+---
+# security-server-secret-storage: unwrap a redacted secret only in the component that uses it.
+# TypeScript variant (.ts, .mts, .cts); redacted-value-reads-tsx.yml is identical except for `id`, `language`, and this line.
+"id": "redacted-value-reads-typescript"
+"language": "TypeScript"
+"message": "Hand the secret on as `Redacted`, and unwrap it with `Redacted.value` only at the call that uses it."
+"note": |
+  The rule reads effect's `Redacted` module and reports each way to reach the wrapped value.
+  That is `Redacted.value` read, called, or subscripted, the module destructured or bound to another name, a `Redacted` import under an alias, and an import from `effect/Redacted`, which no alias can hide.
+  A type-only import may alias the module, since it reaches no value.
+  The rule reads every file, so each component that uses a secret suppresses the finding at its one unwrap, with the use as the reason, as `code-lint-suppressions` allows.
+  A repository that declares those components by path lists them under `ignores` in its own copy of this file instead.
+"rule":
+  "any":
+    - "all":
+        - "has":
+            "field": "object"
+            "regex": '(?:^|\.)Redacted$'
+        - "has":
+            "field": "property"
+            "regex": "^value$"
+      "kind": "member_expression"
+    - "has":
+        "field": "object"
+        "regex": '(?:^|\.)Redacted$'
+      "kind": "subscript_expression"
+    - "has":
+        "field": "value"
+        "regex": "^Redacted$"
+      "kind": "variable_declarator"
+    - "all":
+        - "has":
+            "field": "name"
+            "regex": "^Redacted$"
+        - "has":
+            "field": "alias"
+            "kind": "identifier"
+        - "not":
+            "regex": '^type\s'
+        - "not":
+            "inside":
+              "kind": "import_statement"
+              "regex": '^import\s+type\s'
+              "stopBy": "end"
+      "kind": "import_specifier"
+    - "kind": "string_fragment"
+      "regex": "^effect/Redacted$"
+"severity": "error"
+...

@@ -1,0 +1,39 @@
+---
+# code-source-comments: write no comment in source except a tool's directive and a counted reason comment inside a function body.
+# Python variant (.py, .pyi); it also reports a string that stands alone as a statement, which is how the language writes a doc comment.
+"id": "prose-comments-python"
+"language": "Python"
+"message": "Delete this comment, and state the fact in a name, a type, the package README, or a contract; a reason that only this line can carry goes inside the function body as `# Why: <reason>`."
+"note": |
+  The rule reports every comment that is neither a tool's directive nor a reason comment.
+  A directive passes when it opens with `ruff: ignore[...]`, `ty: ignore[...]`, `ast-grep-ignore:`, a repository check's `<check>-allow`, or `jscpd:ignore-start`, and carries a reason after two hyphens.
+  A `jscpd:ignore-end` marker, an interpreter line, and each line of an inline script metadata block, from `# /// <type>` to `# ///`, pass without a reason, because their tools read no text there.
+  A reason comment is a line comment that starts with `# Why: ` inside a function body; `reason-comments-python` reports each one so that the shipped checker can count them.
+  For example, `# ruff: ignore[too-many-statements] -- the generator writes one case per status code that the provider documents` passes.
+"rule":
+  "any":
+    - "kind": "comment"
+      "not":
+        "any":
+          - "regex": '^# (?:(?:ruff|ty): ignore\[[a-z0-9, -]+\]|ast-grep-ignore:|[a-z0-9]+(?:-[a-z0-9]+)*-allow|jscpd:ignore-start) .*-- \S|^# jscpd:ignore-end$|^#!|^# ///(?: [a-z][a-z0-9-]*)?$'
+          - "matches": "reason-comment"
+          - "follows":
+              "kind": "comment"
+              "regex": '^# /// [a-z][a-z0-9-]*$'
+              "stopBy": "end"
+            "precedes":
+              "kind": "comment"
+              "regex": '^# ///$'
+              "stopBy": "end"
+    - "has":
+        "kind": "string"
+      "kind": "expression_statement"
+"severity": "error"
+"utils":
+  "reason-comment":
+    "inside":
+      "kind": "function_definition"
+      "stopBy": "end"
+    "kind": "comment"
+    "regex": '^# Why: \S'
+...

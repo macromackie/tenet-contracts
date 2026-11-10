@@ -1,6 +1,7 @@
 ---
 name: context-agent-instruction-files
 message: Keep agent instruction files visible, accurate, and consistent, and change them with the code they describe.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -12,6 +13,7 @@ Link to the document, contract, or skill that owns a requirement or procedure in
 
 Make every command, path, file, and link that an instruction file names exist and work from the stated working directory.
 Update or remove an instruction in the same change that renames, moves, or removes what it names.
+A repository may use the checker under `assets/`, which resolves each path, identifier, task, and rule that an instruction file names in a code span against the repository's files.
 
 A nested instruction file may add or narrow instructions for its directory.
 When a nested file replaces an ancestor's instruction, it names the instruction it replaces; an unstated contradiction between files that apply to the same path violates this contract.
@@ -28,6 +30,7 @@ Allowed: a package's instruction file says it replaces the root test command for
 ## Checks
 
 Run each command an instruction file names from its stated working directory, and resolve each path and link.
+For the shipped checker, follow its usage instructions under `assets/`, and run it from the repository root over every instruction file.
 Search instruction files for invisible and bidirectional control characters, comments, and images.
 For a path covered by several instruction files, read them together and confirm that every contradiction names the instruction it replaces.
 For each rename, move, or removal in a change, search instruction files for the old name.

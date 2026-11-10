@@ -1,0 +1,51 @@
+---
+# data-sql-store-boundaries: write each statement whole as one literal, and never assemble its text.
+# Tsx variant (.tsx); assembled-sql-statements-typescript.yml is identical except for `id`, `language`, and this line.
+"id": "assembled-sql-statements-tsx"
+"language": "Tsx"
+"message": "Write the statement whole as one literal, and pass each value to the client as a bound parameter."
+"note": |
+  The rule reports SQL text that is assembled: a template literal with a substitution, a `+` concatenation, or a `join` over an array, when any literal in it starts with a statement keyword in capitals.
+  A tagged template, such as `` sql`SELECT status FROM orders WHERE id = ${id}` ``, is not reported, because its tag binds each substitution as a parameter.
+  A statement nested as a fragment in a tagged template is left to review.
+  The rule reads every file, the store module too.
+"rule":
+  "any":
+    - "inside":
+        "all":
+          - "has":
+              "matches": "sql-text"
+          # A tagged template's tag binds each substitution as a parameter.
+          - "not":
+              "inside":
+                "kind": "call_expression"
+        "kind": "template_string"
+      "kind": "template_substitution"
+    - "all":
+        - "has":
+            "field": "operator"
+            "regex": '^\+$'
+        - "has":
+            "matches": "sql-text"
+            "stopBy": "end"
+      "kind": "binary_expression"
+    - "has":
+        "all":
+          - "has":
+              "field": "object"
+              "has":
+                "matches": "sql-text"
+                "stopBy": "end"
+              "kind": "array"
+          - "has":
+              "field": "property"
+              "regex": "^join$"
+        "field": "function"
+        "kind": "member_expression"
+      "kind": "call_expression"
+"severity": "error"
+"utils":
+  "sql-text":
+    "kind": "string_fragment"
+    "regex": '^\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|PRAGMA)\s'
+...

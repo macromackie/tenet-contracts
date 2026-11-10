@@ -2,10 +2,6 @@
 # cli-output-channels: write each exit status as a member of the program's one closed set, never as a number.
 # TypeScript variant (.ts, .mts, .cts); numeric-exit-statuses-tsx.yml is identical except for `id`, `language`, and this line.
 "id": "numeric-exit-statuses-typescript"
-# The output module, which may hold the exit-status declaration and pass a status to the process.
-"ignores":
-  - "**/output.mts"
-  - "**/output.ts"
 "language": "TypeScript"
 "message": "Pass a member of the program's exit-status set, such as `finish({ status: ExitStatus.Refused })`, instead of a number."
 "note": |
@@ -17,8 +13,8 @@
   A number counts when it is the whole value or a branch of a conditional, such as `isPassed ? 0 : 1`.
   A number nested in another expression, such as an argument or an index, does not count.
   The exit-status declaration, such as `const ExitStatus = { Succeeded: 0, Refused: 2 } as const`, is none of these places, so it is not reported.
-  The output module is exempt by the paths under `ignores`.
-  A repository whose set, exit function, or output module has another name edits the `regex` values below or `ignores`.
+  The rule reads every file, the output module too, whose exit function passes the status it was given, such as `process.exit(status)`.
+  A repository whose set or exit function has another name edits the `regex` values below.
 "rule":
   "inside":
     "any":

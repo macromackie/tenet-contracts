@@ -22,6 +22,7 @@ When the tool reports a block, such as a copied block, surround only that block 
 When the finding concerns a declaration's consumers, such as an export that only another repository imports, mark that declaration with the tool's documentation tag, and write the reason on the tag's own line.
 When the finding reports no line, such as a folder over its file limit, add a configuration entry that names that one path and carries its reason in a comment beside it.
 When a tool honors no suppression at a site it reports, the site follows the rule, and a configuration entry that skips that site by name is a violation.
+Where a tool honors several spellings of one directive, such as a second prefix or a form on the reported line itself, write only the tool's own prefix on the line above the reported line, and reject the others.
 Spell the directive of every check that the repository owns one way: the check's name followed by `-allow`, the rule's name, two hyphens with a space on each side, and the reason, on the line above the reported line.
 
 A suppression that covers a whole file, module, or package, a rule turned off, a lowered severity, and an option or limit changed so that one site passes are violations.

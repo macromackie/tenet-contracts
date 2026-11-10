@@ -1,0 +1,35 @@
+---
+# code-source-comments: write no comment in source except a tool's directive and a counted reason comment inside a function body.
+# Rust variant; it reads line, block, and doc comments alike.
+"id": "prose-comments-rust"
+"language": "Rust"
+"message": "Delete this comment, and state the fact in a name, a type, the package README, or a contract; a reason that only this line can carry goes inside the function body as `// Why: <reason>`."
+"note": |
+  The rule reports every comment that is neither a tool's directive nor a reason comment.
+  A directive passes when it opens with `ast-grep-ignore:`, a repository check's `<check>-allow`, or `jscpd:ignore-start`, and carries a reason after two hyphens.
+  A `jscpd:ignore-end` marker passes without a reason, and a `// SAFETY:` comment, which a lint reads above an unsafe block, carries its reason as its own text.
+  A reason comment is a line comment that starts with `// Why: ` inside a function body; `reason-comments-rust` reports each one so that the shipped checker can count them.
+  For example, `// ast-grep-ignore: numeric-exit-statuses-rust -- the supervisor defines this status` passes.
+"rule":
+  "any":
+    - "kind": "line_comment"
+    - "kind": "block_comment"
+  "not":
+    "any":
+      - "regex": '^// (?:ast-grep-ignore:|[a-z0-9]+(?:-[a-z0-9]+)*-allow|jscpd:ignore-start) .*-- \S|^// jscpd:ignore-end$|^// SAFETY: \S'
+      - "matches": "reason-comment"
+"severity": "error"
+"utils":
+  "reason-comment":
+    "any":
+      - "kind": "line_comment"
+      - "kind": "block_comment"
+    "inside":
+      "inside":
+        "any":
+          - "kind": "function_item"
+          - "kind": "closure_expression"
+      "kind": "block"
+      "stopBy": "end"
+    "regex": '^// Why: \S'
+...

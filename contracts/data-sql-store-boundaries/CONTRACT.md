@@ -1,6 +1,7 @@
 ---
 name: data-sql-store-boundaries
 message: Write SQL text and database client calls only in the database owner's store module, each statement once and whole, and never expose the client.
+requires-tenet: 0.11.0
 ---
 
 ## Rules
@@ -23,6 +24,8 @@ It is the one exported store function that `data-store-ownership` lets carry a s
 The composition root that owns the client's lifecycle may construct the client and close it at shutdown, and it or the class that holds the database may pass the client to the store's constructor or factory, such as `createOrderStore({ sql })`.
 
 Configure the repository's lint to fail on SQL text or a client call outside the declared store paths, other than the composition root's construction and shutdown of the client, and on an exposed client, a function that takes SQL text, or an assembled statement anywhere.
+Load this contract's `assets/` configuration where the lint can; it reports SQL text outside a `store` file or folder, and an assembled statement anywhere.
+A repository may name other store paths there, and adds its own entries for its client's calls, an exposed client, and a function that takes SQL text.
 Suppress a finding only in the form that `code-lint-suppressions` requires.
 
 Violation: the order driver runs `UPDATE orders SET status = $1 WHERE id = $2` through the store's public client, and the order handler repeats that update with an added status guard.
@@ -30,7 +33,7 @@ Allowed: the driver and the handler both call `cancelOrder({ order })`, the orde
 
 ## Checks
 
-From the repository root, run the lint, and confirm that its store, migration, and runner paths match the ones the repository declares.
+From the repository root, run the lint with this contract's `assets/` configuration, and confirm that its store, migration, and runner paths match the ones the repository declares.
 For each statement a change adds, is its store function the only one that runs it outside schema migration steps, counting copies that differ only in a guard?
 Does each store function that runs several statements serve one change, rather than grouping unrelated statements?
 Does an operation that needs one transaction run its store calls inside the store's transaction function?

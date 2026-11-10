@@ -10,6 +10,7 @@
   The lint honors `ruff: ignore` in its preview mode, which the lint file that `code-lint-strictness` ships turns on, and that file reports each `noqa` comment.
   So `noqa` never passes, and neither does a directive that covers more than the reported line, such as `ruff: noqa`, `ruff: file-ignore[...]`, or `ruff: disable[...]`.
   An `ast-grep-ignore` directive passes as `# ast-grep-ignore: <rule>, <rule> -- <reason>`.
+  ast-grep honors that directive after any marks that are not letters, such as `## `, `#: `, or `#! `, so the rule reads it after them and passes it only after `# `.
   A repository check's directive passes as `# <check>-allow <rule> -- <reason>`, such as `# layout-allow folder-size -- the generator writes one file per endpoint`.
   A `type: ignore` comment is left to the type checker, which `code-lint-strictness` configures to disregard it, and copied-block markers to the checker that `code-duplicated-blocks` ships.
 "rule":
@@ -19,7 +20,7 @@
         - "not":
             "regex": '^# (?:ruff|ty): ignore\[[a-z0-9-]+(?:, [a-z0-9-]+)*\] -- \S'
     - "all":
-        - "regex": '^#\s*ast-grep-ignore'
+        - "regex": '^[^A-Za-z]*ast-grep-ignore'
         - "not":
             "regex": '^# ast-grep-ignore: [\w-]+(?:, [\w-]+)* -- \S'
     - "all":

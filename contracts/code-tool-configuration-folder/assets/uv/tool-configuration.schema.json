@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "commandFiles": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "configurationFolder": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "generatedEntries": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          }
+        },
+        "required": ["name", "reason"],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "rootEntries": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "minItems": 1
+    },
+    "sharedSettings": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "tools": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "flags": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1
+          }
+        },
+        "required": ["command", "flags"],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "commandFiles",
+    "configurationFolder",
+    "generatedEntries",
+    "rootEntries",
+    "sharedSettings",
+    "tools"
+  ],
+  "type": "object"
+}

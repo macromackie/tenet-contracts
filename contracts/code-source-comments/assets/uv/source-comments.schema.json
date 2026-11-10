@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "maximumReasonComments": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "sourceRoots": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "minItems": 1
+    }
+  },
+  "required": ["maximumReasonComments", "sourceRoots"],
+  "type": "object"
+}
