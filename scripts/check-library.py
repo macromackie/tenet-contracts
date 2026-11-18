@@ -65,6 +65,7 @@ PACKAGE_TOOLS = "contracts/code-dependency-boundaries/assets/npm"
 PACKAGE_CASES = "tests/code-dependency-boundaries/uv"
 """The native package-boundary cases that protect the shared checker's failures."""
 WORKSPACE_CHECKS = (
+    "contracts/code-rust-module-files/assets/uv",
     "contracts/code-package-shape/assets/uv",
     "contracts/code-source-comments/assets/uv",
     "contracts/code-tool-configuration-folder/assets/uv",
@@ -72,6 +73,7 @@ WORKSPACE_CHECKS = (
 )
 """The standalone checkers of the package, comment, and tool configuration contracts."""
 WORKSPACE_CASES = (
+    "tests/code-rust-module-files/uv/check-module-files-cases.py",
     "tests/code-package-shape/uv/check-package-shape-cases.py",
     "tests/code-source-comments/uv/check-source-comments-cases.py",
     "tests/code-tool-configuration-folder/uv/check-tool-configuration-cases.py",
