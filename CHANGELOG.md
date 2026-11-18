@@ -8,6 +8,12 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v15.2.0
+
+### Added
+
+- The contract-authoring skill describes how to qualify a checker on representative controls and gives examples for relative paths, reusable declarations, streams and rendered fields. The Tenet review skill describes how to verify the submitted source after the last edit with Tenet 0.18.0.
+
 ## v15.1.0
 
 ### Added

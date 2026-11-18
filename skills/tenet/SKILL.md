@@ -22,6 +22,8 @@ With several pending contracts, give each to its own subagent with `tenet show N
 
 A record is bound to the exact code it judged. Editing a scoped file makes its contract pending and `record` refuses it until the next `check`; then `show` gives the diff since the earlier record. When evidence stays unavailable, record `unresolved` and name the missing fact. Never record a conclusion only to stop a hook.
 
+With Tenet 0.18.0 or later, run `tenet check --final --json` after the last edit. Inspect each contract and declared check before reporting the result. On untrusted source, run project checkers in an isolated environment and pass their trusted receipt with `--evidence PATH`. A missing semantic answer stays pending with `--no-model`.
+
 ## Investigate
 
 Follow responsibilities and relationships across the before and after source. For a change spanning owners, briefly identify what moved, its source locations, and any unknown premise. Inspect unchanged callers or implementations that determine the effect. Consider both which requirements the change affects and where each scoped requirement could be affected. A narrow negative answer cannot dismiss a broader relationship.
