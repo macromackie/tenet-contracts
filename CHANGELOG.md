@@ -8,6 +8,18 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.0.0
+
+### Upgrading
+
+- Commit installed copies and `.tenet.lock`, then run `tenet contracts update --ref v17.0.0`.
+- For each Rust crate, rename handwritten source paths to lower_snake_case, remove module path overrides and run the new module-file checker on its full source inventory.
+- To roll back the contract update, run `tenet contracts update --ref v16.0.0`.
+
+### Tightened
+
+- `code-rust-module-files` checks physical filenames and directory components across Rust targets and rejects module path attributes, including conditional overrides. This contract now requires Tenet 0.11.0 to install its checker.
+
 ## v16.0.0
 
 ### Upgrading
