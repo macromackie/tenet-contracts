@@ -23,7 +23,8 @@ A contract installed from a shared library is recorded in `.tenet.lock`. Put loc
 final `## Local adaptations` heading so `tenet contracts update` merges them cleanly. Edit an upstream sentence only
 when a local requirement must replace it, and propose general improvements to the library.
 
-Checks point to project-owned commands and state the working directory. Tenet does not execute them.
+Checks point to project-owned commands and state the working directory. Markdown commands are documentation.
+With Tenet 0.17.0 or later, use the [local check recipes](./resources/local-checks.md) to bind a test or an AST rule, qualify it on a representative mistake, and replay its evidence.
 Keep shared requirements independent of private development commands. Remove obsolete rules and update affected code
 and references when changing an adopted convention. A model finding is evidence to investigate, not permission to relax a rule.
 Put behavior in prose, not just in a script. Keep production test assertions in project tests.

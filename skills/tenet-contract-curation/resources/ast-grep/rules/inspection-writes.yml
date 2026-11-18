@@ -1,0 +1,19 @@
+id: inspection-writes
+language: Python
+severity: error
+message: A describe method assigns to a field on self.
+rule:
+  all:
+    - any:
+        - kind: assignment
+        - kind: augmented_assignment
+    - has:
+        field: left
+        pattern: self.$FIELD
+    - inside:
+        kind: function_definition
+        has:
+          field: name
+          regex: ^describe_
+        stopBy:
+          kind: function_definition

@@ -8,6 +8,16 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v15.1.0
+
+### Added
+
+- `tenet-contract-curation` includes four local check recipes and a Python ast-grep starter rule for inspection methods.
+
+### Clarified
+
+- `tenet` explains saved combined-review limits, focused follow-up checks, and advisory hunk evidence from oversized diffs.
+
 ## v15.0.0
 
 ### Upgrading

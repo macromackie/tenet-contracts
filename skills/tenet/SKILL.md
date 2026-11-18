@@ -34,6 +34,13 @@ For external composition, `tenet export PATH --base BASE --context HELPER` expor
 
 ## Results
 
+When a combined review exceeds its input limit, read its saved byte counts and the file results in `show`.
+A file finding and an oversized combined review can both be present. Use the focused command with related
+implementation supplied through `--context PATH:START-END`, then return to settle the broader selection.
+Tenet automatically checks complete hunk groups when an individual diff is too large. Hunk results are advisory,
+and the file remains incomplete even when every group answers favorably. Inspect unexamined ranges and cross-hunk
+relationships before recording a conclusion. `--dry-run --json` reports planned groups and request counts.
+
 `check` and `status` exit 0 when every contract is settled without a violation, 1 for a recorded failure, 2 for input or execution errors, 3 for a recorded `unresolved`, and 4 while any contract is pending, including failed requests and uncertainty. When a request failed, rerun the check if its `failure` is `retryable`; the rerun sends only the failed requests. Exit 0 is favorable only within the reported scope and assumptions. `violation N%` is the model's estimate, not proof; a middling value does not identify its cause. Tenet skips empty, binary, non-UTF-8, and symlinked files, and a file `judged from its patch only` or a reduced combined input had less source to read. Inspect what was left out before relying on a favorable answer. A warning that a selected path is not checked means no contract assessed it, and `No contract governs` lists changed files no contract covers: review those yourself.
 
 Report supported findings, source locations, consequences, and remaining gaps. Distinguish inspected code from executed checks with observed results. Markdown check commands do not execute themselves. Consult `tenet --help` for exact options.

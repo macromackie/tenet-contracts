@@ -1,0 +1,24 @@
+id: inspection-writes
+invalid:
+  - |
+    def describe_mode(self):
+        self.mode = 0
+  - |
+    def describe_calls(self):
+        self.calls += 1
+valid:
+  - |
+    def describe_mode(self):
+        return self.mode
+  - |
+    def update_mode(self):
+        self.mode = 0
+  - |
+    def describe_mode(self):
+        def update():
+            self.mode = 0
+        return self.mode
+  - |
+    def describe_mode(self):
+        self.update_mode()
+        return self.mode

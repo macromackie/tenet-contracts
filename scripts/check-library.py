@@ -345,7 +345,7 @@ def check_library_files() -> list[str]:
     ]
     tests = [
         ("ast-grep", "test", "--skip-snapshot-tests", "--config", str(path.relative_to(ROOT)))
-        for pattern in (RULE_SETS, SAMPLE_RULE_TESTS)
+        for pattern in (RULE_SETS, SAMPLE_RULE_TESTS, "skills/*/resources/ast-grep/sgconfig.yml")
         for path in sorted(ROOT.glob(pattern))
     ]
 
