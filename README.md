@@ -53,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 175 contracts.
+The library has 176 contracts.
 
 Coverage describes the available checks: `tool-checked` means the contract ships tool configuration;
 `judged with eval` means development cases exercise model judgments; `judged and unmeasured` means neither is
@@ -323,6 +323,7 @@ These labels do not establish whole-contract compliance or general model accurac
 | Contract                           | Requirement                                                                                                                                  | Coverage              |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
 | `web-access-scoping`               | Authorize every server entry point; scope private client data to its session and discard it on access change.                                | judged and unmeasured |
+| `web-client-navigation`            | Keep ordinary links to recognized application routes in the mounted client and preserve native link behavior.                                | judged and unmeasured |
 | `web-development-fixtures`         | Run presentation work against labeled synthetic responses without changing the production path or reaching production.                       | judged and unmeasured |
 | `web-edge-gateway-routing`         | Route exact origins and paths to configured private upstreams, keep credentials away from static and shell upstreams, and hold no authority. | judged and unmeasured |
 | `web-public-page-server-rendering` | Render complete public content and real links in server HTML, and let hydration only add interaction.                                        | judged and unmeasured |
