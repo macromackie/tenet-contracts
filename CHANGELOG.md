@@ -8,6 +8,23 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v16.0.0
+
+### Upgrading
+
+- Commit installed copies and `.tenet.lock`, then run `tenet contracts update --ref v16.0.0`.
+- For each shipped Rust artifact, use the release package, target triple, and default and enabled features in the required locked build and Clippy checks. Existing host checks still run.
+- Projects that qualify Workers on Celld can install `tenet/test-celld-worker-runtime-checks@v16.0.0` in the scope that owns the runtime test.
+- To roll back, remove the optional new contract if installed, then run `tenet contracts update --ref v15.2.0`.
+
+### Tightened
+
+- `code-rust-workspace-checks` requires the normal check to build and lint every shipped package, compilation target, and release feature combination. Cargo's host `--all-targets` checks alone leave cross-compiled and feature-selected code unchecked.
+
+### Added
+
+- `test-celld-worker-runtime-checks` qualifies the built Worker with local bindings, exercises dependency and restart guarantees, and verifies that success and partial startup failure release the run's resources.
+
 ## v15.2.0
 
 ### Added
