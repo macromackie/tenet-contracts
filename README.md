@@ -53,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 174 contracts.
+The library has 175 contracts.
 
 Coverage describes the available checks: `tool-checked` means the contract ships tool configuration;
 `judged with eval` means development cases exercise model judgments; `judged and unmeasured` means neither is
@@ -141,7 +141,7 @@ These labels do not establish whole-contract compliance or general model accurac
 | `code-rust-source-structure`                 | Keep Rust entry points thin, alternatives as enums, and errors as derived types that callers match by variant, propagated with context and never unwrapped in production.                                                                         | tool-checked          |
 | `code-rust-type-ownership`                   | Give each Rust type at most one impl block per file, make its fields all private or all public, give each shared counter its own type, and declare no global mutable state.                                                                       | judged with eval      |
 | `code-rust-visibility`                       | Give every Rust item the narrowest visibility its users need, and fail checks on a public item that the crate root does not export.                                                                                                               | judged with eval      |
-| `code-rust-workspace-checks`                 | Enforce the rustfmt and Clippy settings that code-lint-strictness ships, share dependencies and lints through the workspace, and commit Cargo.lock.                                                                                               | judged and unmeasured |
+| `code-rust-workspace-checks`                 | Share pinned workspace tooling and build and lint every shipped Rust compilation target with its release features.                                                                                                                                | judged and unmeasured |
 | `code-script-entry-points`                   | Keep the top level of every file the repository executes directly to declarations and one statement that runs its main program.                                                                                                                   | judged with eval      |
 | `code-shared-definitions`                    | Declare each pattern, bound, and derivation that several modules must agree on once, and import it everywhere else.                                                                                                                               | judged with eval      |
 | `code-shared-utilities`                      | Keep domain-free helpers in the application's one shared utilities module, one per file, and use the declared utility library first.                                                                                                              | judged with eval      |
@@ -287,13 +287,14 @@ These labels do not establish whole-contract compliance or general model accurac
 
 #### test
 
-| Contract                   | Requirement                                                                                                                                                      | Coverage              |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `test-assertion-integrity` | Change code to satisfy its tests; never weaken a test to match new behavior or special-case test inputs in production code.                                      | tool-checked          |
-| `test-curation`            | Treat development tests as disposable, and commit only checks that guard consequential regressions and declared example tests.                                   | tool-checked          |
-| `test-example-suite`       | Keep a declared, fixed number of one-case example tests for each test runner as templates for temporary tests, and never count one as a regression's protection. | judged and unmeasured |
-| `test-scenario-functions`  | Give each scenario of an end-to-end check its own function named for the one guarantee it protects, and name every reported check without a sequence marker.     | tool-checked          |
-| `test-support-modules`     | Declare each test helper and fixture once, in its own file of the package's test support folder, and never copy it into another test file.                       | judged with eval      |
+| Contract                           | Requirement                                                                                                                                                      | Coverage              |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `test-assertion-integrity`         | Change code to satisfy its tests; never weaken a test to match new behavior or special-case test inputs in production code.                                      | tool-checked          |
+| `test-celld-worker-runtime-checks` | Exercise the built Worker on pinned Celld with local dependencies and verify that each run releases its resources.                                               | judged and unmeasured |
+| `test-curation`                    | Treat development tests as disposable, and commit only checks that guard consequential regressions and declared example tests.                                   | tool-checked          |
+| `test-example-suite`               | Keep a declared, fixed number of one-case example tests for each test runner as templates for temporary tests, and never count one as a regression's protection. | judged and unmeasured |
+| `test-scenario-functions`          | Give each scenario of an end-to-end check its own function named for the one guarantee it protects, and name every reported check without a sequence marker.     | tool-checked          |
+| `test-support-modules`             | Declare each test helper and fixture once, in its own file of the package's test support folder, and never copy it into another test file.                       | judged with eval      |
 
 #### ui
 
