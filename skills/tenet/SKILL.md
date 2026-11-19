@@ -24,6 +24,31 @@ A record is bound to the exact code it judged. Editing a scoped file makes its c
 
 With Tenet 0.18.0 or later, run `tenet check --final --json` after the last edit. Inspect each contract and declared check before reporting the result. On untrusted source, run project checkers in an isolated environment and pass their trusted receipt with `--evidence PATH`. A missing semantic answer stays pending with `--no-model`.
 
+For a pull request, pin the merge base against its fetched target branch. For example, to review a branch targeting `main` with Tenet 0.18.0 or later:
+
+```sh
+base=$(git merge-base origin/main HEAD) || exit 1
+tenet check --base "$base"
+```
+
+Inspect a pending finding with `tenet show NAME` and reproduce the claimed behavior through a public entry point.
+If you can repair the code, rerun the same checker on the fix and finish with `tenet check --final --base "$base"` on a trusted checkout.
+If a model missed a guard, record `preserved` with the changed lines that show the guard works.
+If the change never touches the behavior, record `unaffected` with the evidence for that scope.
+If a test actually reproduces a defect, its observation still belongs in the review regardless of the model's judgment.
+Distinguish a human or agent's recorded conclusion from the outcome a test observed.
+An ongoing exception belongs in the adopted contract's local adaptations.
+
+With Tenet 0.19.0, use `tenet check` on a supported Linux checkout with a configured `OPENROUTER_API_KEY` to build
+behavior checks from English contracts. Inspect the observed value and its public entry point when a check reports
+a failure. Read the generated `agent-checks.lock.json` beside the contract and keep the reviewed lock with the code
+so CI can replay the same test. A passing example covers the behavior it observed. Where detection or execution
+remains unresolved, report the missing evidence.
+
+For a coding task that calls for fixes, run `tenet fix` to apply supported tool fixes. Inspect the patch, repair the
+remaining behaviors, and rerun `tenet check` with the same scope. For a review-only task, leave the checkout's
+implementation as reviewed and report confirmed findings.
+
 ## Investigate
 
 Follow responsibilities and relationships across the before and after source. For a change spanning owners, briefly identify what moved, its source locations, and any unknown premise. Inspect unchanged callers or implementations that determine the effect. Consider both which requirements the change affects and where each scoped requirement could be affected. A narrow negative answer cannot dismiss a broader relationship.

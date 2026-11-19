@@ -8,6 +8,17 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.2.0
+
+### Added
+
+- `code-explicit-input-precedence` checks explicit values and when their fallback is read.
+- `code-borrowed-inputs` checks caller-visible contents through aliases on success and error.
+- `code-equivalent-representations` compares results and errors for inputs with the same documented meaning.
+- `test-independent-result-checks` checks computed results against an independent expectation and ships an exact linear-system example.
+- `tenet-adoption` shows how to select behavior contracts from actual public entry points and adapt their examples.
+- `tenet` describes merge-base reviews, generated checker replay, and the Tenet 0.19.0 coding workflow for observed failures.
+
 ## v17.1.0
 
 ### Added

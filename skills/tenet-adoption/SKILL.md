@@ -57,6 +57,24 @@ embed a different command. Retain justified domain-specific adaptations.
 
 ## Adopt contracts
 
+Start with the workspace manifests and their public exports. Follow those entry points to their implementation,
+documented guarantees and existing tests. Compare those guarantees with the tagged catalog and inspect any
+`assets/<tool>/` in a matching contract. A TypeScript SDK with a Python release script can have a single SDK scope.
+For each recommendation, give the contract name, the public call and path, and one observation the current checks miss.
+When asked for recommendations, return that list without installing anything.
+
+| If the public interface promises this                             | Look for this contract            |
+| ----------------------------------------------------------------- | --------------------------------- |
+| An optional argument takes precedence over its fallback           | `code-explicit-input-precedence`  |
+| The caller can reuse its input unchanged after the call           | `code-borrowed-inputs`            |
+| Two input formats have the same specified meaning                 | `code-equivalent-representations` |
+| A computed answer satisfies a documented equation or wire example | `test-independent-result-checks`  |
+
+On adoption, try the contract with the project's existing public tests and toolchain. Use a shipped rule when it
+can observe the behavior. Adapt a sample to the real entry point when a fixture or behavioral test is needed.
+For example, an existing test may already prove that `timeout: 0` returns zero while missing an eager fallback read.
+Add the missing observation to that test and use one run for both promises.
+
 Shared contracts need Tenet 0.7.0 or later, or 0.11.0 or later for a contract that ships files under `assets/`. Once
 `.tenet.lock` records a skill or contract assets, every `tenet contracts` command and `tenet validate` need Tenet 0.11.0
 or later. Inspect the scoped implementation first, then install the contract into the scope it should govern:
