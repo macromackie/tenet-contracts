@@ -60,6 +60,11 @@ and a tool check where one can decide; these steps meet it.
   maximum with the reason beside it.
 - Check every example against every other adopted contract. A violation example breaks only the rule it illustrates,
   and an allowed example breaks none.
+- Mix automated and manual clauses only when they belong to one concern. A single contract can produce both executable
+  behavior checks (`checks` in `agent-checks.lock.json`) and manual-review clauses (`open` items alongside semantic
+  review). Keep them together when they govern the same concern and `paths` scope; split into separate contracts when
+  concerns or file scopes diverge, so semantic review stays sharp and editing one rule does not invalidate unrelated
+  behavior-check locks.
 
 ## Word rules for a model reviewer
 

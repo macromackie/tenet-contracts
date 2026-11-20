@@ -8,6 +8,14 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.3.0
+
+### Added
+
+- `tenet` documents Tenet 0.20.0 workflows: fresh-codebase vs. PR-reviewer adoption loops, `tenet record` dispute handling, two-layer behavior-check caching (`agent-checks.lock.json` and `.tenet/agent-checks/`), macOS Seatbelt and Linux `bubblewrap` sandboxing, and `fx` failure explanations.
+- `tenet-adoption` adds `tenet init`, `tenet init --starter`, `tenet doctor`, and baseline debt triage workflows alongside catalog recommendations.
+- `tenet-contract-curation` explains how to mix automatable behavior clauses and manual review clauses in one contract without splitting it artificially.
+
 ## v17.2.0
 
 ### Added

@@ -22,28 +22,40 @@ With several pending contracts, give each to its own subagent with `tenet show N
 
 A record is bound to the exact code it judged. Editing a scoped file makes its contract pending and `record` refuses it until the next `check`; then `show` gives the diff since the earlier record. When evidence stays unavailable, record `unresolved` and name the missing fact. Never record a conclusion only to stop a hook.
 
-With Tenet 0.18.0 or later, run `tenet check --final --json` after the last edit. Inspect each contract and declared check before reporting the result. On untrusted source, run project checkers in an isolated environment and pass their trusted receipt with `--evidence PATH`. A missing semantic answer stays pending with `--no-model`.
+With Tenet 0.20.0 or later, `tenet check` always requires a configured model; run `tenet check --final --json` after the last edit. Inspect each contract and declared check before reporting the result. On untrusted source, run project checkers in an isolated environment and pass their trusted receipt with `--evidence PATH`. Use `--max-requests 0` to reuse cached answers without spending new requests, leaving uncached inputs pending.
 
-For a pull request, pin the merge base against its fetched target branch. For example, to review a branch targeting `main` with Tenet 0.18.0 or later:
+## Fresh codebase vs. PR reviewer workflow
+
+Choose the mode that matches the task:
+
+- **Fresh codebase (first-time adoption)**: run `tenet doctor` to verify credentials and sandbox readiness, then `tenet init` (or `tenet contracts recommend`) to inspect high-signal catalog rules, `tenet init --yes` or `tenet contracts add tenet/NAME --scope DIR` (or `tenet init --starter` for a local rule) to adopt 1–3 contracts, and establish a baseline with a full check (`tenet check --contract NAME`, no `--base`). Triage existing findings deliberately: repair real defects, narrow `paths` or document permanent exceptions under `## Local adaptations`, or record `failed` to track known debt. Commit `.contracts/`, `.tenet.lock`, and reviewed `agent-checks.lock.json` files (never commit `.tenet/`).
+- **PR reviewer bot (diff review)**: pin the merge base against the fetched target branch so the review focuses strictly on the PR's changes:
 
 ```sh
 base=$(git merge-base origin/main HEAD) || exit 1
 tenet check --base "$base"
 ```
 
-Inspect a pending finding with `tenet show NAME` and reproduce the claimed behavior through a public entry point.
+Inspect pending findings with `tenet show --pending` (or `tenet show NAME`) and reproduce claimed defects through a public entry point.
 If you can repair the code, rerun the same checker on the fix and finish with `tenet check --final --base "$base"` on a trusted checkout.
-If a model missed a guard, record `preserved` with the changed lines that show the guard works.
-If the change never touches the behavior, record `unaffected` with the evidence for that scope.
-If a test actually reproduces a defect, its observation still belongs in the review regardless of the model's judgment.
-Distinguish a human or agent's recorded conclusion from the outcome a test observed.
-An ongoing exception belongs in the adopted contract's local adaptations.
+When you disagree with a model finding after inspecting the code:
 
-With Tenet 0.19.0, use `tenet check` on a supported Linux checkout with a configured `OPENROUTER_API_KEY` to build
-behavior checks from English contracts. Inspect the observed value and its public entry point when a check reports
-a failure. Read the generated `agent-checks.lock.json` beside the contract and keep the reviewed lock with the code
-so CI can replay the same test. A passing example covers the behavior it observed. Where detection or execution
-remains unresolved, report the missing evidence.
+- For a **one-off false positive or context the model missed**, run `tenet record NAME --conclusion preserved --evidence PATH:START-END -m "why"` (or `unaffected` if untouched). The record stays bound to that exact input hash in `.tenet/events.jsonl` and automatically invalidates (`inputs_changed`) if any governed file or contract text changes.
+- For a **recurring project-wide exception**, add it under `## Local adaptations` in `CONTRACT.md` and run a full check (`tenet check --contract NAME`) so future PRs do not re-flag it.
+- If a **behavior check actually reproduces a defect**, a favorable `tenet record` never hides that live executable failure—repair the code or update the contract if the requirement intentionally changed.
+
+Distinguish a human or agent's recorded conclusion from the outcome an executable check observed.
+
+## Behavior checks and caching
+
+With Tenet 0.20.0 or later, `tenet check` on a supported macOS (`/usr/bin/sandbox-exec`) or Linux (`bubblewrap` + `prlimit`) checkout with `OPENROUTER_API_KEY` automatically generates, qualifies, and replays behavior checks alongside semantic review, and explains failed or unresolved behavior findings through `fx` without changing recorded outcomes.
+
+Behavior checks use two cache layers:
+
+1. **Committed pin (`agent-checks.lock.json` beside `CONTRACT.md`)** stores qualified checks, concrete controls, and any unautomatable `open` items. It auto-invalidates when `CONTRACT.md` changes, when the governed public surface changes, when a referenced subject disappears, or when `--fresh` is passed. Review and commit `agent-checks.lock.json` so CI replays the exact same checks offline.
+2. **Local replay receipt (`.tenet/agent-checks/`)** caches observed outcomes keyed by exact governed file bytes, pin digest, base commit, and runner version. Any byte edit to governed source busts the receipt immediately and replays frozen checks locally without spending a model request.
+
+A passing example covers the behavior it observed. Where detection or execution remains unresolved (`open` items), inspect the code manually and report any missing evidence.
 
 For a coding task that calls for fixes, run `tenet fix` to apply supported tool fixes. Inspect the patch, repair the
 remaining behaviors, and rerun `tenet check` with the same scope. For a review-only task, leave the checkout's

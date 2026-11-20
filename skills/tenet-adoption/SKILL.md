@@ -57,7 +57,7 @@ embed a different command. Retain justified domain-specific adaptations.
 
 ## Adopt contracts
 
-Start with the workspace manifests and their public exports. Follow those entry points to their implementation,
+Run `tenet init` or `tenet contracts recommend` first to inspect catalog suggestions grounded in the repository's structure and public declarations without modifying any files (use `tenet doctor` to verify environment setup and `tenet init --starter` to scaffold a local rule when no shared catalog rule fits). Then read the workspace manifests and their public exports. Follow those entry points to their implementation,
 documented guarantees and existing tests. Compare those guarantees with the tagged catalog and inspect any
 `assets/<tool>/` in a matching contract. A TypeScript SDK with a Python release script can have a single SDK scope.
 For each recommendation, give the contract name, the public call and path, and one observation the current checks miss.
@@ -89,7 +89,7 @@ Library names start with an area such as `api`, `code`, `security`, `ui`, or `we
 contract only into scopes that use that technology.
 
 `add` writes the next numbered `.contracts` folder and records it in `.tenet.lock`. A name already used in the project
-needs `--name`, such as `--name web-data-and-apis` for a second scope. Check a new contract without `--base`: no earlier revision complied with it. To record an existing copy
+needs `--name`, such as `--name web-data-and-apis` for a second scope. Check a new contract without `--base`: no earlier revision complied with it. When that full check finds pre-existing violations, fix real defects, narrow `paths` or document permanent exceptions under `## Local adaptations`, or record `failed` with evidence to acknowledge known debt while keeping future PR reviews clean. Review and commit any generated `agent-checks.lock.json` alongside `.contracts/` and `.tenet.lock` so CI replays the frozen checks offline. To record an existing copy
 of a library contract, run `tenet contracts add tenet/NAME --path PATH`; its differences then count as local edits.
 
 A contract may ship tool configuration or data files under `assets/<tool>/`, such as lint rules, and then declares
