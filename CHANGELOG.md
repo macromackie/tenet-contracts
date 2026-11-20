@@ -8,6 +8,12 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.3.1
+
+### Clarified
+
+- `tenet` documents `tenet record --json` for automated review workflows (Tenet 0.21.0+).
+
 ## v17.3.0
 
 ### Added
