@@ -8,6 +8,13 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.4.1
+
+### Clarified
+
+- `tenet` streamlines workflow formatting into scannable sections and tables, documents Node, Python, multi-file Rust, and Go behavior-check runtimes and read-only dependency directories, adds nested macOS Seatbelt troubleshooting, and advises using `× FAIL` witnesses as starting points rather than the entire defect surface during broad audits.
+- `tenet-contract-curation` adds `paths:` scoping best practices for excluding fixture trees (`!testdata/**`, `!**/locales/**`) and bulky test suites from runtime-behavior contracts so large repos stay within request and context budgets.
+
 ## v17.4.0
 
 ### Added
