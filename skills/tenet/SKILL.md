@@ -79,14 +79,26 @@ On macOS (`/usr/bin/sandbox-exec`) and Linux (`bubblewrap` + `prlimit`), `tenet 
 
 Tenet never runs package installs or `build.rs` inside the sandbox; it mounts existing in-root dependencies read-only when present:
 
-| Runtime     | Source discovery                                                     | Prebuilt read-only dependencies                 | Notes                                                                                      |
-| ----------- | -------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| **Node.js** | `.js`, `.mjs`, `.cjs`, `.ts`, `.mts`, `.tsx`, `.jsx`, `package.json` | `node_modules/`                                 | Runs staged probes or `node --test`.                                                       |
-| **Python**  | `.py`, `pyproject.toml`, `setup.cfg`                                 | `.venv/` (`site-packages`)                      | Runs staged probes or `unittest`.                                                          |
-| **Rust**    | `.rs`, `Cargo.toml`                                                  | `target/debug/deps/` (from `cargo build --lib`) | Compiles multi-file `src/lib.rs` with Cargo edition & default features inside the sandbox. |
-| **Go**      | `.go`, `go.mod`, `go.sum`                                            | `vendor/` (from `go mod vendor`)                | Offline `go build` (`CGO_ENABLED=0`, `GOPROXY=off`, `GOSUMDB=off`).                        |
+| Runtime     | Source discovery                                                     | Prebuilt read-only dependencies                 | Notes                                                                                                       |
+| ----------- | -------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Node.js** | `.js`, `.mjs`, `.cjs`, `.ts`, `.mts`, `.tsx`, `.jsx`, `package.json` | `node_modules/`                                 | Runs staged probes or `node --test`, with a bounded extensionless relative ESM resolution hook.             |
+| **Python**  | `.py`, `pyproject.toml`, `setup.cfg`                                 | `.venv/` (`site-packages`)                      | Runs staged probes or `unittest`.                                                                           |
+| **Rust**    | `.rs`, `Cargo.toml`                                                  | `target/debug/deps/` (from `cargo build --lib`) | Compiles multi-file `src/lib.rs` with Cargo edition, default features, and satisfiable local optional ones. |
+| **Go**      | `.go`, `go.mod`, `go.sum`                                            | `vendor/` (from `go mod vendor`)                | Offline `go build` (`CGO_ENABLED=0`, `GOPROXY=off`, `GOSUMDB=off`).                                         |
 
-If `tenet doctor` reports nested macOS Seatbelt (`sandbox-exec: Operation not permitted`), run `tenet check` outside the outer sandbox wrapper.
+If `tenet doctor` reports nested macOS Seatbelt (`sandbox-exec: Operation not permitted`), run `tenet check` or `tenet audit` outside the outer sandbox wrapper.
+
+### On-demand module audits (`tenet audit`)
+
+On repositories with few or no authored contracts yet, run `tenet audit` (requires `OPENROUTER_API_KEY`):
+
+```sh
+tenet audit                       # Discover production modules, synthesize contracts, falsify in sandbox
+tenet audit src/ --deep --json    # Add adversarial edge-case synthesis and emit a JSON witness queue
+tenet audit --save                # Persist verified contracts and pre-qualified pins into .contracts/
+```
+
+`tenet audit` resumes from `.tenet/audit.json` unless `--fresh` is passed, never edits tracked files without `--save`, and groups findings by module so you can repair one module at a time without losing context.
 
 ### Two cache layers
 

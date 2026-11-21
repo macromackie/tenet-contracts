@@ -8,6 +8,12 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.5.0
+
+### Added
+
+- `tenet` documents `tenet audit [PATHS...] [--deep] [--save] [--fresh] [--json]` for on-demand per-module contract synthesis and sandboxed falsification, plus Node extensionless relative ESM imports and automatic local optional Cargo features (Tenet 0.24.0+).
+
 ## v17.4.1
 
 ### Clarified
