@@ -63,12 +63,13 @@ documented guarantees and existing tests. Compare those guarantees with the tagg
 For each recommendation, give the contract name, the public call and path, and one observation the current checks miss.
 When asked for recommendations, return that list without installing anything.
 
-| If the public interface promises this                             | Look for this contract            |
-| ----------------------------------------------------------------- | --------------------------------- |
-| An optional argument takes precedence over its fallback           | `code-explicit-input-precedence`  |
-| The caller can reuse its input unchanged after the call           | `code-borrowed-inputs`            |
-| Two input formats have the same specified meaning                 | `code-equivalent-representations` |
-| A computed answer satisfies a documented equation or wire example | `test-independent-result-checks`  |
+| If the public interface promises this                                                   | Look for this contract            |
+| --------------------------------------------------------------------------------------- | --------------------------------- |
+| An optional argument takes precedence over its fallback                                 | `code-explicit-input-precedence`  |
+| The caller can reuse its input unchanged after the call                                 | `code-borrowed-inputs`            |
+| Two input formats have the same specified meaning                                       | `code-equivalent-representations` |
+| A formatter or canonical transform is idempotent and preserves comments or line endings | `code-idempotent-transformations` |
+| A computed answer satisfies a documented equation or wire example                       | `test-independent-result-checks`  |
 
 On adoption, try the contract with the project's existing public tests and toolchain. Use a shipped rule when it
 can observe the behavior. Adapt a sample to the real entry point when a fixture or behavioral test is needed.

@@ -53,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 180 contracts.
+The library has 181 contracts.
 
 Coverage describes the available checks: `tool-checked` means the contract ships tool configuration;
 `judged with eval` means development cases exercise model judgments; `judged and unmeasured` means neither is
@@ -120,6 +120,7 @@ These labels do not establish whole-contract compliance or general model accurac
 | `code-folder-size`                           | Keep every source folder within lint-enforced limits on its file count and depth, and name and justify each exempt folder in the lint configuration.                                                                                              | tool-checked          |
 | `code-function-size`                         | Keep every function within lint-enforced length, nesting, callback, markup depth, and complexity limits, and give each case of a branch on a closed set its own function.                                                                         | tool-checked          |
 | `code-guard-clauses`                         | Leave a block early with a guard instead of nesting its remaining work, and never write an `else` after a branch that leaves.                                                                                                                     | judged with eval      |
+| `code-idempotent-transformations`            | Keep canonical source and document transformations idempotent while preserving comments, line endings, and opt-out regions.                                                                                                                       | judged and unmeasured |
 | `code-key-order`                             | Write the keys of every object, struct, and configuration map in code point order, and keep another order only where order is behavior.                                                                                                           | judged and unmeasured |
 | `code-lint-strictness`                       | Run every lint, type checker, compiler, and formatter at its strictest setting, and turn a rule off only for a listed reason named beside its entry.                                                                                              | tool-checked          |
 | `code-lint-suppressions`                     | Suppress a lint or check finding only at the one site it reports, with the rule's name and a reason, and fail checks on every suppression that suppresses nothing.                                                                                | tool-checked          |

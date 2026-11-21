@@ -8,6 +8,17 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.4.0
+
+### Added
+
+- `code-idempotent-transformations` requires formatters, rewriters, and source-to-source normalizers to be idempotent while preserving line endings, comments, and disabled regions.
+
+### Clarified
+
+- `tenet-adoption` adds `code-idempotent-transformations` to the catalog recommendation table.
+- `tenet-contract-curation` updates local check recipes to run declared project checks through `tenet check --final --contract CONTRACT`.
+
 ## v17.3.1
 
 ### Clarified

@@ -39,7 +39,7 @@ With Tenet 0.18.0 or later, run `tenet check --qualify CONTRACT/CHECK` when intr
 ## Repair and rerun
 
 Name the executable claim under `checks` in the contract. Bind a reviewed project command
-in `checks/NAME.json` beside the contract. Run `tenet check --local CONTRACT/NAME`; read the
+in `checks/NAME.json` beside the contract. Run `tenet check --final --contract CONTRACT`; read the
 case, evidence, and replay command. Apply a project-approved safe fixer for mechanical edits.
 For behavior failures, repair the implementation and replay the same case. Run all local checks
 after the repair, including those established earlier. Leave any broader unanswered question visible in the review.
