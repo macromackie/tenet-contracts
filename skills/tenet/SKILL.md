@@ -1,6 +1,6 @@
 ---
 name: tenet
-description: Use Tenet to scan repositories into .contracts/, run semantic and offline behavioral checks, fix or triage failing witnesses, and record review conclusions. Use when auditing codebases, reviewing diffs governed by .contracts, or working with the Tenet CLI.
+description: Use Tenet to scan repositories into .contracts/, run semantic and deterministic behavioral checks, fix or triage failing witnesses, and record review conclusions. Use when auditing codebases, reviewing diffs governed by .contracts, or working with the Tenet CLI.
 license: MIT
 ---
 
@@ -12,16 +12,16 @@ Model answers and generated descriptions help investigate requirements; they do 
 
 ## Core commands & contract layout
 
-Requires Tenet 0.36.0 or later. Contracts live under `.contracts/<NNN>-<name>/` with `CONTRACT.md`, standalone runnable behavior scripts in `scripts/`, and a slim SHA-256 `controlHash` lockfile at `scripts/.lock.json` (`assets/` holds catalog tool fragments; legacy `agent-checks.lock.json` remains readable for compatibility).
+Requires Tenet 0.37.0 or later (for `--skip-semantic`). Contracts live under `.contracts/<NNN>-<name>/` with `CONTRACT.md`, standalone runnable behavior scripts in `scripts/`, and a slim SHA-256 `controlHash` lockfile at `scripts/.lock.json` (`assets/` holds catalog tool fragments; legacy `agent-checks.lock.json` remains readable for compatibility).
 
 1. **`tenet scan`**: Discovers production modules, synthesizes consolidated contracts, and falsifies invariants in isolated OS sandboxes. Deep mode is the default; pass `--shallow` for a lighter, faster scan (`--deep` is accepted as a compatibility no-op). Use `--apply` or `--yes` to write `.contracts/`, `--ephemeral` to stage under `.tenet/scan/.contracts/`, `--starter` to scaffold a starter contract, `--base` to focus on a diff, `--fresh` to ignore cached scan state, and `--json` for structured output. `tenet init` and `tenet audit` remain compatibility aliases.
-2. **`tenet check` & `tenet check --offline`**: `tenet check` runs semantic, static, and runtime checks (requires configured model credentials such as `OPENROUTER_API_KEY`). `tenet check --offline` replays static, local, and locked runtime scripts across `.contracts/` and `.tenet/scan/.contracts/` with zero model calls and persists receipts to `.tenet/offline-check.json`.
+2. **`tenet check` (and fallback `tenet check --skip-semantic`)**: `tenet check` runs semantic, static, and runtime checks (requires configured model credentials such as `OPENROUTER_API_KEY`). As an explicit fallback for air-gapped environments, pre-commit hooks, or CI gates without provider credentials, `tenet check --skip-semantic` (compatibility aliases `--offline`, `--replay`) skips semantic contract review and only replays deterministic static checks, declared local checks, and locked runtime scripts across `.contracts/` and `.tenet/scan/.contracts/`, persisting receipts to `.tenet/offline-check.json`.
 3. **`tenet fix`**: Unified repair for safe native lints and failing runtime checks or witnesses across `.contracts/`, `.tenet/scan/.contracts/`, or `.tenet/audit.json` (filter with `--severity critical|high|medium`; no `--from-audit` flag required).
 4. **`tenet status` & `tenet show`**: `tenet status` prints the offline coverage map, persisted `.tenet/offline-check.json` receipts, and review health without calling a model or writing state. `tenet show` prints pending contract details and direct runnable script paths under `scripts/`.
 
 ## Review loop
 
-1. **Check**: Run `tenet check --base BASE` for a diff review, `tenet check` for the whole repository, or `tenet check --offline` for zero-LLM replay of static, local, and locked runtime scripts.
+1. **Check**: Run `tenet check --base BASE` for a diff review or `tenet check` for the whole repository. Only use the explicit fallback `tenet check --skip-semantic` (compatibility aliases `--offline`, `--replay`) when provider credentials are unavailable to skip semantic contract review and replay deterministic static checks, declared local checks, and locked runtime scripts.
    - `tenet check` captures staged, unstaged, and untracked changes, asks the model, runs executable behavior scripts, and appends a revision to `.tenet/`.
    - Stays pinned to the commit `BASE` resolved to, so committing keeps the review.
    - After `tenet contracts add` or `update` changes a contract, run `tenet check --contract NAME` with no `--base`.
@@ -55,7 +55,7 @@ Choose the workflow that matches the task:
 
 1. Run `tenet doctor` to verify `OPENROUTER_API_KEY`, sandbox readiness (macOS Seatbelt or Linux `bubblewrap`/`prlimit`), and installed runtimes.
 2. Run `tenet scan` (deep by default; pass `--shallow` for a lighter preview) or `tenet contracts recommend` to discover high-signal rules, then persist contracts via `tenet scan --apply` (or `tenet scan --yes`), `tenet contracts add tenet/NAME --scope DIR`, or `tenet scan --starter`. Use `tenet scan --ephemeral` to stage contracts under `.tenet/scan/.contracts/` without modifying tracked files.
-3. Replay locked scripts locally with `tenet check --offline`, and establish a full semantic + runtime baseline with `tenet check --contract NAME` (no `--base`).
+3. Establish a full semantic + runtime baseline with `tenet check --contract NAME` (no `--base`); only use the explicit fallback `tenet check --skip-semantic` when provider credentials are unavailable to skip semantic contract review and replay locked deterministic scripts.
 4. Triage findings deliberately: fix real defects (using `tenet fix --severity critical|high|medium` where helpful), narrow `paths` or document permanent exceptions under `## Local adaptations`, or record `failed` to track known debt.
 5. Commit `.contracts/` (`CONTRACT.md`, `scripts/`, `scripts/.lock.json`, and any catalog `assets/`) and `.tenet.lock` (never commit `.tenet/`).
 
@@ -68,7 +68,7 @@ base=$(git merge-base origin/main HEAD) || exit 1
 tenet check --base "$base"
 ```
 
-Run `tenet check --offline` when you want fast zero-LLM replay of locked scripts across the checkout before or between semantic checks. Inspect pending findings with `tenet show --pending` (or `tenet show NAME`) and reproduce claimed defects through a public entry point or the printed runnable script path. When repairing code, rerun the checker on the fix and finish with `tenet check --final --base "$base"` on a trusted checkout.
+When provider credentials are unavailable or you explicitly want fast deterministic script replay without semantic review, use the fallback `tenet check --skip-semantic` (compatibility aliases `--offline`, `--replay`). Inspect pending findings with `tenet show --pending` (or `tenet show NAME`) and reproduce claimed defects through a public entry point or the printed runnable script path. When repairing code, rerun the checker on the fix and finish with `tenet check --final --base "$base"` on a trusted checkout.
 
 When you disagree with a finding after inspecting the code:
 
@@ -116,7 +116,7 @@ tenet scan --ephemeral --json    # Stage contracts in .tenet/scan/.contracts/ an
 
 ### Two cache layers
 
-1. **Committed scripts & slim lockfile (`scripts/` + `scripts/.lock.json` beside `CONTRACT.md`)** stores standalone runnable behavior scripts, slim SHA-256 `controlHash` lock entries, and unautomatable `open` items (`assets/` stays for catalog tool fragments). Auto-invalidates when `CONTRACT.md` changes, when the governed public surface changes, when a subject disappears, or on `--fresh`. Review and commit both `scripts/` and `scripts/.lock.json` so `tenet check --offline` and CI replay the exact same checks without regenerating. Legacy `agent-checks.lock.json` remains readable for compatibility.
+1. **Committed scripts & slim lockfile (`scripts/` + `scripts/.lock.json` beside `CONTRACT.md`)** stores standalone runnable behavior scripts, slim SHA-256 `controlHash` lock entries, and unautomatable `open` items (`assets/` stays for catalog tool fragments). Auto-invalidates when `CONTRACT.md` changes, when the governed public surface changes, when a subject disappears, or on `--fresh`. Review and commit both `scripts/` and `scripts/.lock.json` so CI and the fallback `tenet check --skip-semantic` replay the exact same locked checks without regenerating. Legacy `agent-checks.lock.json` remains readable for compatibility.
 2. **Local replay receipts (`.tenet/offline-check.json` and `.tenet/agent-checks/`)** cache observed outcomes keyed by exact governed file bytes, lock digest, base commit, and runner version. Any byte edit to governed source busts the receipt immediately and replays locked scripts locally without spending a model request.
 
 ### Witness triage & unified repair (`tenet fix`)
@@ -126,7 +126,7 @@ Treat `× FAIL` behavior witnesses as high-signal verified leads inside a full-m
 1. **Reproduce before editing**: Confirm each failing witness by running its script path printed by `tenet show` against the real module and checking its public docs and docstrings.
 2. **Respect pre-existing green tests**: Never weaken or edit pre-existing test files to fit a witness. If a witness contradicts an explicitly asserted green test, skip that witness and treat the repository's test suite as authoritative.
 3. **Fix highest severity first, then sweep the module**: Repair the highest-severity defects (crashes, state/input mutations, round-trip contradictions) first and checkpoint after every green fix. Then perform an unanchored sweep of the remaining governed code and `open` items so high-confidence witnesses do not cause tunnel vision.
-4. **Use unified `tenet fix` for coding tasks**: Run `tenet fix` (or `tenet fix --severity critical|high|medium`) to apply safe native lint fixes and repair failing runtime checks or witnesses across `.contracts/`, `.tenet/scan/.contracts/`, or `.tenet/audit.json` (no `--from-audit` flag required). Re-verify with `tenet check --offline` and, when checking semantic rules, `tenet check` on the same scope.
+4. **Use unified `tenet fix` for coding tasks**: Run `tenet fix` (or `tenet fix --severity critical|high|medium`) to apply safe native lint fixes and repair failing runtime checks or witnesses across `.contracts/`, `.tenet/scan/.contracts/`, or `.tenet/audit.json` (no `--from-audit` flag required). Re-verify with `tenet check` on the same scope (or with the explicit fallback `tenet check --skip-semantic` when you only want to replay locked deterministic checks without semantic review).
 5. **Leave checkouts clean for review-only tasks**: Do not modify files during review-only tasks; report confirmed findings with evidence.
 6. **Lock in verified fixes**: Run `tenet scan --apply` (or `tenet check --contract NAME`) after fixing to retain durable runnable regression scripts and `scripts/.lock.json` locks.
 

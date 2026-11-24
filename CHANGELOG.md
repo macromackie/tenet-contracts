@@ -8,6 +8,12 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.6.1
+
+### Clarified
+
+- `tenet` and `tenet-adoption` replace `tenet check --offline` with the explicit fallback `tenet check --skip-semantic` (Tenet 0.37.0+; compatibility aliases `--offline` and `--replay`) so bypassing semantic contract review to replay deterministic static, local, and locked runtime checks is unambiguous.
+
 ## v17.6.0
 
 ### Added
