@@ -53,7 +53,7 @@ Each name reads `<area>-[<technology>-]<subject>[-<aspect>]`, for example `secur
 
 ### By area
 
-The library has 181 contracts.
+The library has 182 contracts.
 
 Coverage describes the available checks: `tool-checked` means the contract ships tool configuration;
 `judged with eval` means development cases exercise model judgments; `judged and unmeasured` means neither is
@@ -257,19 +257,20 @@ These labels do not establish whole-contract compliance or general model accurac
 
 #### security
 
-| Contract                                | Requirement                                                                                                                                       | Coverage              |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `security-api-key-lifecycle`            | Store issued keys as hashes bound to owner, scope, and expiry, revoke them permanently, and fail with distinct unauthenticated errors.            | judged and unmeasured |
-| `security-approved-external-actions`    | Execute external writes only from an approved, exact, immutable request, once, and never replay uncertain outcomes.                               | judged and unmeasured |
-| `security-cli-credential-lifecycle`     | Store CLI credentials owner-only and atomically, bound to their origin, and never print them or accept them as arguments.                         | judged and unmeasured |
-| `security-delegated-credential-vending` | Mint a capped, expiring, narrowly scoped child credential per request, return it once, and delete it when it ends.                                | judged and unmeasured |
-| `security-inbound-webhook-verification` | Verify each webhook over its raw body, bind it to the expected source, and store it once before processing.                                       | judged and unmeasured |
-| `security-interpreter-injection`        | Pass untrusted input to interpreters only as bound data, never as code, commands, query text, templates, or type-constructing serialized objects. | judged and unmeasured |
-| `security-oauth-authorization-server`   | Issue audience-bound tokens through PKCE, and never let a login confer authorization.                                                             | judged and unmeasured |
-| `security-oauth-browser-sessions`       | Keep OAuth tokens server-side behind host-only HttpOnly cookies with exact-origin checks.                                                         | judged and unmeasured |
-| `security-resource-access-control`      | Authorize every request on the server from current grants; logins, plain links, and caller-supplied facts grant nothing.                          | judged with eval      |
-| `security-server-secret-storage`        | Encrypt held secrets bound to their record, keep keys outside the database, and never log secret values.                                          | judged and unmeasured |
-| `security-user-content-serving`         | Treat user content as untrusted; never execute markup, inline only verified passive formats, and serve the rest as downloads.                     | judged and unmeasured |
+| Contract                                | Requirement                                                                                                                                                                                        | Coverage              |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `security-api-key-lifecycle`            | Store issued keys as hashes bound to owner, scope, and expiry, revoke them permanently, and fail with distinct unauthenticated errors.                                                             | judged and unmeasured |
+| `security-approved-external-actions`    | Execute external writes only from an approved, exact, immutable request, once, and never replay uncertain outcomes.                                                                                | judged and unmeasured |
+| `security-cli-credential-lifecycle`     | Store CLI credentials owner-only and atomically, bound to their origin, and never print them or accept them as arguments.                                                                          | judged and unmeasured |
+| `security-declarative-secret-delivery`  | Declare every deployment and runtime secret binding in one versioned manifest, deliver values directly from the central secret vault without plaintext scripts, and enforce manifest parity in CI. | tool-checked          |
+| `security-delegated-credential-vending` | Mint a capped, expiring, narrowly scoped child credential per request, return it once, and delete it when it ends.                                                                                 | judged and unmeasured |
+| `security-inbound-webhook-verification` | Verify each webhook over its raw body, bind it to the expected source, and store it once before processing.                                                                                        | judged and unmeasured |
+| `security-interpreter-injection`        | Pass untrusted input to interpreters only as bound data, never as code, commands, query text, templates, or type-constructing serialized objects.                                                  | judged and unmeasured |
+| `security-oauth-authorization-server`   | Issue audience-bound tokens through PKCE, and never let a login confer authorization.                                                                                                              | judged and unmeasured |
+| `security-oauth-browser-sessions`       | Keep OAuth tokens server-side behind host-only HttpOnly cookies with exact-origin checks.                                                                                                          | judged and unmeasured |
+| `security-resource-access-control`      | Authorize every request on the server from current grants; logins, plain links, and caller-supplied facts grant nothing.                                                                           | judged with eval      |
+| `security-server-secret-storage`        | Encrypt held secrets bound to their record, keep keys outside the database, and never log secret values.                                                                                           | judged and unmeasured |
+| `security-user-content-serving`         | Treat user content as untrusted; never execute markup, inline only verified passive formats, and serve the rest as downloads.                                                                      | judged and unmeasured |
 
 #### service
 

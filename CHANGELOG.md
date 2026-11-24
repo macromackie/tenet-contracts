@@ -8,6 +8,12 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.7.0
+
+### Added
+
+- `security-declarative-secret-delivery` requires repositories to declare deployment and runtime secret bindings in one versioned manifest, deliver values directly from the central secret vault without local plaintext scripts, and enforce workflow and runtime binding parity in CI. It ships `assets/uv/check-secret-manifest.py` with its policy schema and example configuration, supporting both single-environment and multi-environment manifests.
+
 ## v17.6.1
 
 ### Clarified

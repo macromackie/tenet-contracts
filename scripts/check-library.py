@@ -70,14 +70,16 @@ WORKSPACE_CHECKS = (
     "contracts/code-source-comments/assets/uv",
     "contracts/code-tool-configuration-folder/assets/uv",
     "contracts/docs-package-readme/assets/uv",
+    "contracts/security-declarative-secret-delivery/assets/uv",
 )
-"""The standalone checkers of the package, comment, and tool configuration contracts."""
+"""The standalone checkers of the package, comment, secret, and tool configuration contracts."""
 WORKSPACE_CASES = (
     "tests/code-rust-module-files/uv/check-module-files-cases.py",
     "tests/code-package-shape/uv/check-package-shape-cases.py",
     "tests/code-source-comments/uv/check-source-comments-cases.py",
     "tests/code-tool-configuration-folder/uv/check-tool-configuration-cases.py",
     "tests/docs-package-readme/uv/check-package-readmes-cases.py",
+    "tests/security-declarative-secret-delivery/uv/check-secret-manifest-cases.py",
 )
 """The passing and failing example workspaces that run each of those checkers."""
 WORKSPACE_CASE_FOLDERS = tuple(str(Path(case).parent) for case in WORKSPACE_CASES)
