@@ -8,6 +8,17 @@ Each major release after v1.0.0 has an `### Upgrading` block. Take one major at 
 no later major exists. Tenet 0.11.0 and earlier move straight to the newest release, so pass them the `--ref` each block
 names. Tenet 0.11.0 installs every release, including the tool files that v9.0.0 and later ship under `assets/`.
 
+## v17.6.0
+
+### Added
+
+- `tenet` documents Tenet 0.36.0's four core commands (`tenet scan` deep by default with `--shallow`, `--apply`/`--yes`, `--ephemeral`, `--starter`, `--base`, `--fresh`, and `--json`; `tenet check --offline` with `.tenet/offline-check.json` receipts; unified `tenet fix --severity`; and `tenet status`/`tenet show` coverage maps and runnable script paths), the unified `.contracts/<NNN>-<name>/{CONTRACT.md, scripts/, scripts/.lock.json}` layout, and witness-triage discipline (witnesses vs. guards vs. unresolved, reproducing before editing, preserving pre-existing green tests, and severity-first fixing inside full-module sweeps).
+
+### Clarified
+
+- `tenet-adoption` updates onboarding from `tenet init` and `agent-checks.lock.json` to `tenet scan` (`--shallow`, `--apply`/`--yes`, `--starter`), `scripts/` + `scripts/.lock.json`, and `tenet check --offline` (Tenet 0.36.0+).
+- `tenet-contract-curation` updates behavior-check lock guidance from `agent-checks.lock.json` to `scripts/` and `scripts/.lock.json` while noting legacy `agent-checks.lock.json` compatibility (Tenet 0.36.0+).
+
 ## v17.5.0
 
 ### Added

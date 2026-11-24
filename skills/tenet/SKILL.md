@@ -1,6 +1,6 @@
 ---
 name: tenet
-description: Use Tenet to discover repository contracts, assess code and changes, and record a conclusion for each contract. Use when reviewing code governed by .contracts or working with the Tenet CLI.
+description: Use Tenet to scan repositories into .contracts/, run semantic and offline behavioral checks, fix or triage failing witnesses, and record review conclusions. Use when auditing codebases, reviewing diffs governed by .contracts, or working with the Tenet CLI.
 license: MIT
 ---
 
@@ -10,16 +10,23 @@ Review against the complete English contracts, including scope and exceptions. Y
 
 Model answers and generated descriptions help investigate requirements; they do not replace them. Keep review within the requested scope.
 
+## Core commands & contract layout
+
+Requires Tenet 0.36.0 or later. Contracts live under `.contracts/<NNN>-<name>/` with `CONTRACT.md`, standalone runnable behavior scripts in `scripts/`, and a slim SHA-256 `controlHash` lockfile at `scripts/.lock.json` (`assets/` holds catalog tool fragments; legacy `agent-checks.lock.json` remains readable for compatibility).
+
+1. **`tenet scan`**: Discovers production modules, synthesizes consolidated contracts, and falsifies invariants in isolated OS sandboxes. Deep mode is the default; pass `--shallow` for a lighter, faster scan (`--deep` is accepted as a compatibility no-op). Use `--apply` or `--yes` to write `.contracts/`, `--ephemeral` to stage under `.tenet/scan/.contracts/`, `--starter` to scaffold a starter contract, `--base` to focus on a diff, `--fresh` to ignore cached scan state, and `--json` for structured output. `tenet init` and `tenet audit` remain compatibility aliases.
+2. **`tenet check` & `tenet check --offline`**: `tenet check` runs semantic, static, and runtime checks (requires configured model credentials such as `OPENROUTER_API_KEY`). `tenet check --offline` replays static, local, and locked runtime scripts across `.contracts/` and `.tenet/scan/.contracts/` with zero model calls and persists receipts to `.tenet/offline-check.json`.
+3. **`tenet fix`**: Unified repair for safe native lints and failing runtime checks or witnesses across `.contracts/`, `.tenet/scan/.contracts/`, or `.tenet/audit.json` (filter with `--severity critical|high|medium`; no `--from-audit` flag required).
+4. **`tenet status` & `tenet show`**: `tenet status` prints the offline coverage map, persisted `.tenet/offline-check.json` receipts, and review health without calling a model or writing state. `tenet show` prints pending contract details and direct runnable script paths under `scripts/`.
+
 ## Review loop
 
-Requires Tenet 0.20.0 or later (`tenet check` always requires configured model credentials such as `OPENROUTER_API_KEY`).
-
-1. **Check**: Run `tenet check --base BASE` for a diff review, or `tenet check` for the whole repository.
-   - Captures staged, unstaged, and untracked changes, asks the model, runs executable behavior checks, and appends a revision to `.tenet/`.
+1. **Check**: Run `tenet check --base BASE` for a diff review, `tenet check` for the whole repository, or `tenet check --offline` for zero-LLM replay of static, local, and locked runtime scripts.
+   - `tenet check` captures staged, unstaged, and untracked changes, asks the model, runs executable behavior scripts, and appends a revision to `.tenet/`.
    - Stays pinned to the commit `BASE` resolved to, so committing keeps the review.
    - After `tenet contracts add` or `update` changes a contract, run `tenet check --contract NAME` with no `--base`.
-2. **Status**: Run `tenet status`. It lists settled vs. pending contracts and suggests the highest-signal violation to inspect first without calling a model or writing state.
-3. **Inspect**: Run `tenet show NAME` (or `tenet show --pending` for all pending contracts with their shared diff once). When `status` attributes a row to an earlier check's paths, pass them too: `tenet show NAME PATH ...`.
+2. **Status**: Run `tenet status`. It shows the offline coverage map, persisted offline check receipts, and settled vs. pending contracts, and suggests the highest-signal violation to inspect first without calling a model or writing state.
+3. **Inspect**: Run `tenet show NAME` (or `tenet show --pending` for all pending contracts with their shared diff once). `show` prints direct runnable script paths under `scripts/` so failing checks can be reproduced immediately. When `status` attributes a row to an earlier check's paths, pass them too: `tenet show NAME PATH ...`.
 4. **Record**: After verifying in source, record your conclusion:
 
    ```sh
@@ -47,10 +54,10 @@ Choose the workflow that matches the task:
 ### Fresh codebase (first-time adoption)
 
 1. Run `tenet doctor` to verify `OPENROUTER_API_KEY`, sandbox readiness (macOS Seatbelt or Linux `bubblewrap`/`prlimit`), and installed runtimes.
-2. Run `tenet init` (or `tenet contracts recommend`) to inspect high-signal catalog rules, then adopt 1–3 contracts via `tenet init --yes`, `tenet contracts add tenet/NAME --scope DIR`, or `tenet init --starter`.
-3. Establish a baseline with a full check (`tenet check --contract NAME`, no `--base`).
-4. Triage findings deliberately: fix real defects, narrow `paths` or document permanent exceptions under `## Local adaptations`, or record `failed` to track known debt.
-5. Commit `.contracts/`, `.tenet.lock`, and reviewed `agent-checks.lock.json` files (never commit `.tenet/`).
+2. Run `tenet scan` (deep by default; pass `--shallow` for a lighter preview) or `tenet contracts recommend` to discover high-signal rules, then persist contracts via `tenet scan --apply` (or `tenet scan --yes`), `tenet contracts add tenet/NAME --scope DIR`, or `tenet scan --starter`. Use `tenet scan --ephemeral` to stage contracts under `.tenet/scan/.contracts/` without modifying tracked files.
+3. Replay locked scripts locally with `tenet check --offline`, and establish a full semantic + runtime baseline with `tenet check --contract NAME` (no `--base`).
+4. Triage findings deliberately: fix real defects (using `tenet fix --severity critical|high|medium` where helpful), narrow `paths` or document permanent exceptions under `## Local adaptations`, or record `failed` to track known debt.
+5. Commit `.contracts/` (`CONTRACT.md`, `scripts/`, `scripts/.lock.json`, and any catalog `assets/`) and `.tenet.lock` (never commit `.tenet/`).
 
 ### PR reviewer bot (diff review)
 
@@ -61,7 +68,7 @@ base=$(git merge-base origin/main HEAD) || exit 1
 tenet check --base "$base"
 ```
 
-Inspect pending findings with `tenet show --pending` (or `tenet show NAME`) and reproduce claimed defects through a public entry point. When repairing code, rerun the checker on the fix and finish with `tenet check --final --base "$base"` on a trusted checkout.
+Run `tenet check --offline` when you want fast zero-LLM replay of locked scripts across the checkout before or between semantic checks. Inspect pending findings with `tenet show --pending` (or `tenet show NAME`) and reproduce claimed defects through a public entry point or the printed runnable script path. When repairing code, rerun the checker on the fix and finish with `tenet check --final --base "$base"` on a trusted checkout.
 
 When you disagree with a finding after inspecting the code:
 
@@ -71,9 +78,9 @@ When you disagree with a finding after inspecting the code:
 
 Always distinguish a human or agent's recorded conclusion from an outcome an executable check observed.
 
-## Behavior checks, runtimes, and caching
+## Scanning, behavior checks, runtimes, and caching
 
-On macOS (`/usr/bin/sandbox-exec`) and Linux (`bubblewrap` + `prlimit`), `tenet check` automatically generates, qualifies, and replays isolated behavior checks alongside semantic review, and explains failed or unresolved behavior findings read-only through `fx`.
+On macOS (`/usr/bin/sandbox-exec`) and Linux (`bubblewrap` + `prlimit`), `tenet scan` and `tenet check` generate, qualify, and replay isolated behavior scripts alongside semantic review, and explain failed or unresolved behavior findings read-only through `fx`.
 
 ### Supported runtimes & read-only dependencies
 
@@ -86,32 +93,42 @@ Tenet never runs package installs or `build.rs` inside the sandbox; it mounts ex
 | **Rust**    | `.rs`, `Cargo.toml`                                                  | `target/debug/deps/` (from `cargo build --lib`) | Compiles multi-file `src/lib.rs` with Cargo edition, default features, and satisfiable local optional ones. |
 | **Go**      | `.go`, `go.mod`, `go.sum`                                            | `vendor/` (from `go mod vendor`)                | Offline `go build` (`CGO_ENABLED=0`, `GOPROXY=off`, `GOSUMDB=off`).                                         |
 
-If `tenet doctor` reports nested macOS Seatbelt (`sandbox-exec: Operation not permitted`), run `tenet check` or `tenet audit` outside the outer sandbox wrapper.
+If `tenet doctor` reports nested macOS Seatbelt (`sandbox-exec: Operation not permitted`), run `tenet scan` or `tenet check` outside the outer sandbox wrapper.
 
-### On-demand module audits (`tenet audit`)
+### Repository scanning (`tenet scan`)
 
-On repositories with few or no authored contracts yet, run `tenet audit` (requires `OPENROUTER_API_KEY`):
+On repositories with few or no authored contracts yet, or when hunting subtle defects across modules, run `tenet scan` (requires `OPENROUTER_API_KEY`):
 
 ```sh
-tenet audit                       # Discover production modules, synthesize contracts, falsify in sandbox
-tenet audit src/ --deep --json    # Add adversarial edge-case synthesis and emit a JSON witness queue
-tenet audit --save                # Persist verified contracts and pre-qualified pins into .contracts/
+tenet scan                       # Deep module discovery, contract synthesis, and sandboxed falsification
+tenet scan --shallow             # Lighter, faster scan without deep adversarial synthesis
+tenet scan --apply               # Persist consolidated contracts, scripts/, and scripts/.lock.json into .contracts/
+tenet scan --ephemeral --json    # Stage contracts in .tenet/scan/.contracts/ and emit a JSON witness queue
 ```
 
-`tenet audit` resumes from `.tenet/audit.json` unless `--fresh` is passed, never edits tracked files without `--save`, and groups findings by module so you can repair one module at a time without losing context.
+`tenet scan` defaults to deep mode (`--shallow` opts into a lighter pass; `--deep` is a compatibility no-op), resumes cached scan state unless `--fresh` is passed, never edits tracked files without `--apply` / `--yes`, and groups findings by module. Pass `--base REF` to focus on a diff, `--starter` to scaffold a starter contract, or `--max-requests N` to bound model calls. Override models with `TENET_AUDIT_MODEL` (synthesis, sharpening, skeptic filter) and `TENET_AGENT_MODEL` (sandbox probe qualification).
+
+`tenet scan --json` reports three distinct categories:
+
+1. **`witnesses` (`outcome: "failed"`)**: Executable probes that qualified against `good`/`defect`/`refactor` controls, survived skeptic review, and failed live on the current checkout, ranked by severity.
+2. **`guards` (`outcome: "passed"`)**: Qualified behavioral probes that currently pass on the checkout. Use `--apply` to commit them as standalone runnable scripts under `.contracts/<NNN>-<name>/scripts/` pinned by `scripts/.lock.json`.
+3. **`unresolved`**: Synthesis, sandbox, or skeptic-dismissed items. Inspect unresolved sandbox errors first when a compiled language fails to resolve dependencies (for example missing `node_modules/`, `.venv/`, `target/debug/deps/`, or `vendor/`).
 
 ### Two cache layers
 
-1. **Committed pin (`agent-checks.lock.json` beside `CONTRACT.md`)** stores qualified checks, concrete controls, and unautomatable `open` items. Auto-invalidates when `CONTRACT.md` changes, when the governed public surface changes, when a subject disappears, or on `--fresh`. Review and commit it so CI replays the exact same checks without regenerating.
-2. **Local replay receipt (`.tenet/agent-checks/`)** caches observed outcomes keyed by exact governed file bytes, pin digest, base commit, and runner version. Any byte edit to governed source busts the receipt immediately and replays frozen checks locally without spending a model request.
+1. **Committed scripts & slim lockfile (`scripts/` + `scripts/.lock.json` beside `CONTRACT.md`)** stores standalone runnable behavior scripts, slim SHA-256 `controlHash` lock entries, and unautomatable `open` items (`assets/` stays for catalog tool fragments). Auto-invalidates when `CONTRACT.md` changes, when the governed public surface changes, when a subject disappears, or on `--fresh`. Review and commit both `scripts/` and `scripts/.lock.json` so `tenet check --offline` and CI replay the exact same checks without regenerating. Legacy `agent-checks.lock.json` remains readable for compatibility.
+2. **Local replay receipts (`.tenet/offline-check.json` and `.tenet/agent-checks/`)** cache observed outcomes keyed by exact governed file bytes, lock digest, base commit, and runner version. Any byte edit to governed source busts the receipt immediately and replays locked scripts locally without spending a model request.
 
-### Using witnesses in broad audits
+### Witness triage & unified repair (`tenet fix`)
 
-Treat `× FAIL` behavior witnesses as verified starting points, not the complete defect list:
+Treat `× FAIL` behavior witnesses as high-signal verified leads inside a full-module sweep, never as the complete defect list:
 
-- Fix and re-verify every `× FAIL` witness first, then perform an unanchored sweep of the remaining governed code and `open` items so high-confidence witnesses do not cause tunnel vision.
-- For coding tasks, run `tenet fix` to apply supported tool fixes, repair remaining behaviors, and rerun `tenet check` with the same scope.
-- For review-only tasks, leave the checkout untouched and report confirmed findings.
+1. **Reproduce before editing**: Confirm each failing witness by running its script path printed by `tenet show` against the real module and checking its public docs and docstrings.
+2. **Respect pre-existing green tests**: Never weaken or edit pre-existing test files to fit a witness. If a witness contradicts an explicitly asserted green test, skip that witness and treat the repository's test suite as authoritative.
+3. **Fix highest severity first, then sweep the module**: Repair the highest-severity defects (crashes, state/input mutations, round-trip contradictions) first and checkpoint after every green fix. Then perform an unanchored sweep of the remaining governed code and `open` items so high-confidence witnesses do not cause tunnel vision.
+4. **Use unified `tenet fix` for coding tasks**: Run `tenet fix` (or `tenet fix --severity critical|high|medium`) to apply safe native lint fixes and repair failing runtime checks or witnesses across `.contracts/`, `.tenet/scan/.contracts/`, or `.tenet/audit.json` (no `--from-audit` flag required). Re-verify with `tenet check --offline` and, when checking semantic rules, `tenet check` on the same scope.
+5. **Leave checkouts clean for review-only tasks**: Do not modify files during review-only tasks; report confirmed findings with evidence.
+6. **Lock in verified fixes**: Run `tenet scan --apply` (or `tenet check --contract NAME`) after fixing to retain durable runnable regression scripts and `scripts/.lock.json` locks.
 
 ## Investigate
 

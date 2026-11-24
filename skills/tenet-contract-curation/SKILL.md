@@ -46,7 +46,7 @@ A good contract leaves one right way to write the code it covers, and a tool or 
 - **Choose on merits**: Write examples in each candidate form and pick the cleanest, most enforceable option with the fewest exceptions. Use code-change volume to plan rollout, never to pick the form.
 - **Keep thresholds in config**: State the requirement in prose ("declare a maximum function length") and keep the number in tool configuration.
 - **Validate examples against all contracts**: A violation example breaks only the rule it illustrates; an allowed example breaks none.
-- **Split diverging concerns**: A single contract may combine executable behavior checks (`checks` in `agent-checks.lock.json`) and manual-review clauses (`open` items) when they share one concern and `paths` scope. Split into separate contracts when concerns or file scopes diverge so editing one rule does not invalidate unrelated behavior pins.
+- **Split diverging concerns**: A single contract may combine executable behavior scripts (`scripts/` pinned by `scripts/.lock.json`; legacy `agent-checks.lock.json` remains readable for compatibility) and manual-review clauses (`open` items) when they share one concern and `paths` scope. Split into separate contracts when concerns or file scopes diverge so editing one rule does not invalidate unrelated behavior locks.
 
 ## Word rules for a model reviewer
 
